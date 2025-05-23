@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Service Station{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+<nav class="bg-gray-800 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="{% url 'home' %}" class="text-2xl font-bold">Gaming Studio</a>
+        <div class="space-x-4">
+            <a href="{% url 'home' %}" class="hover:text-blue-400">Home</a>
+            <a href="{% url 'games' %}" class="hover:text-blue-400">Games</a>
+            <a href="{% url 'news' %}" class="hover:text-blue-400">News</a>
+            <a href="{% url 'team' %}" class="hover:text-blue-400">Team</a>
+            <a href="{% url 'community' %}" class="hover:text-blue-400">Community</a>
+            <a href="{% url 'contact' %}" class="hover:text-blue-400">Contact</a>
+            <a href="{% url 'donate' %}" class="hover:text-blue-400">Donate</a>
+        </div>
+    </div>
+</nav>
+
+    <main class="container mx-auto p-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer class="bg-gray-800 p-4 text-center">
+        <p>© 2025 Gaming Studio. All rights reserved.</p>
+    </footer>
+</body>
+</html>
