@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% extends 'studio/base.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Donations</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-6 max-w-lg bg-gray-800 rounded-lg shadow-xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-red-400">Reset Donations</h1>
+        <p class="text-center mb-6">Are you sure you want to reset all donations? This action cannot be undone.</p>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                Confirm Reset
+            </button>
+        </form>
+        <div class="mt-4 text-center">
+            <a href="{% url 'donate' %}" class="text-blue-400 hover:text-blue-300 underline">Cancel</a>
+        </div>
+    </div>
+</body>
+</html>

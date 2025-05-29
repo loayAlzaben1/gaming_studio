@@ -1,16 +1,26 @@
 {% extends 'studio/base.html' %}
-     {% block title %}News - Gaming Studio{% endblock %}
-     {% block content %}
-         <section class="py-8">
-             <h1 class="text-4xl font-bold text-center mb-6">Latest News</h1>
-             <div class="space-y-6">
-                 {% for post in posts %}
-                     <div class="bg-gray-800 p-6 rounded-lg">
-                         <h2 class="text-2xl font-bold">{{ post.title }}</h2>
-                         <p class="text-gray-500">{{ post.created_at|date:"F d, Y" }} | By {{ post.author }}</p>
-                         <p class="text-gray-400 mt-2">{{ post.content|truncatewords:50 }}</p>
-                     </div>
-                 {% endfor %}
-             </div>
-         </section>
-     {% endblock %}
+{% block title %}News - Gaming Studio{% endblock %}
+{% block content %}
+<section class="py-8 min-h-screen">
+    <h1 class="text-4xl font-bold text-center mb-6 text-blue-400">Latest News</h1>
+    <div class="container mx-auto p-6">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
+            <div class="space-y-6">
+                {% for post in posts %}
+                    <div class="bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition duration-300">
+                        <h2 class="text-2xl font-bold text-yellow-400 mb-2">{{ post.title }}</h2>
+                        <p class="text-gray-500 mb-2">{{ post.created_at|date:"F d, Y" }} | By {{ post.author }}</p>
+                        <p class="text-gray-400">{{ post.content|truncatewords:30 }}</p>
+                        <a href="#" class="mt-4 inline-block text-blue-400 hover:underline">Read More</a>
+                    </div>
+                {% empty %}
+                    <p class="text-center text-gray-400">No news posts available.</p>
+                {% endfor %}
+            </div>
+            <div class="mt-8 text-center">
+                <a href="{% url 'news' %}" class="text-blue-400 hover:underline">Load More News</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

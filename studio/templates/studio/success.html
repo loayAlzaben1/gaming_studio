@@ -1,0 +1,13 @@
+{% extends 'studio/base.html' %}
+{% block title %}Donation Successful{% endblock %}
+{% block content %}
+<div class="container mx-auto p-6 max-w-lg text-center">
+    <h1 class="text-4xl font-bold text-green-400 mb-6 animate-pulse">Thank You for Your Donation!</h1>
+    <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+        <p class="text-lg text-gray-300 mb-4">We’ve received your donation of <span class="text-yellow-400 font-semibold">${{ donation.amount|floatformat:2 }}</span>.</p>
+        <p class="text-lg text-gray-300">Donated by: <span class="text-green-400 font-semibold">{{ donation.donor_name }}</span></p>
+        <p class="text-lg text-gray-300 mt-4">Your support helps us continue creating amazing games!</p>
+        <a href="{% url 'donate' %}" class="inline-block mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Back to Donate</a>
+    </div>
+</div>
+{% endblock %}

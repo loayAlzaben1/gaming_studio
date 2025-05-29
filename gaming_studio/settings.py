@@ -8,15 +8,12 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u+#r&785v2*i=0z@28^af7x9$b5ghfjal_a-c-!41-vtz4*45b'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-u+#r&785v2*i=0z@28^af7x9$b5ghfjal_a-c-!41-vtz4*45b')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '4cab-91-186-251-209.ngrok-free.app']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '4cab-91-186-251-209.ngrok-free.app', 'LoayAlzaben.pythonanywhere.com']
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -60,19 +57,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gaming_studio.wsgi.application'
 
-# Database
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gaming_studio_db',
-        'USER': 'postgres',
-        'PASSWORD': 'loay998877loay',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME', 'gaming_studio_db'),
+        'USER': os.getenv('DB_USER', 'your_postgres_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'your_postgres_password'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
-# Password validation
+# On PythonAnywhere, override with deployment settings
+if os.getenv('DEPLOY_ENV') == 'pythonanywhere':
+    DATABASES['default'].update({
+        'USER': os.getenv('DB_USER', 'LoayAlzaben'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'your-postgres-password'),
+        'HOST': os.getenv('DB_HOST', 'LoayAlzaben-1234.postgres.pythonanywhere-services.com'),
+        'PORT': os.getenv('DB_PORT', '11234'),
+    })
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -80,18 +85,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

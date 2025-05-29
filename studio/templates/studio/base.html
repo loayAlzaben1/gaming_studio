@@ -4,32 +4,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}Service Station{% endblock %}</title>
+    <title>{% block title %}Gaming Studio{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Particle Container */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            pointer-events: none;
+            background: #1a202c; /* Fallback background color */
+            z-index: 0;
+        }
+        /* Typography and General Styles */
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: transparent;
+        }
+        h1, h2, h3 {
+            font-family: 'Press Start 2P', cursive;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        .text-neon {
+            color: #00ffcc;
+            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+        }
+        /* Navbar Styles */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: linear-gradient(90deg, #1a202c, #2d3748);
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            color: #a0aec0;
+            transition: all 0.3s ease;
+        }
+        .navbar a:hover, .navbar a.active {
+            color: #00ffcc;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: #2d3748;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 4px;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a {
+            color: #a0aec0;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background: #4a5568;
+            color: #00ffcc;
+        }
+        /* Button Styles */
+        .btn-neon {
+            background: linear-gradient(45deg, #00ffcc, #ff00ff);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #fff;
+        }
+        .btn-neon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #00ffcc;
+        }
+        /* Slow Spin Animation for Gamepad Icon */
+        .animate-spin-slow {
+            animation: spin 6s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white">
-<nav class="bg-gray-800 p-4">
-    <div class="container mx-auto flex justify-between items-center">
-        <a href="{% url 'home' %}" class="text-2xl font-bold">Gaming Studio</a>
-        <div class="space-x-4">
-            <a href="{% url 'home' %}" class="hover:text-blue-400">Home</a>
-            <a href="{% url 'games' %}" class="hover:text-blue-400">Games</a>
-            <a href="{% url 'news' %}" class="hover:text-blue-400">News</a>
-            <a href="{% url 'team' %}" class="hover:text-blue-400">Team</a>
-            <a href="{% url 'community' %}" class="hover:text-blue-400">Community</a>
-            <a href="{% url 'contact' %}" class="hover:text-blue-400">Contact</a>
-            <a href="{% url 'donate' %}" class="hover:text-blue-400">Donate</a>
+<body class="text-white relative">
+    <div class="particles"><canvas id="particleCanvas"></canvas></div>
+    <nav class="navbar">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold flex items-center text-neon">
+                <i class="fas fa-gamepad mr-2 text-blue-400 animate-spin-slow"></i>
+                Gaming Studio
+            </a>
+            <div class="space-x-4 flex items-center">
+                <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %} hover:text-neon">Home</a>
+                <div class="dropdown">
+                    <a href="#" class="hover:text-neon">Games</a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'games' %}">All Games</a>
+                        <a href="#">Featured</a>
+                        <a href="#">Upcoming</a>
+                    </div>
+                </div>
+                <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}active{% endif %} hover:text-neon">Team</a>
+                <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}active{% endif %} hover:text-neon">Community</a>
+                <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %} hover:text-neon">Contact</a>
+                <a href="{% url 'donate' %}" class="btn-neon">Donate</a>
+            </div>
         </div>
-    </div>
-</nav>
-
-    <main class="container mx-auto p-4">
+    </nav>
+    <main class="container mx-auto p-4 relative z-10">
         {% block content %}
         {% endblock %}
     </main>
-    <footer class="bg-gray-800 p-4 text-center">
+    <footer class="bg-gray-800 bg-opacity-80 p-6 text-center relative z-10">
+        <div class="mb-4 flex justify-center space-x-6">
+            <i class="fas fa-skull-crossbones text-4xl text-red-400 animate-pulse"></i>
+            <i class="fas fa-shield-alt text-4xl text-yellow-400 animate-pulse"></i>
+            <i class="fas fa-gem text-4xl text-green-400 animate-pulse"></i>
+        </div>
+        <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2 text-neon">Follow Us</h3>
+            <div class="flex justify-center space-x-4">
+                <a href="https://twitter.com" target="_blank" class="text-blue-400 hover:text-neon">Twitter</a>
+                <a href="https://instagram.com" target="_blank" class="text-blue-400 hover:text-neon">Instagram</a>
+                <a href="https://youtube.com" target="_blank" class="text-blue-400 hover:text-neon">YouTube</a>
+                <a href="https://discord.gg/your-server-link" target="_blank" class="text-blue-400 hover:text-neon">Discord</a>
+            </div>
+        </div>
+        <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2 text-neon">Subscribe to Our Newsletter</h3>
+            <form method="POST" action="{% url 'newsletter_subscribe' %}" class="flex justify-center">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Enter your email" class="p-2 rounded-l bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-neon" required>
+                <button type="submit" class="btn-neon p-2 rounded-r">Subscribe</button>
+            </form>
+        </div>
         <p>© 2025 Gaming Studio. All rights reserved.</p>
     </footer>
+    <script>
+        // Particle System
+        class Particle {
+            constructor(x, y, size, color) {
+                this.x = x;
+                this.y = y;
+                this.baseX = x;
+                this.baseY = y;
+                this.size = size;
+                this.color = color;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speedY = (Math.random() - 0.5) * 1.5;
+                this.angle = 0;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+                this.opacity = 0.8;
+                this.glow = 0.6;
+                this.trail = [];
+                this.trailLength = 10;
+            }
+
+            update(mouseX, mouseY) {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 100) {
+                    const force = (100 - distance) / 100;
+                    this.speedX += (dx / distance) * force * 0.5;
+                    this.speedY += (dy / distance) * force * 0.5;
+                }
+
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.angle += this.rotationSpeed;
+
+                this.trail.push({ x: this.x, y: this.y, opacity: 0.5 });
+                if (this.trail.length > this.trailLength) this.trail.shift();
+
+                if (this.x < 0 || this.x > window.innerWidth) this.speedX *= -1;
+                if (this.y < 0 || this.y > window.innerHeight) this.speedY *= -1;
+
+                if (Math.abs(this.x - this.baseX) > 100 || Math.abs(this.y - this.baseY) > 100) {
+                    this.x = this.baseX;
+                    this.y = this.baseY;
+                }
+
+                particles.forEach(other => {
+                    if (other !== this) {
+                        const dx = this.x - other.x;
+                        const dy = this.y - other.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < this.size + other.size + 10) {
+                            const angle = Math.atan2(dy, dx);
+                            const overlap = (this.size + other.size + 10 - dist) / 2;
+                            this.x += Math.cos(angle) * overlap;
+                            this.y += Math.sin(angle) * overlap;
+                            this.speedX += Math.cos(angle) * 0.1;
+                            this.speedY += Math.sin(angle) * 0.1;
+                        }
+                    }
+                });
+
+                this.opacity = Math.sin(Date.now() / 200) * 0.4 + 0.4;
+                this.glow = Math.sin(Date.now() / 200) * 0.2 + 0.6;
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                this.trail.forEach((point, index) => {
+                    const scale = index / this.trailLength;
+                    ctx.arc(point.x, point.y, this.size * scale, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${this.color.join(',')}, ${point.opacity * scale})`;
+                    ctx.fill();
+                });
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.join(',')}, ${this.opacity})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `rgba(${this.color.join(',')}, ${this.glow})`;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Spark extends Particle {
+            constructor(x, y) {
+                super(x, y, Math.random() * 3 + 1, [255, 255, 255]);
+                this.life = 1;
+                this.speedX = (Math.random() - 0.5) * 3;
+                this.speedY = (Math.random() - 0.5) * 3;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.02;
+                this.opacity = this.life;
+                this.glow = this.life;
+                return this.life > 0;
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = `rgba(255, 255, 255, ${this.glow})`;
+                ctx.fill();
+            }
+        }
+
+        let particles = window.globalParticles || [];
+        let sparks = window.globalSparks || [];
+        const colors = [
+            [59, 130, 246],  // Blue
+            [6, 182, 212],   // Cyan
+            [147, 51, 234],  // Purple
+            [16, 185, 129],  // Green
+            [239, 68, 68]    // Red
+        ];
+        const sizes = [2, 4, 6];
+
+        function initParticles() {
+            const particleCount = 20;
+            const canvasElement = document.getElementById('particleCanvas');
+            const ctx = canvasElement.getContext('2d');
+
+            canvasElement.style.width = '100%';
+            canvasElement.style.height = '100vh';
+            canvasElement.width = window.innerWidth;
+            canvasElement.height = window.innerHeight;
+
+            if (particles.length === 0) {
+                for (let i = 0; i < particleCount; i++) {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    const size = sizes[Math.floor(Math.random() * sizes.length)];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    particles.push(new Particle(x, y, size, color));
+                }
+            } else {
+                particles.forEach(p => {
+                    p.baseX = (p.baseX / window.innerWidth) * window.innerWidth;
+                    p.baseY = (p.baseY / window.innerHeight) * window.innerHeight;
+                    p.x = (p.x / window.innerWidth) * window.innerWidth;
+                    p.y = (p.y / window.innerHeight) * window.innerHeight;
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                particles.forEach(particle => {
+                    particle.update(mouseX, mouseY);
+                    particle.draw(ctx);
+                });
+
+                sparks = sparks.filter(spark => spark.update());
+                sparks.forEach(spark => spark.draw(ctx));
+                if (Math.random() < 0.02) {
+                    sparks.push(new Spark(Math.random() * window.innerWidth, Math.random() * window.innerHeight));
+                }
+
+                window.globalParticles = particles;
+                window.globalSparks = sparks;
+
+                requestAnimationFrame(animate);
+            }
+
+            let mouseX = 0, mouseY = 0;
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvasElement.width = window.innerWidth;
+                canvasElement.height = window.innerHeight;
+                particles.forEach(p => {
+                    p.baseX = (p.baseX / window.innerWidth) * window.innerWidth;
+                    p.baseY = (p.baseY / window.innerHeight) * window.innerHeight;
+                    p.x = (p.x / window.innerWidth) * window.innerWidth;
+                    p.y = (p.y / window.innerHeight) * window.innerHeight;
+                });
+            });
+        }
+
+        if (!window.particlesInitialized) {
+            initParticles();
+            window.particlesInitialized = true;
+        } else {
+            const canvasElement = document.getElementById('particleCanvas');
+            canvasElement.width = window.innerWidth;
+            canvasElement.height = window.innerHeight;
+        }
+    </script>
 </body>
 </html>

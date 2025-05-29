@@ -1,41 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaming Studio - Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <!-- Navigation Bar -->
-    <nav class="bg-gray-800 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-400">Gaming Studio</a>
-            <div class="space-x-4">
-                <a href="{% url 'home' %}" class="hover:text-blue-400">Home</a>
-                <a href="{% url 'games' %}" class="hover:text-blue-400">Games</a>
-                <a href="{% url 'news' %}" class="hover:text-blue-400">News</a>
-                <a href="{% url 'team' %}" class="hover:text-blue-400">Team</a>
-                <a href="{% url 'community' %}" class="hover:text-blue-400">Community</a>
-                <a href="{% url 'contact' %}" class="hover:text-blue-400">Contact</a>
-                <a href="{% url 'donate' %}" class="hover:text-blue-400">Donate</a>
+{% extends 'studio/base.html' %}
+{% block title %}Home - Gaming Studio{% endblock %}
+{% block content %}
+<section class="relative min-h-screen">
+    <!-- Hero Section -->
+    <div class="relative bg-cover bg-center h-96" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-5xl font-bold text-white mb-4 animate-pulse">Welcome to Gaming Studio</h1>
+                <p class="text-xl text-gray-300 mb-6">Creating epic gaming experiences since 2023</p>
+                <a href="{% url 'donate' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">Support Us Today</a>
             </div>
         </div>
-    </nav>
-
-    <!-- Home Content -->
+    </div>
+    <!-- Featured Games -->
     <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold text-center mb-6 text-blue-400">Welcome to Gaming Studio</h1>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {% for game in featured_games %}
-                <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <h2 class="text-xl font-semibold">{{ game.name }}</h2>
-                    <p>{{ game.description }}</p>
-                </div>
-            {% empty %}
-                <p>No featured games available.</p>
-            {% endfor %}
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
+            <h2 class="text-3xl font-bold text-center mb-8 text-yellow-400">Featured Games</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for game in featured_games %}
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300">
+                        {% if game.cover_image %}
+                            <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-700 flex items-center justify-center">
+                                <span class="text-gray-400">No Image</span>
+                            </div>
+                        {% endif %}
+                        <div class="p-4">
+                            <h3 class="text-xl font-semibold text-yellow-400">{{ game.title }}</h3>
+                            <p class="text-gray-400 mt-2">{{ game.description|truncatewords:15 }}</p>
+                            <a href="{% url 'games' %}" class="mt-4 inline-block text-blue-400 hover:underline">Learn More</a>
+                        </div>
+                        <!-- Devlog Section -->
+                        <div class="p-4 bg-gray-700 rounded-b-lg">
+                            <h4 class="text-lg font-semibold text-green-400 mb-2 flex items-center">
+                                <i class="fas fa-code-branch mr-2"></i> Devlog
+                                <button id="toggle-devlog-{{ game.id }}" class="ml-2 text-blue-400 hover:text-blue-300 underline focus:outline-none text-sm" onclick="toggleDevlog('devlog-{{ game.id }}', 'toggle-devlog-{{ game.id }}')">
+                                    Show Devlog
+                                </button>
+                            </h4>
+                            <div id="devlog-{{ game.id }}" class="hidden">
+                                {% if game.devlog_video_entries.exists %}
+                                    <div class="grid grid-cols-1 gap-4">
+                                        {% for devlog in game.devlog_video_entries.all %}
+                                            <div class="bg-gray-800 p-3 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                                                <iframe class="w-full h-32 rounded" src="{{ devlog.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
+                                                <h5 class="text-md font-medium text-white mt-2">{{ devlog.title }}</h5>
+                                                <p class="text-gray-400 text-sm mt-1">{{ devlog.description|truncatewords:15 }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-gray-400 text-center text-sm">No devlog videos available yet.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center text-gray-400">No featured games available.</p>
+                {% endfor %}
+            </div>
         </div>
     </div>
-</body>
-</html>
+    <!-- Call to Action -->
+    <div class="bg-gray-800 py-12 text-center">
+        <h2 class="text-2xl font-semibold text-yellow-400 mb-4">Join Our Community</h2>
+        <p class="text-gray-300 mb-6">Stay updated with the latest news and events!</p>
+        <a href="{% url 'community' %}" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Get Involved</a>
+    </div>
+</section>
+<script>
+    function toggleDevlog(devlogId, buttonId) {
+        const devlog = document.getElementById(devlogId);
+        const button = document.getElementById(buttonId);
+        if (devlog.classList.contains('hidden')) {
+            devlog.classList.remove('hidden');
+            devlog.classList.add('block');
+            button.textContent = 'Hide Devlog';
+        } else {
+            devlog.classList.add('hidden');
+            devlog.classList.remove('block');
+            button.textContent = 'Show Devlog';
+        }
+    }
+</script>
+{% endblock %}

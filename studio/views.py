@@ -1,109 +1,165 @@
-from pathlib import Path
-from dotenv import load_dotenv
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
+import paypalrestsdk
 import os
-import django_heroku
+from dotenv import load_dotenv
+from .models import ContactMessage, Donation, Game, TeamMember
+from .forms import DonationForm
+from django.contrib import messages
+from django.db.models import Sum
+from decimal import Decimal
 
-# Load .env variables
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
+# Load environment variables
+load_dotenv()
 
-# Base directory
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Initialize PayPal SDK with error handling
+paypal_client_id = os.getenv("PAYPAL_CLIENT_ID")
+paypal_client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-u+#r&785v2*i=0z@28^af7x9$b5ghfjal_a-c-!41-vtz4*45b')
+print(f"PayPal Client ID: {paypal_client_id}")
+print(f"PayPal Client Secret: {paypal_client_secret}")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-
-# Allow Heroku host
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '4cab-91-186-251-209.ngrok-free.app', '*.herokuapp.com']
-
-# Application definition
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'studio',
-    'crispy_forms',
-    'crispy_bootstrap4',
-]
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-ROOT_URLCONF = 'gaming_studio.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'gaming_studio.wsgi.application'
-
-# Database - Heroku will override this with PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gaming_studio_db',
-        'USER': 'postgres',
-        'PASSWORD': 'loay998877loay',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-
-# Password validation
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-
-# Static files
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / "media"
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Configure PayPal SDK (move this to views.py as it's already there)
-client_id = os.getenv("PAYPAL_CLIENT_ID")
-client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
-
-if not client_id or not client_secret:
+if not paypal_client_id or not paypal_client_secret:
     raise ValueError("PayPal Client ID or Secret not found in environment variables.")
 
-# Configure Django for Heroku (must be at the bottom)
-django_heroku.settings(locals())
+try:
+    paypalrestsdk.configure({
+        "mode": "live",
+        "client_id": paypal_client_id,
+        "client_secret": paypal_client_secret
+    })
+except Exception as e:
+    print(f"PayPal configuration error: {e}")
+
+    raise
+def news(request):
+    return render(request, 'studio/news.html', {})
+
+def home(request):
+    featured_games = Game.objects.filter(is_featured=True).prefetch_related('devlog_video_entries')
+    return render(request, 'studio/home.html', {'featured_games': featured_games})
+
+def games(request):
+    games = Game.objects.all().prefetch_related('photos', 'videos', 'devlog_video_entries')
+    return render(request, 'studio/games.html', {'games': games})
+
+def donate(request):
+    """Handle donation via PayPal."""
+    total_donations = Donation.objects.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    goal = Decimal('1000.00')
+    progress = min((total_donations / goal) * 100, 100)
+    donations = Donation.objects.order_by('-donated_at')[:5]
+
+    if request.method == "POST":
+        form = DonationForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            donor_name = form.cleaned_data['donor_name'] or "Anonymous"
+            request.session['donor_name'] = donor_name
+            try:
+                payment = paypalrestsdk.Payment({
+                    "intent": "sale",
+                    "payer": {"payment_method": "paypal"},
+                    "transactions": [{
+                        "amount": {"total": f"{amount:.2f}", "currency": "USD"},
+                        "description": f"Donation of ${amount:.2f} to Gaming Studio by {donor_name}"
+                    }],
+                    "redirect_urls": {
+                        "return_url": request.build_absolute_uri("/donate/success/"),
+                        "cancel_url": request.build_absolute_uri("/cancel/")
+                    }
+                })
+                if payment.create():
+                    for link in payment.links:
+                        if link.method == "REDIRECT":
+                            return HttpResponseRedirect(link.href)
+                else:
+                    print(f"Payment creation failed: {payment.error}")
+                    return render(request, 'studio/donate.html', {'form': form, 'error': f"Payment creation failed: {payment.error}", 'total_donations': total_donations, 'progress': progress, 'donations': donations})
+            except paypalrestsdk.exceptions.UnauthorizedAccess as e:
+                print(f"UnauthorizedAccess error: {e}")
+                messages.error(request, f"Payment failed due to authorization error: {e}")
+                return render(request, 'studio/donate.html', {'form': form, 'total_donations': total_donations, 'progress': progress, 'donations': donations})
+            except Exception as e:
+                print(f"Unexpected error during payment creation: {e}")
+                messages.error(request, f"An unexpected error occurred: {e}")
+                return render(request, 'studio/donate.html', {'form': form, 'total_donations': total_donations, 'progress': progress, 'donations': donations})
+        else:
+            return render(request, 'studio/donate.html', {'form': form, 'total_donations': total_donations, 'progress': progress, 'donations': donations})
+    else:
+        form = DonationForm()
+    return render(request, 'studio/donate.html', {'form': form, 'total_donations': total_donations, 'progress': progress, 'donations': donations})
+
+def donate_success(request):
+    """Handle successful donation and save to database."""
+    payment_id = request.GET.get('paymentId')
+    payer_id = request.GET.get('PayerID')
+    if not payment_id or not payer_id:
+        return HttpResponse("Missing paymentId or PayerID in the request.")
+
+    try:
+        payment = paypalrestsdk.Payment.find(payment_id)
+        if payment.execute({"payer_id": payer_id}):
+            amount = float(payment.transactions[0].amount.total)
+            donor_name = request.session.get('donor_name', 'Anonymous')
+            donation = Donation(
+                amount=amount,
+                donor_name=donor_name,
+                donated_at=payment.create_time
+            )
+            donation.save()
+            if 'donor_name' in request.session:
+                del request.session['donor_name']
+            messages.success(request, f"Thank you, {donor_name}, for your generous donation of ${amount:.2f}!")
+            return render(request, 'studio/success.html', {'donation': donation})
+        else:
+            print(f"Payment execution failed: {payment.error}")
+            return HttpResponse(f"Payment execution failed: {payment.error}")
+    except paypalrestsdk.exceptions.UnauthorizedAccess as e:
+        print(f"UnauthorizedAccess error: {e}")
+        return HttpResponse(f"Payment execution failed due to authorization error: {e}")
+    except Exception as e:
+        print(f"Unexpected error during payment execution: {e}")
+        return HttpResponse(f"An unexpected error occurred: {e}")
+
+def team(request):
+    team_members = TeamMember.objects.all()
+    return render(request, 'studio/team.html', {'team_members': team_members})
+
+def contact(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        if name and email and message:
+            ContactMessage.objects.create(name=name, email=email, message=message)
+            send_mail(
+                'New Contact Message',
+                f"From: {name} ({email})\n\n{message}",
+                email,
+                ['your-email@example.com'],  # Replace with your email
+                fail_silently=False,
+            )
+            messages.success(request, "Thank you! Your message has been sent.")
+        else:
+            messages.error(request, "All fields are required.")
+        return redirect('contact')
+    return render(request, 'studio/contact.html')
+    
+
+def community(request):
+    """Render the community page."""
+    return render(request, 'studio/community.html')
+
+def cancel(request):
+    """Handle cancelled donation."""
+    messages.info(request, "Donation was cancelled.")
+    return render(request, 'studio/cancel.html')
+
+def newsletter_subscribe(request):
+    """Handle newsletter subscriptions."""
+    if request.method == "POST":
+        email = request.POST.get('email')
+        messages.success(request, "Thank you for subscribing to our newsletter!")
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+    return redirect('home')

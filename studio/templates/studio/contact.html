@@ -1,25 +1,43 @@
 {% extends 'studio/base.html' %}
-     {% block title %}Contact - Gaming Studio{% endblock %}
-     {% block content %}
-         <section class="py-8">
-             <h1 class="text-4xl font-bold text-center mb-6">Get in Touch</h1>
-             <div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg">
-                 <form method="POST">
-                     {% csrf_token %}
-                     <div class="mb-4">
-                         <label for="name" class="block text-gray-400">Name</label>
-                         <input type="text" name="name" id="name" class="w-full p-2 rounded bg-gray-700 text-white" required>
-                     </div>
-                     <div class="mb-4">
-                         <label for="email" class="block text-gray-400">Email</label>
-                         <input type="email" name="email" id="email" class="w-full p-2 rounded bg-gray-700 text-white" required>
-                     </div>
-                     <div class="mb-4">
-                         <label for="message" class="block text-gray-400">Message</label>
-                         <textarea name="message" id="message" rows="4" class="w-full p-2 rounded bg-gray-700 text-white" required></textarea>
-                     </div>
-                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Send Message</button>
-                 </form>
-             </div>
-         </section>
-     {% endblock %}
+{% block title %}Contact - Gaming Studio{% endblock %}
+{% block content %}
+<section class="relative min-h-screen">
+    <!-- Hero Section -->
+    <div class="relative bg-cover bg-center h-64" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+            <h1 class="text-5xl font-bold text-white animate-pulse flex items-center">
+                <i class="fas fa-envelope mr-2"></i> Contact Us
+            </h1>
+        </div>
+    </div>
+    <div class="container mx-auto p-6 max-w-lg">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
+            <!-- Display Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-600{% else %}bg-red-600{% endif %} text-white text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- Contact Form -->
+            <form method="POST" action="{% url 'contact' %}" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label for="name" class="block text-gray-300 mb-1">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" class="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                </div>
+                <div>
+                    <label for="email" class="block text-gray-300 mb-1">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" class="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                </div>
+                <div>
+                    <label for="message" class="block text-gray-300 mb-1">Message</label>
+                    <textarea id="message" name="message" placeholder="Your Message" class="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded transition duration-300">Send Message</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

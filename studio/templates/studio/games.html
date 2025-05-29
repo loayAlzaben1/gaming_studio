@@ -1,20 +1,102 @@
 {% extends 'studio/base.html' %}
 {% block title %}Games - Gaming Studio{% endblock %}
 {% block content %}
-    <section class="py-8">
-        <h2 class="text-3xl font-bold text-center mb-6">Our Games</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {% for game in games %}
-                <div class="bg-gray-800 rounded-lg overflow-hidden">
-                    <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-xl font-bold">{{ game.title }}</h3>
-                        <p class="text-gray-400">{{ game.description|truncatewords:20 }}</p>
-                        <p class="text-gray-500">Platform: {{ game.platform }}</p>
-                        <a href="{{ game.trailer_link }}" class="text-blue-400 hover:underline">Watch Trailer</a>
+<section class="py-8 min-h-screen">
+    <h1 class="text-4xl font-bold text-center mb-6 text-blue-400">Our Games</h1>
+    <div class="container mx-auto p-6">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for game in games %}
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300">
+                        <!-- Cover Image -->
+                        <div class="w-full">
+                            {% if game.cover_image %}
+                                <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-48 object-cover rounded-t-lg">
+                            {% else %}
+                                <div class="w-full h-48 bg-gray-700 flex items-center justify-center rounded-t-lg">
+                                    <span class="text-gray-400">No Cover Image</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- Game Title and Toggle Button -->
+                        <div class="p-4">
+                            <h3 class="text-2xl font-bold text-yellow-400">{{ game.title }}</h3>
+                            <p class="text-gray-400 mt-2">{{ game.description|truncatewords:15 }}</p>
+                            <button id="toggle-{{ game.id }}" class="mt-2 text-blue-400 hover:text-blue-300 underline focus:outline-none" onclick="toggleDetails('details-{{ game.id }}', 'toggle-{{ game.id }}')">
+                                View Details
+                            </button>
+                        </div>
+                        <!-- Collapsible Details Section -->
+                        <div id="details-{{ game.id }}" class="hidden p-4 bg-gray-700 rounded-b-lg transition-all duration-300">
+                            <p class="text-gray-400 mb-4">{{ game.description }}</p>
+                            <p class="text-gray-500 mb-2">Platform: {{ game.platform }}</p>
+                            <p class="text-gray-500 mb-4">Release Date: {{ game.release_date|date:"F d, Y" }}</p>
+                            {% if game.trailer_link %}
+                                <a href="{{ game.trailer_link }}" target="_blank" class="inline-block mt-2 text-blue-400 hover:underline">Watch Trailer</a>
+                            {% endif %}
+                            <!-- Inline Photos -->
+                            {% if game.photos.exists %}
+                                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {% for photo in game.photos.all %}
+                                        <div>
+                                            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-32 object-cover rounded">
+                                            <p class="text-gray-400 text-center mt-1">{{ photo.caption|default:"Screenshot" }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <!-- Inline Videos -->
+                            {% if game.videos.exists %}
+                                <div class="mt-4 grid grid-cols-1 gap-2">
+                                    {% for video in game.videos.all %}
+                                        <div>
+                                            <iframe class="w-full h-32 rounded" src="{{ video.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
+                                            <p class="text-gray-400 text-center mt-1">{{ video.title|default:"Video" }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- Devlog Section -->
+                        <div class="p-4 bg-gray-700 rounded-b-lg">
+                            <h4 class="text-xl font-semibold text-green-400 mb-2 flex items-center">
+                                <i class="fas fa-code-branch mr-2"></i> Devlog
+                            </h4>
+                            {% if game.devlog_video_entries.exists %}
+                                <div class="grid grid-cols-1 gap-4">
+                                    {% for devlog in game.devlog_video_entries.all %}
+                                        <div class="bg-gray-800 p-3 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                                            <iframe class="w-full h-32 rounded" src="{{ devlog.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
+                                            <h5 class="text-md font-medium text-white mt-2">{{ devlog.title }}</h5>
+                                            <p class="text-gray-400 text-sm mt-1">{{ devlog.description|truncatewords:15 }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-gray-400 text-center">No devlog videos available yet.</p>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% empty %}
+                    <p class="text-center text-gray-400">No games available yet.</p>
+                {% endfor %}
+            </div>
         </div>
-    </section>
+    </div>
+</section>
+<script>
+    function toggleDetails(detailsId, buttonId) {
+        const details = document.getElementById(detailsId);
+        const button = document.getElementById(buttonId);
+        if (details.classList.contains('hidden')) {
+            details.classList.remove('hidden');
+            details.classList.add('block');
+            button.textContent = 'Hide Details';
+        } else {
+            details.classList.add('hidden');
+            details.classList.remove('block');
+            button.textContent = 'View Details';
+        }
+    }
+</script>
 {% endblock %}
