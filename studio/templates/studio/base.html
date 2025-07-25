@@ -106,12 +106,15 @@
 <body class="text-white relative">
     <div class="particles"><canvas id="particleCanvas"></canvas></div>
     <nav class="navbar">
-        <div class="container mx-auto flex justify-between items-center">
+        <div class="container mx-auto flex justify-between items-center relative">
             <a href="{% url 'home' %}" class="text-2xl font-bold flex items-center text-neon">
                 <i class="fas fa-gamepad mr-2 text-blue-400 animate-spin-slow"></i>
-                Gaming Studio
+                <span class="hidden sm:inline">Gaming Studio</span>
+                <span class="sm:hidden">GS</span>
             </a>
-            <div class="space-x-4 flex items-center">
+            
+            <!-- Desktop Menu -->
+            <div class="space-x-4 flex items-center hidden md:flex">
                 <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %} hover:text-neon">Home</a>
                 <div class="dropdown">
                     <a href="#" class="hover:text-neon">Games</a>
@@ -125,6 +128,35 @@
                 <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}active{% endif %} hover:text-neon">Community</a>
                 <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %} hover:text-neon">Contact</a>
                 <a href="{% url 'donate' %}" class="btn-neon">Donate</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <div class="mobile-menu-button md:hidden" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden">
+                <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %} hover:text-neon">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <a href="{% url 'games' %}" class="hover:text-neon">
+                    <i class="fas fa-gamepad mr-2"></i>Games
+                </a>
+                <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}active{% endif %} hover:text-neon">
+                    <i class="fas fa-users mr-2"></i>Team
+                </a>
+                <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}active{% endif %} hover:text-neon">
+                    <i class="fas fa-comments mr-2"></i>Community
+                </a>
+                <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %} hover:text-neon">
+                    <i class="fas fa-envelope mr-2"></i>Contact
+                </a>
+                <a href="{% url 'donate' %}" class="btn-neon">
+                    <i class="fas fa-heart mr-2"></i>Donate
+                </a>
             </div>
         </div>
     </nav>
@@ -355,6 +387,52 @@
             const canvasElement = document.getElementById('particleCanvas');
             canvasElement.width = window.innerWidth;
             canvasElement.height = window.innerHeight;
+        }
+        
+        // Mobile Menu Toggle Function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = document.querySelector('.mobile-menu-button');
+            
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                menuButton.classList.remove('active');
+            } else {
+                mobileMenu.classList.add('active');
+                menuButton.classList.add('active');
+            }
+        }
+        
+        // Close mobile menu when clicking on a link
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = document.querySelector('.mobile-menu-button');
+            
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    menuButton.classList.remove('active');
+                });
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const navbar = document.querySelector('.navbar');
+                if (!navbar.contains(event.target)) {
+                    mobileMenu.classList.remove('active');
+                    menuButton.classList.remove('active');
+                }
+            });
+        });
+        
+        // Optimize particles for mobile devices
+        if (window.innerWidth <= 768) {
+            // Reduce particle count on mobile for better performance
+            const particleElements = document.querySelectorAll('.particles');
+            particleElements.forEach(el => {
+                el.style.opacity = '0.5';
+            });
         }
     </script>
 </body>

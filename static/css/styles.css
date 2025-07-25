@@ -1,5 +1,10 @@
+/* ===========================================
+   MOBILE-FIRST RESPONSIVE GAMING STUDIO CSS
+   =========================================== */
+
 body {
     font-family: 'Arial', sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 nav a:hover {
@@ -10,10 +15,195 @@ main {
     min-height: calc(100vh - 120px);
 }
 
-/* Smooth scrolling for carousels */
+/* ===========================================
+   MOBILE NAVIGATION IMPROVEMENTS
+   =========================================== */
+
+/* Mobile hamburger menu */
+.mobile-menu-button {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.mobile-menu-button span {
+    width: 25px;
+    height: 3px;
+    background-color: #00ffcc;
+    margin: 3px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+.mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, #1a202c, #2d3748);
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu.active {
+    display: block;
+}
+
+.mobile-menu a {
+    display: block;
+    padding: 12px 0;
+    border-bottom: 1px solid #4a5568;
+    text-align: center;
+    font-size: 16px;
+}
+
+.mobile-menu a:last-child {
+    border-bottom: none;
+}
+
+/* ===========================================
+   RESPONSIVE BREAKPOINTS
+   =========================================== */
+
+/* Mobile phones (up to 768px) */
+@media (max-width: 768px) {
+    /* Hide desktop menu, show mobile menu */
+    .navbar .space-x-4 {
+        display: none;
+    }
+    
+    .mobile-menu-button {
+        display: flex;
+    }
+    
+    /* Typography adjustments */
+    h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.4;
+    }
+    
+    h2 {
+        font-size: 1.25rem !important;
+        line-height: 1.4;
+    }
+    
+    h3 {
+        font-size: 1.125rem !important;
+        line-height: 1.4;
+    }
+    
+    /* Navbar adjustments */
+    .navbar {
+        padding: 0.75rem;
+        position: relative;
+    }
+    
+    .navbar a {
+        font-size: 1.25rem;
+    }
+    
+    /* Container padding */
+    main {
+        padding: 1rem;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Game cards - stack vertically on mobile */
+    .grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+    
+    /* Image adjustments */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Button adjustments */
+    .btn-neon {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        display: block;
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+    
+    /* Modal adjustments */
+    .modal-content {
+        margin: 1rem;
+        max-height: 90vh;
+        width: calc(100% - 2rem);
+    }
+    
+    /* Footer adjustments */
+    footer {
+        padding: 2rem 1rem;
+    }
+    
+    footer .flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    /* Text size adjustments */
+    .text-2xl {
+        font-size: 1.25rem !important;
+    }
+    
+    .text-xl {
+        font-size: 1.125rem !important;
+    }
+    
+    .text-lg {
+        font-size: 1rem !important;
+    }
+}
+
+/* Tablets (768px to 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Show desktop menu */
+    .mobile-menu-button {
+        display: none;
+    }
+    
+    /* Adjust grid for tablets */
+    .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    /* Container adjustments */
+    .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+    
+    /* Text adjustments */
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ===========================================
+   SMOOTH SCROLLING & CAROUSEL IMPROVEMENTS
+   =========================================== */
+
 .carousel {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    /* Better touch scrolling on mobile */
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -26,23 +216,128 @@ main {
     scrollbar-width: none;
 }
 
-/* Enhance game card hover effect */
+/* ===========================================
+   ENHANCED GAME CARD HOVER EFFECTS
+   =========================================== */
+
 .bg-gray-800:hover {
     transform: translateY(-2px);
     transition: transform 0.3s ease;
 }
 
-/* Ensure full-width image fits nicely */
+/* Touch-friendly adjustments for mobile */
+@media (max-width: 768px) {
+    .bg-gray-800:hover {
+        transform: none; /* Remove hover effects on mobile */
+    }
+    
+    .bg-gray-800:active {
+        transform: scale(0.98); /* Add touch feedback */
+        transition: transform 0.1s ease;
+    }
+}
+
+/* ===========================================
+   IMAGE & MEDIA OPTIMIZATIONS
+   =========================================== */
+
 .w-full {
     max-width: 100%;
     height: auto;
 }
 
-/* Modal styles */
+/* Responsive images */
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Game cover images */
+.game-cover {
+    aspect-ratio: 16/9;
+    object-fit: cover;
+}
+
+/* ===========================================
+   MODAL & OVERLAY IMPROVEMENTS
+   =========================================== */
+
 .modal-content {
-    max-height: 90vh; /* Fallback for non-Tailwind environments */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .max-h-screen {
-    max-height: 100vh; /* Use Tailwind's screen height utility */
+    max-height: 100vh;
+}
+
+/* Mobile modal adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 2.5%;
+        border-radius: 0.5rem;
+    }
+}
+
+/* ===========================================
+   TOUCH & INTERACTION IMPROVEMENTS
+   =========================================== */
+
+/* Larger touch targets for mobile */
+@media (max-width: 768px) {
+    button, a, input, select, textarea {
+        min-height: 44px; /* Apple's recommended touch target size */
+        min-width: 44px;
+    }
+    
+    /* Better spacing for touch */
+    .space-x-4 > * + * {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+    
+    .space-y-4 > * + * {
+        margin-top: 1.5rem;
+    }
+}
+
+/* ===========================================
+   PERFORMANCE OPTIMIZATIONS
+   =========================================== */
+
+/* Reduce animations on mobile for better performance */
+@media (max-width: 768px) {
+    * {
+        animation-duration: 0.5s !important;
+        animation-delay: 0s !important;
+    }
+    
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-spin-slow {
+        animation: spin 3s linear infinite;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
