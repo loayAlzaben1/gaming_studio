@@ -75,13 +75,23 @@ DATABASES = {
 }
 
 # On PythonAnywhere, override with deployment settings
-if os.getenv('DEPLOY_ENV') == 'pythonanywhere':
-    DATABASES['default'].update({
-        'USER': os.getenv('DB_USER', 'LoayAlzaben'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'your-postgres-password'),
-        'HOST': os.getenv('DB_HOST', 'LoayAlzaben-1234.postgres.pythonanywhere-services.com'),
-        'PORT': os.getenv('DB_PORT', '11234'),
-    })
+if os.getenv('RENDER', None):
+    # Use SQLite on Render
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # Use SQLite locally as well
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+# ...ex
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
