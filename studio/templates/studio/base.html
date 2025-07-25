@@ -3,10 +3,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-      <meta name="google-site-verification" content="bsUCyfYYhdNcBqq2-39-T7E2hTtyuTYfdFBAdTFwUrA" />
-    <title>Gaming Studio</title>
+    <meta name="google-site-verification" content="bsUCyfYYhdNcBqq2-39-T7E2hTtyuTYfdFBAdTFwUrA" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Gaming Studio{% endblock %}</title>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon.svg' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon.svg' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon.svg' %}">
+    
+    <!-- PWA and Mobile App Icons -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#00ffcc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gaming Studio">
+    
+    <!-- SEO and Social Media Meta Tags -->
+    <meta name="description" content="Gaming Studio - Creating epic gaming experiences since 2023. Join our community of gamers and developers.">
+    <meta name="keywords" content="gaming, studio, games, development, community, esports">
+    <meta name="author" content="Gaming Studio">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gaming-studio.onrender.com/">
+    <meta property="og:title" content="Gaming Studio - Epic Gaming Experiences">
+    <meta property="og:description" content="Creating epic gaming experiences since 2023. Join our community of gamers and developers.">
+    <meta property="og:image" content="https://gaming-studio.onrender.com/static/media/game_covers/RTS_GAME.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://gaming-studio.onrender.com/">
+    <meta property="twitter:title" content="Gaming Studio - Epic Gaming Experiences">
+    <meta property="twitter:description" content="Creating epic gaming experiences since 2023. Join our community of gamers and developers.">
+    <meta property="twitter:image" content="https://gaming-studio.onrender.com/static/media/game_covers/RTS_GAME.png">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
