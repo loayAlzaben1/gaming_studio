@@ -104,13 +104,3 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-import sys
-if 'gunicorn' in sys.argv[0]:
-    import django
-    django.setup()
-    from django.core.management import call_command
-    try:
-        call_command('migrate', interactive=False)
-        call_command('collectstatic', interactive=False, verbosity=0)
-    except Exception as e:
-        print(f"Startup management command error: {e}")

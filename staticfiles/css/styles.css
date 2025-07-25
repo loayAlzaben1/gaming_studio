@@ -1,20 +1,48 @@
 body {
     font-family: 'Arial', sans-serif;
 }
-.progress-bar {
-    height: 20px;
-    background-color: #4b5563;
-    border-radius: 10px;
-    overflow: hidden;
-}
-.progress-bar-fill {
-    height: 100%;
-    background-color: #3b82f6;
-    transition: width 0.3s ease-in-out;
-}
+
 nav a:hover {
     transition: color 0.3s ease;
 }
+
 main {
-    min-height: calc(100vh - 120px); /* Adjust for nav and footer height */
+    min-height: calc(100vh - 120px);
+}
+
+/* Smooth scrolling for carousels */
+.carousel {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Enhance game card hover effect */
+.bg-gray-800:hover {
+    transform: translateY(-2px);
+    transition: transform 0.3s ease;
+}
+
+/* Ensure full-width image fits nicely */
+.w-full {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Modal styles */
+.modal-content {
+    max-height: 90vh; /* Fallback for non-Tailwind environments */
+}
+
+.max-h-screen {
+    max-height: 100vh; /* Use Tailwind's screen height utility */
 }
