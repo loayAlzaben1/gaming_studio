@@ -1,34 +1,34 @@
 {% extends 'studio/base.html' %}
 {% block title %}Team - Gaming Studio{% endblock %}
 {% block content %}
-<section class="py-8 min-h-screen">
-    <h1 class="text-4xl font-bold text-center mb-6 text-blue-400">Meet Our Team</h1>
-    <div class="container mx-auto p-6">
-        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<section class="py-4 sm:py-8 min-h-screen">
+    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-4 sm:mb-6 text-blue-400 px-4">Meet Our Team</h1>
+    <div class="container mx-auto p-3 sm:p-6">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {% for member in team_members %}
                     <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
                         <!-- Clickable Team Member Photo -->
                         <div class="w-full cursor-pointer" onclick="openModal('modal-{{ member.id }}')">
                             {% if member.photo %}
-                                <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="w-full h-64 object-cover rounded-t-lg">
+                                <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="w-full h-48 sm:h-64 object-cover rounded-t-lg">
                             {% else %}
-                                <div class="w-full h-64 bg-gray-700 flex items-center justify-center rounded-t-lg">
+                                <div class="w-full h-48 sm:h-64 bg-gray-700 flex items-center justify-center rounded-t-lg">
                                     <span class="text-gray-400">No Photo</span>
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="p-4">
-                            <h3 class="text-xl font-semibold text-yellow-400">{{ member.name }}</h3>
-                            <p class="text-gray-500 mb-2">{{ member.role }}</p>
-                            <p class="text-gray-400">{{ member.bio|truncatewords:15 }}</p>
+                        <div class="p-3 sm:p-4">
+                            <h3 class="text-lg sm:text-xl font-semibold text-yellow-400">{{ member.name }}</h3>
+                            <p class="text-gray-500 mb-2 text-sm sm:text-base">{{ member.role }}</p>
+                            <p class="text-gray-400 text-sm sm:text-base">{{ member.bio|truncatewords:15 }}</p>
                             {% if member.social_link %}
-                                <a href="{{ member.social_link }}" target="_blank" class="mt-2 inline-block text-blue-400 hover:underline">Connect</a>
+                                <a href="{{ member.social_link }}" target="_blank" class="mt-2 inline-block text-blue-400 hover:underline text-sm sm:text-base">Connect</a>
                             {% endif %}
                         </div>
                         <!-- Modal for Team Member Photo -->
                         <div id="modal-{{ member.id }}" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
-                            <div class="bg-gray-800 p-4 rounded-lg max-w-2xl w-full relative overflow-y-auto max-h-screen">
+                            <div class="bg-gray-800 p-4 rounded-lg max-w-2xl w-full mx-4 relative overflow-y-auto max-h-screen">
                                 <!-- Close Button -->
                                 <button class="absolute top-2 right-2 text-gray-400 hover:text-white focus:outline-none" onclick="closeModal('modal-{{ member.id }}')">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -39,6 +39,9 @@
                                 {% if member.photo %}
                                     <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="w-full h-auto object-contain rounded">
                                     <p class="text-gray-400 text-center mt-2">{{ member.name }} - {{ member.role }}</p>
+                                    {% if member.bio %}
+                                        <p class="text-gray-300 text-center mt-2 text-sm">{{ member.bio }}</p>
+                                    {% endif %}
                                 {% else %}
                                     <p class="text-center text-gray-400">No Photo Available</p>
                                 {% endif %}
@@ -46,7 +49,7 @@
                         </div>
                     </div>
                 {% empty %}
-                    <p class="text-center text-gray-400">No team members available.</p>
+                    <p class="text-center text-gray-400 col-span-full">No team members available.</p>
                 {% endfor %}
             </div>
         </div>

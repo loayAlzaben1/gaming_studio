@@ -1,18 +1,150 @@
 /* ===========================================
-   MOBILE-FIRST RESPONSIVE GAMING STUDIO CSS
+   MOBILE-OPTIMIZED FORM STYLING
    =========================================== */
 
-body {
-    font-family: 'Arial', sans-serif;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+/* Form inputs for mobile */
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        padding: 12px !important;
+        border-radius: 8px !important;
+        border: 2px solid #4a5568 !important;
+        background-color: #2d3748 !important;
+        color: #fff !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+    }
+    
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none !important;
+        border-color: #00ffcc !important;
+        box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.1) !important;
+    }
+    
+    /* Touch-friendly buttons */
+    button,
+    .btn,
+    a.btn {
+        min-height: 44px !important; /* Apple's recommended touch target size */
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        border-radius: 8px !important;
+        touch-action: manipulation !important;
+    }
+    
+    /* Better spacing for mobile forms */
+    .space-y-4 > * + * {
+        margin-top: 1rem !important;
+    }
+    
+    .space-y-6 > * + * {
+        margin-top: 1.5rem !important;
+    }
 }
 
-nav a:hover {
-    transition: color 0.3s ease;
+/* ===========================================
+   MOBILE LAYOUT IMPROVEMENTS
+   =========================================== */
+
+@media (max-width: 640px) {
+    /* Improved padding for small screens */
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Better image handling on mobile */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Responsive video embeds */
+    .video-responsive {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 ratio */
+        height: 0;
+        overflow: hidden;
+    }
+    
+    .video-responsive iframe,
+    .video-responsive object,
+    .video-responsive embed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    /* Modal improvements for mobile */
+    .modal-content {
+        max-width: 95vw !important;
+        max-height: 90vh !important;
+        margin: 5vh auto !important;
+    }
+    
+    /* Grid improvements */
+    .grid {
+        gap: 1rem !important;
+    }
+    
+    /* Text size adjustments */
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.125rem !important; }
+    
+    /* Card improvements */
+    .bg-gray-800,
+    .bg-gray-900 {
+        margin-bottom: 1rem !important;
+        border-radius: 0.5rem !important;
+    }
 }
 
-main {
-    min-height: calc(100vh - 120px);
+/* ===========================================
+   ACCESSIBILITY AND UX IMPROVEMENTS
+   =========================================== */
+
+/* High contrast focus states */
+:focus {
+    outline: 2px solid #00ffcc !important;
+    outline-offset: 2px !important;
+}
+
+/* Better button states */
+button:disabled,
+.btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.7 !important;
+    pointer-events: none !important;
+}
+
+/* Error states */
+.error {
+    border-color: #f56565 !important;
+    background-color: rgba(245, 101, 101, 0.1) !important;
+}
+
+/* Success states */
+.success {
+    border-color: #48bb78 !important;
+    background-color: rgba(72, 187, 120, 0.1) !important;
 }
 
 /* ===========================================
@@ -460,6 +592,128 @@ img {
     
     .animate-spin-slow {
         animation: spin 3s linear infinite;
+    }
+    
+    /* Mobile form improvements */
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important; /* Prevent zoom on iOS */
+        -webkit-appearance: none;
+        border-radius: 8px;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 255, 204, 0.3);
+    }
+    
+    /* Mobile button improvements */
+    button, .btn, a.btn-neon {
+        min-height: 44px; /* Apple's recommended touch target */
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    button:active,
+    .btn:active {
+        transform: scale(0.98);
+    }
+    
+    /* Mobile typography improvements */
+    h1 {
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+    
+    h3 {
+        font-size: 1.3rem;
+        line-height: 1.3;
+    }
+    
+    p, li {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    /* Mobile modal improvements */
+    .fixed.inset-0 {
+        padding: 16px;
+    }
+    
+    .fixed.inset-0 > div {
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mobile image improvements */
+    img {
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    
+    /* Mobile iframe improvements (for videos) */
+    iframe {
+        max-width: 100%;
+        border-radius: 8px;
+    }
+    
+    /* Mobile grid improvements */
+    .grid {
+        gap: 12px;
+    }
+    
+    /* Mobile card improvements */
+    .bg-gray-800, .bg-gray-700 {
+        margin-bottom: 16px;
+    }
+    
+    /* Mobile link improvements */
+    a {
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    a:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Mobile scroll improvements */
+    .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mobile performance improvements */
+    * {
+        -webkit-tap-highlight-color: rgba(0, 255, 204, 0.3);
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    input, textarea, [contenteditable] {
+        -webkit-user-select: text;
+        user-select: text;
     }
 }
 

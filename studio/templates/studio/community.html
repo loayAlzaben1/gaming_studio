@@ -3,133 +3,133 @@
 {% block content %}
 <section class="min-h-screen">
     <!-- Hero Section -->
-    <div class="relative bg-cover bg-center h-72" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');">
-        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+    <div class="relative bg-cover bg-center h-48 sm:h-64 lg:h-72" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center px-4">
             <div class="text-center">
-                <h1 class="text-5xl font-bold text-white mb-4 animate-pulse">Join the Gaming Studio Community!</h1>
-                <p class="text-xl text-gray-300 mb-6">Connect, compete, and create with us!</p>
-                <a href="#get-involved" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 flex items-center">
+                <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-2 sm:mb-4 animate-pulse">Join the Gaming Studio Community!</h1>
+                <p class="text-base sm:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-6">Connect, compete, and create with us!</p>
+                <a href="#get-involved" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition duration-300 inline-flex items-center text-sm sm:text-base">
                     <i class="fas fa-users mr-2"></i> Get Involved
                 </a>
             </div>
         </div>
     </div>
-    <div class="container mx-auto p-6">
-        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
+    <div class="container mx-auto p-3 sm:p-6">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-6">
             <!-- Get Involved Section -->
-            <div id="get-involved" class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
-                <h2 class="text-3xl font-bold text-yellow-400 mb-4 flex items-center">
+            <div id="get-involved" class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl mb-6 sm:mb-8">
+                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400 mb-3 sm:mb-4 flex items-center">
                     <i class="fas fa-handshake mr-2"></i> Get Involved
                 </h2>
-                <p class="text-gray-400 mb-6">Dive into our vibrant community and connect with gamers worldwide!</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
-                        <i class="fas fa-discord text-blue-400 text-3xl mr-4"></i>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Join Our Discord</h3>
-                            <a href="https://discord.gg/QU94BbgW" target="_blank" class="text-blue-300 hover:underline">https://discord.gg/QU94BbgW</a>
+                <p class="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">Dive into our vibrant community and connect with gamers worldwide!</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+                    <div class="flex items-center p-3 sm:p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                        <i class="fas fa-discord text-blue-400 text-2xl sm:text-3xl mr-3 sm:mr-4 flex-shrink-0"></i>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-sm sm:text-lg font-semibold text-white">Join Our Discord</h3>
+                            <a href="https://discord.gg/QU94BbgW" target="_blank" class="text-blue-300 hover:underline text-xs sm:text-sm break-words">discord.gg/QU94BbgW</a>
                         </div>
                     </div>
-                    <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
-                        <i class="fab fa-twitter text-blue-400 text-3xl mr-4"></i>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Follow on Twitter</h3>
-                            <a href="https://twitter.com" target="_blank" class="text-blue-300 hover:underline">@GamingStudio</a>
+                    <div class="flex items-center p-3 sm:p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                        <i class="fab fa-twitter text-blue-400 text-2xl sm:text-3xl mr-3 sm:mr-4 flex-shrink-0"></i>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-sm sm:text-lg font-semibold text-white">Follow on Twitter</h3>
+                            <a href="https://twitter.com" target="_blank" class="text-blue-300 hover:underline text-xs sm:text-sm">@GamingStudio</a>
                         </div>
                     </div>
-                    <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
-                        <i class="fas fa-envelope text-green-400 text-3xl mr-4"></i>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Contact Us</h3>
-                            <a href="{% url 'contact' %}" class="text-blue-300 hover:underline">Send Feedback</a>
+                    <div class="flex items-center p-3 sm:p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                        <i class="fas fa-envelope text-green-400 text-2xl sm:text-3xl mr-3 sm:mr-4 flex-shrink-0"></i>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-sm sm:text-lg font-semibold text-white">Contact Us</h3>
+                            <a href="{% url 'contact' %}" class="text-blue-300 hover:underline text-xs sm:text-sm">Send Feedback</a>
                         </div>
                     </div>
-                    <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
-                        <i class="fas fa-trophy text-yellow-400 text-3xl mr-4"></i>
-                        <div>
-                            <h3 class="text-lg font-semibold text-white">Join Tournaments</h3>
-                            <a href="#events" class="text-blue-300 hover:underline">Check Events</a>
+                    <div class="flex items-center p-3 sm:p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                        <i class="fas fa-trophy text-yellow-400 text-2xl sm:text-3xl mr-3 sm:mr-4 flex-shrink-0"></i>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-sm sm:text-lg font-semibold text-white">Join Tournaments</h3>
+                            <a href="#events" class="text-blue-300 hover:underline text-xs sm:text-sm">Check Events</a>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Upcoming Events Section -->
-            <div id="events" class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
-                <h2 class="text-3xl font-bold text-yellow-400 mb-4 flex items-center">
+            <div id="events" class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl mb-6 sm:mb-8">
+                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400 mb-3 sm:mb-4 flex items-center">
                     <i class="fas fa-calendar-alt mr-2"></i> Upcoming Events
                 </h2>
-                <div class="space-y-4">
-                    <div class="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
-                        <h3 class="text-lg font-semibold text-white">Gaming Tournament 2025</h3>
-                        <p class="text-gray-400">June 10, 2025 - Compete for glory and prizes!</p>
-                        <a href="#" class="text-blue-300 hover:underline flex items-center">
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="p-3 sm:p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                        <h3 class="text-sm sm:text-lg font-semibold text-white">Gaming Tournament 2025</h3>
+                        <p class="text-gray-400 text-xs sm:text-sm">June 10, 2025 - Compete for glory and prizes!</p>
+                        <a href="#" class="text-blue-300 hover:underline flex items-center text-xs sm:text-sm mt-1">
                             <i class="fas fa-info-circle mr-2"></i> Details
                         </a>
                     </div>
-                    <div class="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
-                        <h3 class="text-lg font-semibold text-white">Community Meetup</h3>
-                        <p class="text-gray-400">July 5, 2025 - Online meet and greet.</p>
-                        <a href="#" class="text-blue-300 hover:underline flex items-center">
+                    <div class="p-3 sm:p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                        <h3 class="text-sm sm:text-lg font-semibold text-white">Community Meetup</h3>
+                        <p class="text-gray-400 text-xs sm:text-sm">July 5, 2025 - Online meet and greet.</p>
+                        <a href="#" class="text-blue-300 hover:underline flex items-center text-xs sm:text-sm mt-1">
                             <i class="fas fa-info-circle mr-2"></i> Details
                         </a>
                     </div>
                 </div>
             </div>
             <!-- Leaderboard Section -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
-                <h2 class="text-3xl font-bold text-yellow-400 mb-4 flex items-center">
+            <div class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl mb-6 sm:mb-8">
+                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400 mb-3 sm:mb-4 flex items-center">
                     <i class="fas fa-crown mr-2"></i> Top Donors Leaderboard
                 </h2>
                 <ul class="space-y-2">
                     <li class="p-3 bg-gray-700 rounded-lg flex justify-between items-center">
-                        <span class="text-white">John Doe</span>
-                        <span class="text-green-400">$250.00</span>
+                        <span class="text-white text-sm sm:text-base">John Doe</span>
+                        <span class="text-green-400 text-sm sm:text-base font-semibold">$250.00</span>
                     </li>
                     <li class="p-3 bg-gray-700 rounded-lg flex justify-between items-center">
-                        <span class="text-white">Jane Smith</span>
-                        <span class="text-green-400">$150.00</span>
+                        <span class="text-white text-sm sm:text-base">Jane Smith</span>
+                        <span class="text-green-400 text-sm sm:text-base font-semibold">$150.00</span>
                     </li>
                     <li class="p-3 bg-gray-700 rounded-lg flex justify-between items-center">
-                        <span class="text-white">Alex Brown</span>
-                        <span class="text-green-400">$100.00</span>
+                        <span class="text-white text-sm sm:text-base">Alex Brown</span>
+                        <span class="text-green-400 text-sm sm:text-base font-semibold">$100.00</span>
                     </li>
                 </ul>
-                <p class="text-gray-400 mt-4">Donate to climb the ranks! <a href="{% url 'donate' %}" class="text-blue-300 hover:underline">Donate Now</a></p>
+                <p class="text-gray-400 mt-4 text-xs sm:text-sm">Donate to climb the ranks! <a href="{% url 'donate' %}" class="text-blue-300 hover:underline">Donate Now</a></p>
             </div>
             <!-- Newsletter Signup -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
-                <h2 class="text-3xl font-bold text-yellow-400 mb-4 flex items-center">
+            <div class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
+                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400 mb-3 sm:mb-4 flex items-center">
                     <i class="fas fa-bell mr-2"></i> Subscribe to Newsletter
                 </h2>
-                <p class="text-gray-400 mb-4">Get the latest updates and exclusive content!</p>
-                <form method="post" action="{% url 'newsletter_subscribe' %}" class="flex space-x-2">
+                <p class="text-gray-400 mb-3 sm:mb-4 text-sm sm:text-base">Get the latest updates and exclusive content!</p>
+                <form method="post" action="{% url 'newsletter_subscribe' %}" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     {% csrf_token %}
-                    <input type="email" name="email" placeholder="Enter your email" class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                    <input type="email" name="email" placeholder="Enter your email" class="flex-1 p-2 sm:p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base" required>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 sm:py-3 sm:px-4 rounded-lg transition duration-300 flex items-center justify-center text-sm sm:text-base">
                         <i class="fas fa-paper-plane mr-2"></i> Subscribe
                     </button>
                 </form>
                 {% if messages %}
                     {% for message in messages %}
-                        <p class="mt-2 text-center {% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %}">{{ message }}</p>
+                        <p class="mt-2 text-center {% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} text-sm">{{ message }}</p>
                     {% endfor %}
                 {% endif %}
             </div>
             <!-- Social Media Section -->
-            <div class="mt-8 text-center">
-                <h2 class="text-2xl font-semibold text-yellow-400 mb-4">Follow Us</h2>
-                <div class="flex justify-center space-x-6">
+            <div class="mt-6 sm:mt-8 text-center">
+                <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-yellow-400 mb-3 sm:mb-4">Follow Us</h2>
+                <div class="flex justify-center space-x-4 sm:space-x-6">
                     <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-blue-400 transition duration-300">
-                        <i class="fab fa-twitter-square text-3xl"></i>
+                        <i class="fab fa-twitter-square text-2xl sm:text-3xl"></i>
                     </a>
                     <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-blue-400 transition duration-300">
-                        <i class="fab fa-facebook-square text-3xl"></i>
+                        <i class="fab fa-facebook-square text-2xl sm:text-3xl"></i>
                     </a>
                     <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-blue-400 transition duration-300">
-                        <i class="fab fa-instagram-square text-3xl"></i>
+                        <i class="fab fa-instagram-square text-2xl sm:text-3xl"></i>
                     </a>
                     <a href="https://youtube.com" target="_blank" class="text-gray-400 hover:text-red-600 transition duration-300">
-                        <i class="fab fa-youtube-square text-3xl"></i>
+                        <i class="fab fa-youtube-square text-2xl sm:text-3xl"></i>
                     </a>
                 </div>
             </div>

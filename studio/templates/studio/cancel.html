@@ -1,12 +1,14 @@
 {% extends 'studio/base.html' %}
 {% block title %}Donation Cancelled{% endblock %}
 {% block content %}
-<div class="min-h-screen flex items-center justify-center">
-    <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6 text-center">
-        <h1 class="text-3xl font-bold mb-6 text-red-400">Donation Cancelled</h1>
-        <p>Your donation was cancelled.</p>
-        <p><a href="{% url 'donate' %}" class="text-blue-400 hover:text-blue-300 underline">Try Again</a></p>
-        <p><a href="{% url 'home' %}" class="text-blue-400 hover:text-blue-300 underline">Return to Home</a></p>
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6 text-center max-w-md w-full">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-red-400">Donation Cancelled</h1>
+        <p class="text-gray-300 mb-4 text-sm sm:text-base">Your donation was cancelled.</p>
+        <div class="space-y-2">
+            <p><a href="{% url 'donate' %}" class="text-blue-400 hover:text-blue-300 underline text-sm sm:text-base">Try Again</a></p>
+            <p><a href="{% url 'home' %}" class="text-blue-400 hover:text-blue-300 underline text-sm sm:text-base">Return to Home</a></p>
+        </div>
     </div>
 </div>
 {% endblock %}

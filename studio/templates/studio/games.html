@@ -1,89 +1,107 @@
 {% extends 'studio/base.html' %}
 {% block title %}Games - Gaming Studio{% endblock %}
 {% block content %}
-<section class="py-8 min-h-screen">
-    <h1 class="text-4xl font-bold text-center mb-6 text-blue-400">Our Games</h1>
-    <div class="container mx-auto p-6">
-        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<section class="py-4 sm:py-8 min-h-screen">
+    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-4 sm:mb-6 text-blue-400 px-4">Our Games</h1>
+    <div class="container mx-auto p-3 sm:p-6">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {% for game in games %}
                     <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300">
                         <!-- Cover Image -->
                         <div class="w-full">
                             {% if game.cover_image %}
-                                <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-48 object-cover rounded-t-lg">
+                                <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-36 sm:h-48 object-cover rounded-t-lg">
                             {% else %}
-                                <div class="w-full h-48 bg-gray-700 flex items-center justify-center rounded-t-lg">
+                                <div class="w-full h-36 sm:h-48 bg-gray-700 flex items-center justify-center rounded-t-lg">
                                     <span class="text-gray-400">No Cover Image</span>
                                 </div>
                             {% endif %}
                         </div>
                         <!-- Game Title and Toggle Button -->
-                        <div class="p-4">
-                            <h3 class="text-2xl font-bold text-yellow-400">{{ game.title }}</h3>
-                            <p class="text-gray-400 mt-2">{{ game.description|truncatewords:15 }}</p>
-                            <button id="toggle-{{ game.id }}" class="mt-2 text-blue-400 hover:text-blue-300 underline focus:outline-none" onclick="toggleDetails('details-{{ game.id }}', 'toggle-{{ game.id }}')">
+                        <div class="p-3 sm:p-4">
+                            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-400">{{ game.title }}</h3>
+                            <p class="text-gray-400 mt-2 text-sm sm:text-base">{{ game.description|truncatewords:15 }}</p>
+                            <button id="toggle-{{ game.id }}" class="mt-2 text-blue-400 hover:text-blue-300 underline focus:outline-none text-sm sm:text-base" onclick="toggleDetails('details-{{ game.id }}', 'toggle-{{ game.id }}')">
                                 View Details
                             </button>
                         </div>
                         <!-- Collapsible Details Section -->
-                        <div id="details-{{ game.id }}" class="hidden p-4 bg-gray-700 rounded-b-lg transition-all duration-300">
-                            <p class="text-gray-400 mb-4">{{ game.description }}</p>
-                            <p class="text-gray-500 mb-2">Platform: {{ game.platform }}</p>
-                            <p class="text-gray-500 mb-4">Release Date: {{ game.release_date|date:"F d, Y" }}</p>
+                        <div id="details-{{ game.id }}" class="hidden p-3 sm:p-4 bg-gray-700 rounded-b-lg transition-all duration-300">
+                            <p class="text-gray-400 mb-4 text-sm sm:text-base">{{ game.description }}</p>
+                            <p class="text-gray-500 mb-2 text-sm">Platform: {{ game.platform }}</p>
+                            <p class="text-gray-500 mb-4 text-sm">Release Date: {{ game.release_date|date:"F d, Y" }}</p>
                             {% if game.trailer_link %}
-                                <a href="{{ game.trailer_link }}" target="_blank" class="inline-block mt-2 text-blue-400 hover:underline">Watch Trailer</a>
+                                <a href="{{ game.trailer_link }}" target="_blank" class="inline-block mt-2 text-blue-400 hover:underline text-sm sm:text-base">Watch Trailer</a>
                             {% endif %}
                             <!-- Inline Photos -->
                             {% if game.photos.exists %}
                                 <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     {% for photo in game.photos.all %}
                                         <div>
-                                            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-32 object-cover rounded">
-                                            <p class="text-gray-400 text-center mt-1">{{ photo.caption|default:"Screenshot" }}</p>
+                                            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-24 sm:h-32 object-cover rounded cursor-pointer" onclick="openImageModal('{{ photo.image.url }}', '{{ photo.caption|default:"Screenshot"|escapejs }}')">
+                                            <p class="text-gray-400 text-center mt-1 text-xs sm:text-sm">{{ photo.caption|default:"Screenshot" }}</p>
                                         </div>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                             <!-- Inline Videos -->
                             {% if game.videos.exists %}
-                                <div class="mt-4 grid grid-cols-1 gap-2">
+                                <div class="mt-4 space-y-3">
                                     {% for video in game.videos.all %}
                                         <div>
-                                            <iframe class="w-full h-32 rounded" src="{{ video.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
-                                            <p class="text-gray-400 text-center mt-1">{{ video.title|default:"Video" }}</p>
+                                            <div class="relative w-full" style="padding-bottom: 56.25%; /* 16:9 aspect ratio */">
+                                                <iframe class="absolute top-0 left-0 w-full h-full rounded" src="{{ video.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
+                                            </div>
+                                            <p class="text-gray-400 text-center mt-1 text-xs sm:text-sm">{{ video.title|default:"Video" }}</p>
                                         </div>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
                         <!-- Devlog Section -->
-                        <div class="p-4 bg-gray-700 rounded-b-lg">
-                            <h4 class="text-xl font-semibold text-green-400 mb-2 flex items-center">
+                        <div class="p-3 sm:p-4 bg-gray-700 rounded-b-lg">
+                            <h4 class="text-lg sm:text-xl font-semibold text-green-400 mb-2 flex items-center">
                                 <i class="fas fa-code-branch mr-2"></i> Devlog
                             </h4>
                             {% if game.devlog_video_entries.exists %}
-                                <div class="grid grid-cols-1 gap-4">
+                                <div class="space-y-3">
                                     {% for devlog in game.devlog_video_entries.all %}
                                         <div class="bg-gray-800 p-3 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                                            <iframe class="w-full h-32 rounded" src="{{ devlog.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
-                                            <h5 class="text-md font-medium text-white mt-2">{{ devlog.title }}</h5>
-                                            <p class="text-gray-400 text-sm mt-1">{{ devlog.description|truncatewords:15 }}</p>
+                                            <div class="relative w-full" style="padding-bottom: 56.25%; /* 16:9 aspect ratio */">
+                                                <iframe class="absolute top-0 left-0 w-full h-full rounded" src="{{ devlog.video_url|safe }}" frameborder="0" allowfullscreen></iframe>
+                                            </div>
+                                            <h5 class="text-sm sm:text-md font-medium text-white mt-2">{{ devlog.title }}</h5>
+                                            <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ devlog.description|truncatewords:15 }}</p>
                                         </div>
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                <p class="text-gray-400 text-center">No devlog videos available yet.</p>
+                                <p class="text-gray-400 text-center text-sm">No devlog videos available yet.</p>
                             {% endif %}
                         </div>
                     </div>
                 {% empty %}
-                    <p class="text-center text-gray-400">No games available yet.</p>
+                    <p class="text-center text-gray-400 col-span-full">No games available yet.</p>
                 {% endfor %}
             </div>
         </div>
     </div>
 </section>
+
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+    <div class="bg-gray-800 p-4 rounded-lg max-w-4xl w-full mx-4 relative overflow-y-auto max-h-screen">
+        <button class="absolute top-2 right-2 text-gray-400 hover:text-white focus:outline-none z-10" onclick="closeImageModal()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <img id="modalImage" src="" alt="" class="w-full h-auto object-contain rounded">
+        <p id="modalCaption" class="text-gray-400 text-center mt-2"></p>
+    </div>
+</div>
+
 <script>
     function toggleDetails(detailsId, buttonId) {
         const details = document.getElementById(detailsId);
@@ -98,5 +116,40 @@
             button.textContent = 'View Details';
         }
     }
+    
+    function openImageModal(imageUrl, caption) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalCaption = document.getElementById('modalCaption');
+        
+        modalImage.src = imageUrl;
+        modalImage.alt = caption;
+        modalCaption.textContent = caption;
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside the image
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeImageModal();
+        }
+    });
+    
+    // Close modal with escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeImageModal();
+        }
+    });
 </script>
 {% endblock %}

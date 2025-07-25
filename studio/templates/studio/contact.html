@@ -3,19 +3,19 @@
 {% block content %}
 <section class="relative min-h-screen">
     <!-- Hero Section -->
-    <div class="relative bg-cover bg-center h-64" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');">
-        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-            <h1 class="text-5xl font-bold text-white animate-pulse flex items-center">
+    <div class="relative bg-cover bg-center h-48 sm:h-56 lg:h-64" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center px-4">
+            <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-white animate-pulse flex items-center text-center">
                 <i class="fas fa-envelope mr-2"></i> Contact Us
             </h1>
         </div>
     </div>
-    <div class="container mx-auto p-6 max-w-lg">
-        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-6">
+    <div class="container mx-auto p-3 sm:p-6 max-w-lg">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
             <!-- Display Messages -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-600{% else %}bg-red-600{% endif %} text-white text-center">
+                    <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-600{% else %}bg-red-600{% endif %} text-white text-center text-sm sm:text-base">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -24,19 +24,38 @@
             <form method="POST" action="{% url 'contact' %}" class="space-y-4">
                 {% csrf_token %}
                 <div>
-                    <label for="name" class="block text-gray-300 mb-1">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Your Name" class="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                    <label for="name" class="block text-gray-300 mb-1 text-sm sm:text-base">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" class="w-full p-3 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base" required>
                 </div>
                 <div>
-                    <label for="email" class="block text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Your Email" class="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                    <label for="email" class="block text-gray-300 mb-1 text-sm sm:text-base">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" class="w-full p-3 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base" required>
                 </div>
                 <div>
-                    <label for="message" class="block text-gray-300 mb-1">Message</label>
-                    <textarea id="message" name="message" placeholder="Your Message" class="w-full p-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400" rows="4" required></textarea>
+                    <label for="message" class="block text-gray-300 mb-1 text-sm sm:text-base">Message</label>
+                    <textarea id="message" name="message" placeholder="Your Message" class="w-full p-3 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base" rows="5" required></textarea>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded transition duration-300">Send Message</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded transition duration-300 font-semibold text-sm sm:text-base">Send Message</button>
             </form>
+            
+            <!-- Additional Contact Information -->
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <h3 class="text-lg sm:text-xl font-semibold text-yellow-400 mb-4">Other Ways to Reach Us</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center text-gray-300 text-sm sm:text-base">
+                        <i class="fas fa-envelope text-blue-400 mr-3 w-5"></i>
+                        <span>info@gamingstudio.com</span>
+                    </div>
+                    <div class="flex items-center text-gray-300 text-sm sm:text-base">
+                        <i class="fab fa-discord text-blue-400 mr-3 w-5"></i>
+                        <a href="https://discord.gg/QU94BbgW" target="_blank" class="text-blue-300 hover:underline">Join our Discord</a>
+                    </div>
+                    <div class="flex items-center text-gray-300 text-sm sm:text-base">
+                        <i class="fab fa-twitter text-blue-400 mr-3 w-5"></i>
+                        <a href="https://twitter.com" target="_blank" class="text-blue-300 hover:underline">@GamingStudio</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
