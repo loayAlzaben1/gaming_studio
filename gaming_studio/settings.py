@@ -63,28 +63,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gaming_studio.wsgi.application'
 
 # Database configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'gaming_studio_db'),
-        'USER': os.getenv('DB_USER', 'your_postgres_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'your_postgres_password'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-    }
-}
-
-# On PythonAnywhere, override with deployment settings
-if os.getenv('RENDER', None):
-    # Use SQLite on Render
+if os.getenv('DEPLOY_ENV') == 'pythonanywhere':
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'gaming_studio_db'),
+            'USER': os.getenv('DB_USER', 'LoayAlzaben'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'your-postgres-password'),
+            'HOST': os.getenv('DB_HOST', 'LoayAlzaben-1234.postgres.pythonanywhere-services.com'),
+            'PORT': os.getenv('DB_PORT', '11234'),
         }
     }
 else:
-    # Use SQLite locally as well
+    # Use SQLite for local and Render deployments
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -113,3 +104,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+import sys
+if 'gunicorn' in sys.argv[0]:
+    import django
+    django.setup()
+    from django.core.management import call_command
+    try:
+        call_command('migrate', interactive=False)
+        call_command('collectstatic', interactive=False, verbosity=0)
+    except Exception as e:
+        print(f"Startup management command error: {e}")
