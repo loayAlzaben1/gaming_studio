@@ -12,8 +12,13 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-u+#r&785v2*i=0z@28^
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '4cab-91-186-251-209.ngrok-free.app', 'LoayAlzaben.pythonanywhere.com']
-
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '4cab-91-186-251-209.ngrok-free.app',
+    'LoayAlzaben.pythonanywhere.com',
+    'gaming-studio.onrender.com',  
+]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
