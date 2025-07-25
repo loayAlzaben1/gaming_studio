@@ -106,57 +106,82 @@
 <body class="text-white relative">
     <div class="particles"><canvas id="particleCanvas"></canvas></div>
     <nav class="navbar">
-        <div class="container mx-auto flex justify-between items-center relative">
-            <a href="{% url 'home' %}" class="text-2xl font-bold flex items-center text-neon">
+        <div class="container mx-auto flex justify-between items-center relative px-4">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="text-xl sm:text-2xl font-bold flex items-center text-neon">
                 <i class="fas fa-gamepad mr-2 text-blue-400 animate-spin-slow"></i>
                 <span class="hidden sm:inline">Gaming Studio</span>
-                <span class="sm:hidden">GS</span>
+                <span class="sm:hidden text-lg">GS</span>
             </a>
             
             <!-- Desktop Menu -->
-            <div class="space-x-4 flex items-center hidden md:flex">
-                <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %} hover:text-neon">Home</a>
-                <div class="dropdown">
-                    <a href="#" class="hover:text-neon">Games</a>
+            <div class="space-x-4 flex items-center hidden lg:flex">
+                <a href="{% url 'home' %}" class="{% if request.path == '/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Home</a>
+                <div class="dropdown relative">
+                    <a href="#" class="hover:text-neon transition-colors duration-200">Games</a>
                     <div class="dropdown-content">
                         <a href="{% url 'games' %}">All Games</a>
                         <a href="#">Featured</a>
                         <a href="#">Upcoming</a>
                     </div>
                 </div>
-                <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}active{% endif %} hover:text-neon">Team</a>
-                <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}active{% endif %} hover:text-neon">Community</a>
-                <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %} hover:text-neon">Contact</a>
+                <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Team</a>
+                <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Community</a>
+                <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Contact</a>
                 <a href="{% url 'donate' %}" class="btn-neon">Donate</a>
             </div>
             
-            <!-- Mobile Menu Button -->
-            <div class="mobile-menu-button md:hidden" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <!-- Mobile Menu Button (improved design) -->
+            <button class="mobile-menu-button lg:hidden z-50 relative" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                <div class="hamburger-lines">
+                    <span class="line line1"></span>
+                    <span class="line line2"></span>
+                    <span class="line line3"></span>
+                </div>
+            </button>
+            
+            <!-- Mobile Menu Overlay -->
+            <div id="mobileMenuOverlay" class="mobile-menu-overlay lg:hidden"></div>
             
             <!-- Mobile Menu -->
-            <div id="mobileMenu" class="mobile-menu md:hidden">
-                <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %} hover:text-neon">
-                    <i class="fas fa-home mr-2"></i>Home
-                </a>
-                <a href="{% url 'games' %}" class="hover:text-neon">
-                    <i class="fas fa-gamepad mr-2"></i>Games
-                </a>
-                <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}active{% endif %} hover:text-neon">
-                    <i class="fas fa-users mr-2"></i>Team
-                </a>
-                <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}active{% endif %} hover:text-neon">
-                    <i class="fas fa-comments mr-2"></i>Community
-                </a>
-                <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %} hover:text-neon">
-                    <i class="fas fa-envelope mr-2"></i>Contact
-                </a>
-                <a href="{% url 'donate' %}" class="btn-neon">
-                    <i class="fas fa-heart mr-2"></i>Donate
-                </a>
+            <div id="mobileMenu" class="mobile-menu lg:hidden">
+                <div class="mobile-menu-header">
+                    <h3 class="text-lg font-bold text-neon mb-4">
+                        <i class="fas fa-gamepad mr-2"></i>Gaming Studio
+                    </h3>
+                </div>
+                <nav class="mobile-menu-nav">
+                    <a href="{% url 'home' %}" class="mobile-menu-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'games' %}" class="mobile-menu-link">
+                        <i class="fas fa-gamepad"></i>
+                        <span>Games</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'team' %}" class="mobile-menu-link {% if request.path == '/team/' %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span>Team</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'community' %}" class="mobile-menu-link {% if request.path == '/community/' %}active{% endif %}">
+                        <i class="fas fa-comments"></i>
+                        <span>Community</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'contact' %}" class="mobile-menu-link {% if request.path == '/contact/' %}active{% endif %}">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contact</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'donate' %}" class="mobile-menu-link special">
+                        <i class="fas fa-heart"></i>
+                        <span>Donate</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </nav>
             </div>
         </div>
     </nav>
@@ -389,39 +414,70 @@
             canvasElement.height = window.innerHeight;
         }
         
-        // Mobile Menu Toggle Function
+        // Enhanced Mobile Menu Toggle Function
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
             const menuButton = document.querySelector('.mobile-menu-button');
             
             if (mobileMenu.classList.contains('active')) {
+                // Close menu
                 mobileMenu.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
                 menuButton.classList.remove('active');
+                document.body.style.overflow = 'auto';
             } else {
+                // Open menu
                 mobileMenu.classList.add('active');
+                mobileMenuOverlay.classList.add('active');
                 menuButton.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent body scroll when menu is open
             }
         }
         
-        // Close mobile menu when clicking on a link
+        // Enhanced menu functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+            const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
             const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
             const menuButton = document.querySelector('.mobile-menu-button');
             
+            // Close menu when clicking on a link
             mobileMenuLinks.forEach(link => {
                 link.addEventListener('click', function() {
                     mobileMenu.classList.remove('active');
+                    mobileMenuOverlay.classList.remove('active');
                     menuButton.classList.remove('active');
+                    document.body.style.overflow = 'auto';
                 });
             });
             
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const navbar = document.querySelector('.navbar');
-                if (!navbar.contains(event.target)) {
+            // Close menu when clicking on overlay
+            mobileMenuOverlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                menuButton.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Close menu with escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && mobileMenu.classList.contains('active')) {
                     mobileMenu.classList.remove('active');
+                    mobileMenuOverlay.classList.remove('active');
                     menuButton.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1024) {
+                    // Close mobile menu if window becomes large
+                    mobileMenu.classList.remove('active');
+                    mobileMenuOverlay.classList.remove('active');
+                    menuButton.classList.remove('active');
+                    document.body.style.overflow = 'auto';
                 }
             });
         });
