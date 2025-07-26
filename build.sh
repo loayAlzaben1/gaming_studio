@@ -25,10 +25,16 @@ else:
 echo "==> Collecting static files..."
 python manage.py collectstatic --noinput
 
+echo "==> Setting up Google OAuth for production..."
+python manage.py update_google_oauth --production
+
 echo "==> Setting up achievements..."
 python manage.py setup_achievements || echo "Achievements setup failed, continuing..."
 
 echo "==> Setting up user profiles..."
 python manage.py setup_user_profiles || echo "User profiles setup failed, continuing..."
+
+echo "==> Setting up Google OAuth for production..."
+python manage.py setup_google_oauth_production || echo "Google OAuth setup failed, continuing..."
 
 echo "==> Build completed successfully!"
