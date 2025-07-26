@@ -14,8 +14,8 @@ class DonationForm(forms.Form):
         min_value=1.00,
         label="Donation Amount (USD)",
         widget=forms.NumberInput(attrs={
-            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400', 
-            'placeholder': 'Enter amount'
+            'class': 'w-full p-3 pl-8 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors', 
+            'placeholder': '25.00'
         })
     )
     
@@ -24,17 +24,17 @@ class DonationForm(forms.Form):
         required=False,
         label="Your Name (Optional)",
         widget=forms.TextInput(attrs={
-            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400', 
-            'placeholder': 'Enter your name (or leave blank for anonymous)'
+            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors', 
+            'placeholder': 'Anonymous Gamer'
         })
     )
     
     donor_email = forms.EmailField(
         required=False,
-        label="Email (Optional - for thank you message and updates)",
+        label="Email (Optional - for thank you & updates)",
         widget=forms.EmailInput(attrs={
-            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400', 
-            'placeholder': 'Enter your email'
+            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors', 
+            'placeholder': 'your@email.com'
         })
     )
     
@@ -50,10 +50,10 @@ class DonationForm(forms.Form):
     donation_goal = forms.ModelChoiceField(
         queryset=DonationGoal.objects.filter(status='active'),
         required=False,
-        empty_label="General Support",
+        empty_label="💝 General Support",
         label="Support a specific goal (Optional)",
         widget=forms.Select(attrs={
-            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400'
+            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors'
         })
     )
     
