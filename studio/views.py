@@ -482,3 +482,33 @@ def my_donations(request):
         except Exception:
             messages.error(request, 'Donation history is temporarily unavailable. Please try again later.')
             return redirect('dashboard')
+
+@login_required
+def settings(request):
+    """Enhanced user settings page with gaming profile integration."""
+    try:
+        # Get or create user profile
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        # Get user's achievements count for display
+        achievements_count = UserAchievement.objects.filter(user=request.user).count()
+        
+        # Calculate total donated
+        total_donated = Donation.objects.filter(donor_email=request.user.email).aggregate(
+            total=Sum('amount'))['total'] or Decimal('0.00')
+        
+        context = {
+            'profile': profile,
+            'achievements_count': achievements_count,
+            'total_donated': total_donated,
+        }
+        
+        return render(request, 'studio/settings.html', context)
+    
+    except Exception as e:
+        print(f"Settings page error: {e}")
+        # Fallback context without profile dependencies
+        context = {
+            'error': 'Profile system temporarily unavailable'
+        }
+        return render(request, 'studio/settings.html', context)

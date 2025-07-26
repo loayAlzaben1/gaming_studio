@@ -1,0 +1,259 @@
+{% extends 'studio/base.html' %}
+{% block title %}Account Settings - Gaming Studio{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen">
+    <!-- Hero Banner -->
+    <div class="relative bg-cover bg-center h-32 sm:h-40 lg:h-48" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center px-4">
+            <h1 class="text-xl sm:text-2xl lg:text-4xl font-bold text-white animate-pulse text-center flex items-center">
+                <i class="fas fa-cog mr-2 sm:mr-3"></i> Account Settings
+            </h1>
+        </div>
+    </div>
+    
+    <div class="container mx-auto p-2 sm:p-4 lg:p-6 max-w-4xl">
+        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-4 lg:p-6">
+            <!-- Current User Info -->
+            <div class="text-center mb-4 sm:mb-6">
+                <div class="relative inline-block mb-3 sm:mb-4">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-16 sm:w-20 h-16 sm:h-20 rounded-full border-4 border-blue-500 object-cover">
+                    {% else %}
+                        <div class="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-4 border-blue-500">
+                            <i class="fas fa-user text-white text-lg sm:text-2xl"></i>
+                        </div>
+                    {% endif %}
+                    <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        Lv.{{ profile.account_level|default:"1" }}
+                    </div>
+                </div>
+                <h2 class="text-white font-bold text-lg sm:text-xl">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-gray-400 text-sm">Member since {{ user.date_joined|date:"F Y" }}</p>
+            </div>
+
+            <!-- Settings Categories -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+                
+                <!-- Account Information -->
+                <div class="bg-gray-800 rounded-lg p-3 sm:p-4 hover:bg-gray-750 transition duration-300">
+                    <h3 class="text-green-400 font-semibold text-base sm:text-lg mb-3 flex items-center">
+                        <i class="fas fa-user-circle mr-2"></i> Account Information
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Username:</span>
+                            <span class="text-white font-medium">{{ user.username }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Email:</span>
+                            <span class="text-white font-medium truncate ml-2">{{ user.email }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">First Name:</span>
+                            <span class="text-white font-medium">{{ user.first_name|default:"Not Set" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Last Name:</span>
+                            <span class="text-white font-medium">{{ user.last_name|default:"Not Set" }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'profile_edit' %}" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg transition duration-300 block text-center text-sm">
+                            <i class="fas fa-edit mr-2"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Email Management -->
+                <div class="bg-gray-800 rounded-lg p-3 sm:p-4 hover:bg-gray-750 transition duration-300">
+                    <h3 class="text-blue-400 font-semibold text-base sm:text-lg mb-3 flex items-center">
+                        <i class="fas fa-envelope mr-2"></i> Email Settings
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Primary Email:</span>
+                            <span class="text-white font-medium truncate ml-2">{{ user.email }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Email Verified:</span>
+                            {% if user.emailaddress_set.all.0.verified %}
+                                <span class="text-green-400 font-medium">✓ Verified</span>
+                            {% else %}
+                                <span class="text-red-400 font-medium">✗ Not Verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="/accounts/email/" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg transition duration-300 block text-center text-sm">
+                            <i class="fas fa-envelope-open mr-2"></i>Manage Email
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Password & Security -->
+                <div class="bg-gray-800 rounded-lg p-3 sm:p-4 hover:bg-gray-750 transition duration-300">
+                    <h3 class="text-red-400 font-semibold text-base sm:text-lg mb-3 flex items-center">
+                        <i class="fas fa-shield-alt mr-2"></i> Password & Security
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Password:</span>
+                            <span class="text-white font-medium">••••••••</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Last Changed:</span>
+                            <span class="text-gray-400 text-xs">{{ user.last_login|date:"M d, Y"|default:"Never" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Two-Factor Auth:</span>
+                            <span class="text-gray-400 font-medium">Not Enabled</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="/accounts/password/change/" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-lg transition duration-300 block text-center text-sm">
+                            <i class="fas fa-key mr-2"></i>Change Password
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Gaming Profile -->
+                <div class="bg-gray-800 rounded-lg p-3 sm:p-4 hover:bg-gray-750 transition duration-300">
+                    <h3 class="text-purple-400 font-semibold text-base sm:text-lg mb-3 flex items-center">
+                        <i class="fas fa-gamepad mr-2"></i> Gaming Profile
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Level:</span>
+                            <span class="text-purple-400 font-bold">{{ profile.account_level|default:"1" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Experience:</span>
+                            <span class="text-blue-400 font-medium">{{ profile.experience_points|default:"0" }} XP</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Achievements:</span>
+                            <span class="text-yellow-400 font-medium">{{ profile.achievements_count|default:"0" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Total Donated:</span>
+                            <span class="text-green-400 font-bold">${{ profile.total_donated|default:"0.00" }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'dashboard' %}" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 rounded-lg transition duration-300 block text-center text-sm">
+                            <i class="fas fa-tachometer-alt mr-2"></i>View Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Social Connections -->
+                <div class="bg-gray-800 rounded-lg p-3 sm:p-4 hover:bg-gray-750 transition duration-300">
+                    <h3 class="text-yellow-400 font-semibold text-base sm:text-lg mb-3 flex items-center">
+                        <i class="fas fa-link mr-2"></i> Social Connections
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        {% if user.socialaccount_set.all %}
+                            {% for account in user.socialaccount_set.all %}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300 flex items-center">
+                                        <i class="fab fa-{{ account.provider }} mr-2 text-{{ account.provider }}-400"></i>
+                                        {{ account.provider|title }}:
+                                    </span>
+                                    <span class="text-green-400 font-medium">✓ Connected</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-gray-400 py-2">
+                                <i class="fas fa-unlink text-2xl mb-2"></i>
+                                <p class="text-xs">No social accounts connected</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mt-4">
+                        <a href="/accounts/social/connections/" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-3 rounded-lg transition duration-300 block text-center text-sm">
+                            <i class="fas fa-plug mr-2"></i>Manage Connections
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Privacy & Data -->
+                <div class="bg-gray-800 rounded-lg p-3 sm:p-4 hover:bg-gray-750 transition duration-300">
+                    <h3 class="text-orange-400 font-semibold text-base sm:text-lg mb-3 flex items-center">
+                        <i class="fas fa-user-shield mr-2"></i> Privacy & Data
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Profile Visibility:</span>
+                            <span class="text-white font-medium">Public</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Email Notifications:</span>
+                            <span class="text-green-400 font-medium">Enabled</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">Data Usage:</span>
+                            <span class="text-gray-400 font-medium">Standard</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <button class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-3 rounded-lg transition duration-300 text-sm">
+                            <i class="fas fa-download mr-2"></i>Download My Data
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-700">
+                <h3 class="text-white font-semibold text-base sm:text-lg mb-3 flex items-center">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i> Quick Actions
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                    <a href="{% url 'my_donations' %}" class="bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg transition duration-300 text-center text-sm">
+                        <i class="fas fa-heart mr-2"></i>My Donations
+                    </a>
+                    <a href="{% url 'community' %}" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg transition duration-300 text-center text-sm">
+                        <i class="fas fa-users mr-2"></i>Community
+                    </a>
+                    <a href="/accounts/logout/" class="bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-lg transition duration-300 text-center text-sm">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Help & Support -->
+            <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-700">
+                <h3 class="text-white font-semibold text-base sm:text-lg mb-3 flex items-center">
+                    <i class="fas fa-question-circle mr-2 text-blue-400"></i> Need Help?
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                    <a href="{% url 'contact' %}" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-lg transition duration-300 text-center text-sm">
+                        <i class="fas fa-envelope mr-2"></i>Contact Support
+                    </a>
+                    <a href="{% url 'community' %}" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-lg transition duration-300 text-center text-sm">
+                        <i class="fas fa-book mr-2"></i>Help Center
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Navigation -->
+        <div class="mt-4 sm:mt-6 text-center">
+            <a href="{% url 'dashboard' %}" class="text-blue-400 hover:text-blue-300 underline text-sm sm:text-base">
+                <i class="fas fa-arrow-left mr-1"></i>← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Gaming Background Animation -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-purple-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}

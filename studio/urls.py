@@ -16,5 +16,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),
     path('my-donations/', views.my_donations, name='my_donations'),
-    path('settings/', lambda request: redirect('/accounts/email/'), name='account_settings'),
+    path('settings/', views.settings, name='settings'),
+    path('account-settings/', lambda request: redirect('/accounts/email/'), name='account_settings'),
 ]
