@@ -14,9 +14,9 @@
     </div>
     
     <div class="container mx-auto p-2 sm:p-4 lg:p-6 max-w-7xl">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Left Sidebar - Profile & Quick Stats -->
-            <div class="lg:col-span-1 space-y-3 sm:space-y-6">
+            <div class="lg:col-span-1 space-y-4 sm:space-y-6 order-2 lg:order-1">
                 <!-- Profile Card -->
                 <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-4 lg:p-6">
                     <div class="text-center">
@@ -95,7 +95,7 @@
             </div>
             
             <!-- Main Content Area -->
-            <div class="lg:col-span-3 space-y-3 sm:space-y-6">
+            <div class="lg:col-span-3 space-y-4 sm:space-y-6 order-1 lg:order-2">
                 <!-- Achievement Showcase -->
                 {% if showcased_achievements %}
                 <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-4 lg:p-6">
@@ -124,7 +124,7 @@
                 {% endif %}
                 
                 <!-- Recent Achievements & Activities Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-4 sm:gap-6">
                     <!-- Recent Achievements -->
                     <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
                         <h3 class="text-lg font-bold text-purple-400 mb-4">
@@ -205,37 +205,39 @@
                         <i class="fas fa-history mr-2"></i>Donation History
                     </h3>
                     {% if recent_donations %}
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-gray-700">
-                                        <th class="text-left py-2 text-gray-300">Date</th>
-                                        <th class="text-left py-2 text-gray-300">Amount</th>
-                                        <th class="text-left py-2 text-gray-300">Type</th>
-                                        <th class="text-left py-2 text-gray-300">Goal</th>
-                                        <th class="text-left py-2 text-gray-300">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for donation in recent_donations %}
-                                    <tr class="border-b border-gray-800">
-                                        <td class="py-3 text-gray-300">{{ donation.donated_at|date:"M d, Y" }}</td>
-                                        <td class="py-3 text-green-400 font-semibold">${{ donation.amount }}</td>
-                                        <td class="py-3">
-                                            {% if donation.is_recurring %}
-                                                <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs">{{ donation.get_donation_type_display }}</span>
-                                            {% else %}
-                                                <span class="text-gray-400">One-time</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="py-3 text-gray-300">{{ donation.donation_goal.title|default:"General" }}</td>
-                                        <td class="py-3">
-                                            <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">Completed</span>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                        <div class="overflow-x-auto -mx-2 sm:mx-0">
+                            <div class="inline-block min-w-full px-2 sm:px-0">
+                                <table class="w-full text-xs sm:text-sm min-w-full">
+                                    <thead>
+                                        <tr class="border-b border-gray-700">
+                                            <th class="text-left py-2 px-1 text-gray-300 min-w-0">Date</th>
+                                            <th class="text-left py-2 px-1 text-gray-300 min-w-0">Amount</th>
+                                            <th class="text-left py-2 px-1 text-gray-300 hidden sm:table-cell">Type</th>
+                                            <th class="text-left py-2 px-1 text-gray-300 hidden md:table-cell">Goal</th>
+                                            <th class="text-left py-2 px-1 text-gray-300 min-w-0">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for donation in recent_donations %}
+                                        <tr class="border-b border-gray-800">
+                                            <td class="py-2 px-1 text-gray-300 text-xs">{{ donation.donated_at|date:"M d" }}</td>
+                                            <td class="py-2 px-1 text-green-400 font-semibold text-xs">${{ donation.amount }}</td>
+                                            <td class="py-2 px-1 hidden sm:table-cell">
+                                                {% if donation.is_recurring %}
+                                                    <span class="bg-blue-600 text-white px-1 py-0.5 rounded text-xs">{{ donation.get_donation_type_display }}</span>
+                                                {% else %}
+                                                    <span class="text-gray-400 text-xs">One-time</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-2 px-1 text-gray-300 text-xs hidden md:table-cell">{{ donation.donation_goal.title|default:"General"|truncatewords:2 }}</td>
+                                            <td class="py-2 px-1">
+                                                <span class="bg-green-600 text-white px-1 py-0.5 rounded text-xs">✓</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="mt-4 text-center">
                             <a href="{% url 'donate' %}" class="text-blue-400 hover:text-blue-300 text-sm underline">
