@@ -2,264 +2,241 @@
 {% block title %}Dashboard - Gaming Studio{% endblock %}
 
 {% block content %}
-<section class="relative min-h-screen">
-    <!-- Hero Banner -->
-    <div class="relative bg-cover bg-center h-48 sm:h-56 lg:h-64" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop');">
-        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
-            <div class="text-center">
-                <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-2">Welcome back, {{ user.first_name|default:user.username }}!</h1>
-                <p class="text-blue-200 text-sm sm:text-base">Level {{ gaming_stats.account_level }} Gaming Studio Member</p>
+<!-- Mobile-First Dashboard -->
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <!-- Compact Header for Mobile -->
+    <div class="bg-gray-900 bg-opacity-90 backdrop-blur-sm border-b border-blue-500/30">
+        <div class="container mx-auto px-3 py-3">
+            <div class="flex items-center justify-between">
+                <h1 class="text-lg sm:text-xl font-bold text-white">
+                    <i class="fas fa-tachometer-alt mr-2 text-blue-400"></i>Dashboard
+                </h1>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-300">Level {{ gaming_stats.account_level }}</span>
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full border-2 border-blue-400">
+                    {% else %}
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-xs"></i>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="container mx-auto p-2 sm:p-4 lg:p-6 max-w-7xl">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
-            <!-- Left Sidebar - Profile & Quick Stats -->
-            <div class="lg:col-span-1 space-y-4 sm:space-y-6 order-2 lg:order-1">
-                <!-- Profile Card -->
-                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-4 lg:p-6">
-                    <div class="text-center">
-                        <div class="relative inline-block mb-3 sm:mb-4">
-                            {% if profile.avatar %}
-                                <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-16 sm:w-20 h-16 sm:h-20 rounded-full border-4 border-blue-500 object-cover">
-                            {% else %}
-                                <div class="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-4 border-blue-500">
-                                    <i class="fas fa-user text-white text-lg sm:text-2xl"></i>
-                                </div>
-                            {% endif %}
+
+    <div class="container mx-auto px-3 py-4 max-w-6xl">
+        <!-- Welcome Section - Mobile Optimized -->
+        <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg p-4 mb-4 border border-blue-400/30">
+            <div class="text-center">
+                <h2 class="text-xl font-bold text-white mb-1">Welcome back, {{ user.first_name|default:user.username }}!</h2>
+                <p class="text-blue-200 text-sm">Gaming Studio Member since {{ user.date_joined|date:"M Y" }}</p>
+            </div>
+        </div>
+
+        <!-- Quick Stats Grid - Mobile First -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 text-center border border-blue-400/20">
+                <div class="text-lg font-bold text-blue-400">{{ user.userprofile.level }}</div>
+                <div class="text-xs text-gray-300">Level</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 text-center border border-green-400/20">
+                <div class="text-lg font-bold text-green-400">{{ user.userprofile.total_experience }}</div>
+                <div class="text-xs text-gray-300">XP</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 text-center border border-purple-400/20">
+                <div class="text-lg font-bold text-purple-400">{{ achievements_count }}</div>
+                <div class="text-xs text-gray-300">Achievements</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 text-center border border-yellow-400/20">
+                <div class="text-lg font-bold text-yellow-400">${{ total_donated|floatformat:0 }}</div>
+                <div class="text-xs text-gray-300">Donated</div>
+            </div>
+        </div>
+
+        <!-- Main Content - Single Column on Mobile -->
+        <div class="space-y-4">
                             <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                                 Lv.{{ gaming_stats.account_level }}
                             </div>
                         </div>
                         <h3 class="text-white font-bold text-base sm:text-lg">{{ user.get_full_name|default:user.username }}</h3>
                         {% if profile.current_tier %}
-                            <div class="inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold mt-2" style="background-color: {{ profile.current_tier.color }}; color: white;">
-                                <i class="{{ profile.current_tier.icon }} mr-1"></i>
-                                {{ profile.current_tier.get_name_display }}
-                            </div>
-                        {% endif %}
-                        {% if profile.bio %}
-                            <p class="text-gray-300 text-xs sm:text-sm mt-2 sm:mt-3">{{ profile.bio }}</p>
-                        {% endif %}
+            <!-- Profile Section - Mobile Compact -->
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-blue-400/20">
+                <div class="flex items-center space-x-3">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-12 h-12 rounded-full border-2 border-blue-400">
+                    {% else %}
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-2 border-blue-400">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <h3 class="text-white font-bold text-sm">{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="text-gray-300 text-xs">{{ gaming_stats.experience_points }} XP</p>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: {{ next_level_progress }}%;"></div>
+                        </div>
                     </div>
-                    
-                    <!-- Level Progress -->
-                    <div class="mt-3 sm:mt-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-gray-300 text-xs sm:text-sm">Level Progress</span>
-                            <span class="text-blue-400 text-xs sm:text-sm">{{ next_level_progress|floatformat:0 }}%</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2 sm:h-3">
-                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 sm:h-3 rounded-full transition-all duration-500" style="width: {{ next_level_progress }}%;"></div>
-                        </div>
-                        <p class="text-gray-400 text-xs mt-1">{{ gaming_stats.experience_points }} XP</p>
-                    </div>
-                    
-                    <!-- Quick Actions -->
-                    <div class="mt-4 sm:mt-6 space-y-2">
-                        <a href="{% url 'donate' %}" class="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-2 px-3 sm:px-4 rounded-lg transition duration-300 block text-center text-xs sm:text-sm">
-                            <i class="fas fa-heart mr-2"></i>Make Donation
-                        </a>
-                        <a href="{% url 'profile_edit' %}" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 sm:px-4 rounded-lg transition duration-300 block text-center text-xs sm:text-sm">
-                            <i class="fas fa-edit mr-2"></i>Edit Profile
-                        </a>
-                        <a href="{% url 'settings' %}" class="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 sm:px-4 rounded-lg transition duration-300 block text-center text-xs sm:text-sm">
-                            <i class="fas fa-cog mr-2"></i>Settings
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Quick Stats -->
-                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-4">
-                    <h4 class="text-yellow-400 font-bold mb-2 sm:mb-3 text-sm">📊 Quick Stats</h4>
-                    <div class="space-y-2 text-xs sm:text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Login Streak:</span>
-                            <span class="text-orange-400 font-semibold">{{ gaming_stats.login_streak }} days</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Total Donated:</span>
-                            <span class="text-green-400 font-semibold">${{ gaming_stats.total_donated }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Donations Made:</span>
-                            <span class="text-blue-400 font-semibold">{{ gaming_stats.donations_count }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Achievements:</span>
-                            <span class="text-purple-400 font-semibold">{{ gaming_stats.achievements_count }}/{{ total_achievements }}</span>
-                        </div>
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400">Level</div>
+                        <div class="text-lg font-bold text-blue-400">{{ user.userprofile.level }}</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Main Content Area -->
-            <div class="lg:col-span-3 space-y-4 sm:space-y-6 order-1 lg:order-2">
-                <!-- Achievement Showcase -->
-                {% if showcased_achievements %}
-                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-4 lg:p-6">
-                    <h3 class="text-lg sm:text-xl font-bold text-yellow-400 mb-3 sm:mb-4">
-                        <i class="fas fa-trophy mr-2"></i>Featured Achievements
-                    </h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        {% for user_achievement in showcased_achievements %}
-                        <div class="bg-gray-800 rounded-lg p-3 sm:p-4 border-l-4 {% if user_achievement.achievement.is_rare %}border-yellow-400{% else %}border-blue-400{% endif %}">
-                            <div class="flex items-center space-x-2 sm:space-x-3">
-                                <div class="text-lg sm:text-2xl flex-shrink-0" style="color: {{ user_achievement.achievement.color }}">
-                                    <i class="{{ user_achievement.achievement.icon }}"></i>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="text-white font-semibold text-xs sm:text-sm">{{ user_achievement.achievement.name }}</h4>
-                                    <p class="text-gray-400 text-xs">{{ user_achievement.achievement.description|truncatewords:6 }}</p>
-                                    {% if user_achievement.achievement.is_rare %}
-                                        <span class="inline-block bg-yellow-600 text-white text-xs px-2 py-1 rounded mt-1">RARE</span>
-                                    {% endif %}
-                                </div>
+
+            <!-- Quick Actions - Mobile Optimized -->
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-gray-600/20">
+                <h3 class="text-white font-semibold mb-3 text-sm">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>Quick Actions
+                </h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <a href="{% url 'donate' %}" class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-2 rounded text-center text-xs hover:scale-105 transition-transform">
+                        <i class="fas fa-heart block mb-1"></i>
+                        Donate
+                    </a>
+                    <a href="{% url 'profile_edit' %}" class="bg-purple-600 text-white p-2 rounded text-center text-xs hover:scale-105 transition-transform">
+                        <i class="fas fa-edit block mb-1"></i>
+                        Profile
+                    </a>
+                    <a href="{% url 'settings' %}" class="bg-gray-700 text-white p-2 rounded text-center text-xs hover:scale-105 transition-transform">
+                        <i class="fas fa-cog block mb-1"></i>
+                        Settings
+                    </a>
+                </div>
+            </div>
+
+            <!-- Featured Achievements -->
+            {% if showcased_achievements %}
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-yellow-400/20">
+                <h3 class="text-yellow-400 font-semibold mb-3 text-sm">
+                    <i class="fas fa-trophy mr-2"></i>Featured Achievements
+                </h3>
+                <div class="space-y-2">
+                    {% for user_achievement in showcased_achievements|slice:":3" %}
+                    <div class="bg-gray-700/50 rounded p-2 flex items-center space-x-2">
+                        <div class="text-lg flex-shrink-0" style="color: {{ user_achievement.achievement.color }}">
+                            <i class="{{ user_achievement.achievement.icon }}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white font-medium text-xs">{{ user_achievement.achievement.name }}</h4>
+                            <p class="text-gray-400 text-xs truncate">{{ user_achievement.achievement.description|truncatewords:4 }}</p>
+                        </div>
+                        {% if user_achievement.achievement.is_rare %}
+                            <span class="bg-yellow-600 text-white text-xs px-1 py-0.5 rounded">RARE</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Achievements -->
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-purple-400/20">
+                <h3 class="text-purple-400 font-semibold mb-3 text-sm">
+                    <i class="fas fa-medal mr-2"></i>Recent Achievements
+                </h3>
+                {% if user_achievements %}
+                    <div class="space-y-2">
+                        {% for user_achievement in user_achievements|slice:":4" %}
+                        <div class="bg-gray-700/50 rounded p-2 flex items-center space-x-2">
+                            <div class="text-base flex-shrink-0" style="color: {{ user_achievement.achievement.color }}">
+                                <i class="{{ user_achievement.achievement.icon }}"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white font-medium text-xs">{{ user_achievement.achievement.name }}</h4>
+                                <p class="text-gray-500 text-xs">{{ user_achievement.earned_date|date:"M d, Y" }}</p>
+                            </div>
+                            <div class="text-green-400 text-xs font-semibold">
+                                +{{ user_achievement.achievement.experience_reward }} XP
                             </div>
                         </div>
                         {% endfor %}
                     </div>
-                </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-trophy text-gray-600 text-2xl mb-2"></i>
+                        <p class="text-gray-400 text-xs">No achievements yet!</p>
+                    </div>
                 {% endif %}
-                
-                <!-- Recent Achievements & Activities Grid -->
-                <div class="grid grid-cols-1 gap-4 sm:gap-6">
-                    <!-- Recent Achievements -->
-                    <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
-                        <h3 class="text-lg font-bold text-purple-400 mb-4">
-                            <i class="fas fa-medal mr-2"></i>Recent Achievements
-                        </h3>
-                        {% if user_achievements %}
-                            <div class="space-y-3">
-                                {% for user_achievement in user_achievements %}
-                                <div class="bg-gray-800 rounded-lg p-3 flex items-center space-x-3">
-                                    <div class="text-lg flex-shrink-0" style="color: {{ user_achievement.achievement.color }}">
-                                        <i class="{{ user_achievement.achievement.icon }}"></i>
-                                    </div>
-                                    <div class="flex-grow min-w-0">
-                                        <h4 class="text-white font-semibold text-sm">{{ user_achievement.achievement.name }}</h4>
-                                        <p class="text-gray-400 text-xs truncate">{{ user_achievement.achievement.description }}</p>
-                                        <p class="text-gray-500 text-xs">{{ user_achievement.earned_date|date:"M d, Y" }}</p>
-                                    </div>
-                                    <div class="text-green-400 text-xs font-semibold">
-                                        +{{ user_achievement.achievement.experience_reward }} XP
-                                    </div>
-                                </div>
-                                {% endfor %}
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-green-400/20">
+                <h3 class="text-green-400 font-semibold mb-3 text-sm">
+                    <i class="fas fa-clock mr-2"></i>Recent Activity
+                </h3>
+                {% if recent_activities %}
+                    <div class="space-y-2">
+                        {% for activity in recent_activities|slice:":4" %}
+                        <div class="bg-gray-700/50 rounded p-2 flex items-center space-x-2">
+                            <div class="text-green-400 flex-shrink-0">
+                                {% if activity.activity_type == 'login' %}
+                                    <i class="fas fa-sign-in-alt"></i>
+                                {% elif activity.activity_type == 'donation' %}
+                                    <i class="fas fa-heart"></i>
+                                {% elif activity.activity_type == 'achievement_earned' %}
+                                    <i class="fas fa-trophy"></i>
+                                {% else %}
+                                    <i class="fas fa-circle"></i>
+                                {% endif %}
                             </div>
-                        {% else %}
-                            <div class="text-center py-8">
-                                <i class="fas fa-trophy text-gray-600 text-4xl mb-3"></i>
-                                <p class="text-gray-400">No achievements yet! Start by making your first donation.</p>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-xs">{{ activity.description|truncatewords:6 }}</p>
+                                <p class="text-gray-500 text-xs">{{ activity.timestamp|timesince }} ago</p>
                             </div>
-                        {% endif %}
+                            {% if activity.experience_gained > 0 %}
+                                <div class="text-blue-400 text-xs">+{{ activity.experience_gained }} XP</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
-                    
-                    <!-- Recent Activities -->
-                    <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
-                        <h3 class="text-lg font-bold text-green-400 mb-4">
-                            <i class="fas fa-clock mr-2"></i>Recent Activity
-                        </h3>
-                        {% if recent_activities %}
-                            <div class="space-y-3">
-                                {% for activity in recent_activities %}
-                                <div class="bg-gray-800 rounded-lg p-3 flex items-center space-x-3">
-                                    <div class="text-green-400 flex-shrink-0">
-                                        {% if activity.activity_type == 'login' %}
-                                            <i class="fas fa-sign-in-alt"></i>
-                                        {% elif activity.activity_type == 'donation' %}
-                                            <i class="fas fa-heart"></i>
-                                        {% elif activity.activity_type == 'achievement_earned' %}
-                                            <i class="fas fa-trophy"></i>
-                                        {% elif activity.activity_type == 'level_up' %}
-                                            <i class="fas fa-arrow-up"></i>
-                                        {% else %}
-                                            <i class="fas fa-circle"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="flex-grow min-w-0">
-                                        <p class="text-white text-sm">{{ activity.description }}</p>
-                                        <p class="text-gray-500 text-xs">{{ activity.timestamp|timesince }} ago</p>
-                                    </div>
-                                    {% if activity.experience_gained > 0 %}
-                                        <div class="text-blue-400 text-xs">
-                                            +{{ activity.experience_gained }} XP
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-8">
-                                <i class="fas fa-clock text-gray-600 text-4xl mb-3"></i>
-                                <p class="text-gray-400">No recent activity to show.</p>
-                            </div>
-                        {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-clock text-gray-600 text-2xl mb-2"></i>
+                        <p class="text-gray-400 text-xs">No recent activity</p>
                     </div>
-                </div>
-                
-                <!-- Donation History -->
-                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">
-                        <i class="fas fa-history mr-2"></i>Donation History
-                    </h3>
-                    {% if recent_donations %}
-                        <div class="overflow-x-auto -mx-2 sm:mx-0">
-                            <div class="inline-block min-w-full px-2 sm:px-0">
-                                <table class="w-full text-xs sm:text-sm min-w-full">
-                                    <thead>
-                                        <tr class="border-b border-gray-700">
-                                            <th class="text-left py-2 px-1 text-gray-300 min-w-0">Date</th>
-                                            <th class="text-left py-2 px-1 text-gray-300 min-w-0">Amount</th>
-                                            <th class="text-left py-2 px-1 text-gray-300 hidden sm:table-cell">Type</th>
-                                            <th class="text-left py-2 px-1 text-gray-300 hidden md:table-cell">Goal</th>
-                                            <th class="text-left py-2 px-1 text-gray-300 min-w-0">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for donation in recent_donations %}
-                                        <tr class="border-b border-gray-800">
-                                            <td class="py-2 px-1 text-gray-300 text-xs">{{ donation.donated_at|date:"M d" }}</td>
-                                            <td class="py-2 px-1 text-green-400 font-semibold text-xs">${{ donation.amount }}</td>
-                                            <td class="py-2 px-1 hidden sm:table-cell">
-                                                {% if donation.is_recurring %}
-                                                    <span class="bg-blue-600 text-white px-1 py-0.5 rounded text-xs">{{ donation.get_donation_type_display }}</span>
-                                                {% else %}
-                                                    <span class="text-gray-400 text-xs">One-time</span>
-                                                {% endif %}
-                                            </td>
-                                            <td class="py-2 px-1 text-gray-300 text-xs hidden md:table-cell">{{ donation.donation_goal.title|default:"General"|truncatewords:2 }}</td>
-                                            <td class="py-2 px-1">
-                                                <span class="bg-green-600 text-white px-1 py-0.5 rounded text-xs">✓</span>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                {% endif %}
+            </div>
+
+            <!-- Donation History - Mobile Compact -->
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-blue-400/20">
+                <h3 class="text-blue-400 font-semibold mb-3 text-sm">
+                    <i class="fas fa-history mr-2"></i>Recent Donations
+                </h3>
+                {% if recent_donations %}
+                    <div class="space-y-2">
+                        {% for donation in recent_donations|slice:":3" %}
+                        <div class="bg-gray-700/50 rounded p-2 flex items-center justify-between">
+                            <div>
+                                <div class="text-white text-xs font-medium">${{ donation.amount }}</div>
+                                <div class="text-gray-400 text-xs">{{ donation.donated_at|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">✓ Completed</span>
                             </div>
                         </div>
-                        <div class="mt-4 text-center">
-                            <a href="{% url 'donate' %}" class="text-blue-400 hover:text-blue-300 text-sm underline">
-                                Make Another Donation →
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="text-center py-8">
-                            <i class="fas fa-heart text-gray-600 text-4xl mb-3"></i>
-                            <p class="text-gray-400 mb-4">No donations yet. Support our gaming studio!</p>
-                            <a href="{% url 'donate' %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-2 px-4 rounded-lg transition duration-300 inline-block">
-                                <i class="fas fa-heart mr-2"></i>Make Your First Donation
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'my_donations' %}" class="text-blue-400 text-xs underline">View All Donations →</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-heart text-gray-600 text-2xl mb-2"></i>
+                        <p class="text-gray-400 text-xs mb-2">No donations yet</p>
+                        <a href="{% url 'donate' %}" class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-2 px-3 rounded text-xs">
+                            <i class="fas fa-heart mr-1"></i>Make First Donation
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
-        
+
         <!-- Navigation -->
-        <div class="mt-8 text-center">
-            <a href="{% url 'home' %}" class="text-blue-400 hover:text-blue-300 underline text-sm sm:text-base">← Back to Gaming Studio</a>
+        <div class="mt-6 text-center">
+            <a href="{% url 'home' %}" class="text-blue-400 hover:text-blue-300 underline text-sm">← Back to Gaming Studio</a>
         </div>
     </div>
 </section>
