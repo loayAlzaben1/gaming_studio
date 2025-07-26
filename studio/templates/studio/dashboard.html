@@ -1,4 +1,4 @@
-{% extends 'studio/base.html' %}
+    {% extends 'studio/base.html' %}
 {% block title %}Dashboard - Gaming Studio{% endblock %}
 
 {% block content %}
@@ -12,9 +12,9 @@
                     <i class="fas fa-tachometer-alt mr-2 text-blue-400"></i>Dashboard
                 </h1>
                 <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-300">Level {{ gaming_stats.account_level }}</span>
-                    {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full border-2 border-blue-400">
+                    <span class="text-sm text-gray-300">Level {{ user.userprofile.level|default:1 }}</span>
+                    {% if user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full border-2 border-blue-400">
                     {% else %}
                         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
                             <i class="fas fa-user text-white text-xs"></i>
@@ -56,17 +56,11 @@
 
         <!-- Main Content - Single Column on Mobile -->
         <div class="space-y-4">
-                            <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                Lv.{{ gaming_stats.account_level }}
-                            </div>
-                        </div>
-                        <h3 class="text-white font-bold text-base sm:text-lg">{{ user.get_full_name|default:user.username }}</h3>
-                        {% if profile.current_tier %}
             <!-- Profile Section - Mobile Compact -->
             <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-blue-400/20">
                 <div class="flex items-center space-x-3">
-                    {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-12 h-12 rounded-full border-2 border-blue-400">
+                    {% if user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" class="w-12 h-12 rounded-full border-2 border-blue-400">
                     {% else %}
                         <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-2 border-blue-400">
                             <i class="fas fa-user text-white"></i>
@@ -74,14 +68,14 @@
                     {% endif %}
                     <div class="flex-1">
                         <h3 class="text-white font-bold text-sm">{{ user.get_full_name|default:user.username }}</h3>
-                        <p class="text-gray-300 text-xs">{{ gaming_stats.experience_points }} XP</p>
+                        <p class="text-gray-300 text-xs">{{ user.userprofile.total_experience|default:0 }} XP</p>
                         <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
-                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: {{ next_level_progress }}%;"></div>
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: {{ next_level_progress|default:0 }}%;"></div>
                         </div>
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-gray-400">Level</div>
-                        <div class="text-lg font-bold text-blue-400">{{ user.userprofile.level }}</div>
+                        <div class="text-lg font-bold text-blue-400">{{ user.userprofile.level|default:1 }}</div>
                     </div>
                 </div>
             </div>
@@ -116,8 +110,8 @@
                 <div class="space-y-2">
                     {% for user_achievement in showcased_achievements|slice:":3" %}
                     <div class="bg-gray-700/50 rounded p-2 flex items-center space-x-2">
-                        <div class="text-lg flex-shrink-0" style="color: {{ user_achievement.achievement.color }}">
-                            <i class="{{ user_achievement.achievement.icon }}"></i>
+                        <div class="text-lg flex-shrink-0 text-yellow-400">
+                            <i class="{{ user_achievement.achievement.icon|default:'fas fa-trophy' }}"></i>
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-white font-medium text-xs">{{ user_achievement.achievement.name }}</h4>
@@ -183,10 +177,10 @@
                                 {% endif %}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-white text-xs">{{ activity.description|truncatewords:6 }}</p>
-                                <p class="text-gray-500 text-xs">{{ activity.timestamp|timesince }} ago</p>
+                                <p class="text-white text-xs">{{ activity.description|default:"Activity"|truncatewords:6 }}</p>
+                                <p class="text-gray-500 text-xs">{{ activity.timestamp|timesince|default:"Recently" }} ago</p>
                             </div>
-                            {% if activity.experience_gained > 0 %}
+                            {% if activity.experience_gained|default:0 > 0 %}
                                 <div class="text-blue-400 text-xs">+{{ activity.experience_gained }} XP</div>
                             {% endif %}
                         </div>
