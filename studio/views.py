@@ -297,26 +297,37 @@ def newsletter_subscribe(request):
 @login_required
 def dashboard(request):
     """Enhanced user dashboard with gaming stats, achievements, and donation history."""
-    # Get or create user profile
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
-    # Update login streak
-    today = date.today()
-    if profile.last_login_date:
-        if profile.last_login_date == today - timedelta(days=1):
-            profile.login_streak += 1
-        elif profile.last_login_date != today:
+    try:
+        # Get or create user profile
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        # Update login streak
+        today = date.today()
+        if profile.last_login_date:
+            if profile.last_login_date == today - timedelta(days=1):
+                profile.login_streak += 1
+            elif profile.last_login_date != today:
+                profile.login_streak = 1
+        else:
             profile.login_streak = 1
-    else:
-        profile.login_streak = 1
-    
-    profile.last_login_date = today
-    profile.save()
-    
-    # Award achievements for first login
-    if created:
-        profile.award_achievement('early_supporter')
-        profile.add_experience(50)
+        
+        profile.last_login_date = today
+        profile.save()
+        
+        # Award achievements for first login
+        if created:
+            try:
+                profile.award_achievement('early_supporter')
+                profile.add_experience(50)
+            except Exception as e:
+                print(f"Achievement error: {e}")
+    except Exception as e:
+        print(f"Profile creation error: {e}")
+        # Create a basic context for error cases
+        return render(request, 'studio/dashboard_simple.html', {
+            'user': request.user,
+            'error': 'Profile system temporarily unavailable'
+        })
     
     # Calculate total donated and update profile
     total_donated = Donation.objects.filter(donor_email=request.user.email).aggregate(
@@ -389,56 +400,85 @@ def dashboard(request):
 @login_required
 def profile_edit(request):
     """Allow users to edit their gaming profile."""
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    try:
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        if request.method == 'POST':
+            form = UserProfileForm(request.POST, request.FILES, instance=profile)
+            if form.is_valid():
+                form.save()
+                
+                # Award achievements for profile completion
+                try:
+                    if profile.avatar and profile.bio:
+                        profile.award_achievement('social_butterfly')
+                    
+                    # Create activity record
+                    UserActivity.objects.create(
+                        user=request.user,
+                        activity_type='profile_update',
+                        description='Updated gaming profile',
+                        experience_gained=25
+                    )
+                    
+                    # Add experience for profile update
+                    profile.add_experience(25)
+                except Exception as e:
+                    print(f"Achievement/Activity error: {e}")
+                
+                messages.success(request, 'Your gaming profile has been updated successfully!')
+                return redirect('dashboard')
+        else:
+            form = UserProfileForm(instance=profile)
+        
+        context = {
+            'form': form,
+            'profile': profile,
+        }
+        
+        return render(request, 'studio/profile_edit.html', context)
     
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            
-            # Award achievements for profile completion
-            if profile.avatar and profile.bio:
-                profile.award_achievement('social_butterfly')
-            
-            # Create activity record
-            UserActivity.objects.create(
-                user=request.user,
-                activity_type='profile_update',
-                description='Updated gaming profile',
-                experience_gained=25
-            )
-            
-            # Add experience for profile update
-            profile.add_experience(25)
-            
-            messages.success(request, 'Your gaming profile has been updated successfully!')
-            return redirect('dashboard')
-    else:
-        form = UserProfileForm(instance=profile)
-    
-    context = {
-        'form': form,
-        'profile': profile,
-    }
-    
-    return render(request, 'studio/profile_edit.html', context)
+    except Exception as e:
+        print(f"Profile edit error: {e}")
+        messages.error(request, 'Profile editing is temporarily unavailable. Please try again later.')
+        return redirect('dashboard')
 
 @login_required
 def my_donations(request):
     """Display user's donation history."""
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    try:
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        # Get all donations for this user
+        user_donations = Donation.objects.filter(donor_email=request.user.email).order_by('-donated_at')
+        
+        # Calculate total donated
+        total_donated = user_donations.aggregate(total=Sum('amount'))['total'] or 0
+        
+        context = {
+            'profile': profile,
+            'donations': user_donations,
+            'total_donated': total_donated,
+            'donation_count': user_donations.count(),
+        }
+        
+        return render(request, 'studio/my_donations.html', context)
     
-    # Get all donations for this user
-    user_donations = Donation.objects.filter(donor_email=request.user.email).order_by('-donated_at')
-    
-    # Calculate total donated
-    total_donated = user_donations.aggregate(total=Sum('amount'))['total'] or 0
-    
-    context = {
-        'profile': profile,
-        'donations': user_donations,
-        'total_donated': total_donated,
-        'donation_count': user_donations.count(),
-    }
-    
-    return render(request, 'studio/my_donations.html', context)
+    except Exception as e:
+        print(f"My donations error: {e}")
+        # Return simple donation history without profile dependencies
+        try:
+            user_donations = Donation.objects.filter(donor_email=request.user.email).order_by('-donated_at')
+            total_donated = user_donations.aggregate(total=Sum('amount'))['total'] or 0
+            
+            context = {
+                'donations': user_donations,
+                'total_donated': total_donated,
+                'donation_count': user_donations.count(),
+                'error': 'Profile system temporarily unavailable'
+            }
+            
+            return render(request, 'studio/my_donations.html', context)
+        except Exception:
+            messages.error(request, 'Donation history is temporarily unavailable. Please try again later.')
+            return redirect('dashboard')

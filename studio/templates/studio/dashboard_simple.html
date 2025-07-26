@@ -1,0 +1,42 @@
+{% extends 'studio/base.html' %}
+{% block title %}Dashboard - Gaming Studio{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 max-w-4xl">
+    <div class="bg-gray-900 rounded-lg p-6 text-white">
+        <h1 class="text-3xl font-bold mb-6 text-center">Gaming Dashboard</h1>
+        
+        {% if error %}
+            <div class="bg-yellow-600 bg-opacity-20 border border-yellow-400 rounded-lg p-4 mb-6">
+                <p class="text-yellow-400">{{ error }}</p>
+                <p class="text-gray-300 text-sm mt-2">We're working to restore full functionality. Basic features are still available.</p>
+            </div>
+        {% endif %}
+        
+        <div class="text-center mb-6">
+            <h2 class="text-xl font-semibold">Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+            <p class="text-gray-300 mt-2">Your gaming profile is being set up. Please check back shortly.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4">
+                <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
+                <div class="space-y-2">
+                    <a href="{% url 'games' %}" class="block text-blue-400 hover:text-blue-300">View Games</a>
+                    <a href="{% url 'donate' %}" class="block text-green-400 hover:text-green-300">Make Donation</a>
+                    <a href="{% url 'contact' %}" class="block text-purple-400 hover:text-purple-300">Contact Us</a>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4">
+                <h3 class="text-lg font-semibold mb-2">Account</h3>
+                <div class="space-y-2">
+                    <p class="text-gray-300">Username: {{ user.username }}</p>
+                    <p class="text-gray-300">Email: {{ user.email }}</p>
+                    <p class="text-gray-300">Member since: {{ user.date_joined|date:"F Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
