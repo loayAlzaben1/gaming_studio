@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: gaming-studio
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn gaming_studio.wsgi:application"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: DEBUG
+        value: False
+      - key: DJANGO_SETTINGS_MODULE
+        value: gaming_studio.settings
