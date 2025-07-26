@@ -120,6 +120,12 @@
                         <i class="fab fa-twitter text-xl"></i>
                         <span>Connect Twitter</span>
                     </a>
+                {% elif provider.id == "github" %}
+                    <a href="{% provider_login_url provider.id %}" 
+                       class="flex items-center justify-center space-x-3 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-lg transition duration-300">
+                        <i class="fab fa-github text-xl"></i>
+                        <span>Connect GitHub</span>
+                    </a>
                 {% endif %}
             {% empty %}
                 <div class="col-span-full bg-gray-800 bg-opacity-60 rounded-lg p-6 text-center border border-gray-700">
