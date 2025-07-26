@@ -1,0 +1,345 @@
+{% extends 'studio/base.html' %}
+{% block title %}{{ profile_user.username }}'s Gaming Profile{% endblock %}
+
+{% block content %}
+<!-- Enhanced Gaming Profile Page -->
+<section class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    
+    <!-- Profile Banner Section -->
+    <div class="relative">
+        {% if profile.profile_banner %}
+            <div class="h-64 bg-cover bg-center" style="background-image: url('{{ profile.profile_banner.url }}');">
+                <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+            </div>
+        {% else %}
+            <div class="h-64 bg-gradient-to-r from-purple-800 via-blue-800 to-indigo-800">
+                <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+            </div>
+        {% endif %}
+        
+        <!-- Profile Header -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+            <div class="container mx-auto max-w-6xl">
+                <div class="flex flex-col sm:flex-row items-start sm:items-end space-y-4 sm:space-y-0 sm:space-x-6">
+                    
+                    <!-- Avatar -->
+                    <div class="relative">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" 
+                                 class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-yellow-400 shadow-lg object-cover">
+                        {% else %}
+                            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-yellow-400 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-user text-white text-2xl sm:text-4xl"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Level Badge -->
+                        <div class="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                            LVL {{ profile.account_level }}
+                        </div>
+                    </div>
+                    
+                    <!-- User Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between">
+                            <div>
+                                <h1 class="text-2xl sm:text-4xl font-bold text-white">
+                                    {{ profile_user.get_full_name|default:profile_user.username }}
+                                </h1>
+                                {% if profile.custom_title %}
+                                    <p class="text-lg text-yellow-400 font-semibold mt-1">{{ profile.custom_title }}</p>
+                                {% endif %}
+                                {% if profile.current_tier %}
+                                    <div class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-sm font-semibold" 
+                                         style="background-color: {{ profile.current_tier.color }}20; color: {{ profile.current_tier.color }}; border: 1px solid {{ profile.current_tier.color }};">
+                                        <i class="{{ profile.current_tier.icon }} mr-2"></i>
+                                        {{ profile.current_tier.get_name_display }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Social Actions -->
+                            <div class="flex items-center space-x-2 mt-4 sm:mt-0">
+                                {% if user != profile_user %}
+                                    <button class="follow-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-300">
+                                        <i class="fas fa-user-plus mr-2"></i>Follow
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'profile_edit' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-300">
+                                        <i class="fas fa-edit mr-2"></i>Edit Profile
+                                    </a>
+                                {% endif %}
+                                <button class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition duration-300">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Profile Stats Row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 text-center border border-blue-400/20">
+                <div class="text-2xl font-bold text-blue-400">{{ profile.account_level }}</div>
+                <div class="text-xs text-gray-400">Level</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 text-center border border-green-400/20">
+                <div class="text-2xl font-bold text-green-400">{{ profile.experience_points }}</div>
+                <div class="text-xs text-gray-400">XP</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 text-center border border-purple-400/20">
+                <div class="text-2xl font-bold text-purple-400">{{ achievements_count }}</div>
+                <div class="text-xs text-gray-400">Achievements</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 text-center border border-yellow-400/20">
+                <div class="text-2xl font-bold text-yellow-400">${{ profile.total_donated|floatformat:0 }}</div>
+                <div class="text-xs text-gray-400">Donated</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 text-center border border-red-400/20">
+                <div class="text-2xl font-bold text-red-400">{{ profile.login_streak }}</div>
+                <div class="text-xs text-gray-400">Day Streak</div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 text-center border border-pink-400/20">
+                <div class="text-2xl font-bold text-pink-400">{{ followers_count }}</div>
+                <div class="text-xs text-gray-400">Followers</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Bio Section -->
+                {% if profile.bio %}
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-user mr-2 text-blue-400"></i>About
+                    </h3>
+                    <p class="text-gray-300 leading-relaxed">{{ profile.bio }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Gaming Preferences -->
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-gamepad mr-2 text-green-400"></i>Gaming Profile
+                    </h3>
+                    <div class="space-y-4">
+                        {% if profile.gaming_style %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Gaming Style:</span>
+                            <span class="text-green-400 font-semibold">{{ profile.get_gaming_style_display }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.gaming_hours_weekly %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Weekly Hours:</span>
+                            <span class="text-blue-400 font-semibold">{{ profile.gaming_hours_weekly }}h</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.preferred_platforms %}
+                        <div>
+                            <span class="text-gray-400">Platforms:</span>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                {% for platform in profile.preferred_platforms|split:"," %}
+                                    <span class="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm border border-blue-400/30">
+                                        {{ platform.strip }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.favorite_genres %}
+                        <div>
+                            <span class="text-gray-400">Favorite Genres:</span>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                {% for genre in profile.favorite_genres|split:"," %}
+                                    <span class="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm border border-purple-400/30">
+                                        {{ genre.strip }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.favorite_game %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Favorite Game:</span>
+                            <span class="text-yellow-400 font-semibold">{{ profile.favorite_game.title }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Featured Achievements -->
+                {% if showcased_achievements %}
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-trophy mr-2 text-yellow-400"></i>Featured Achievements
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {% for user_achievement in showcased_achievements %}
+                        <div class="bg-gray-700/60 p-4 rounded-lg border border-gray-600/50 text-center hover:scale-105 transition-transform">
+                            <div class="text-2xl mb-2" style="color: {{ user_achievement.achievement.color }}">
+                                <i class="{{ user_achievement.achievement.icon }}"></i>
+                            </div>
+                            <h4 class="font-semibold text-white text-sm mb-1">{{ user_achievement.achievement.name }}</h4>
+                            <p class="text-xs text-gray-400">{{ user_achievement.earned_date|date:"M d, Y" }}</p>
+                            {% if user_achievement.achievement.is_rare %}
+                                <span class="inline-block mt-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full">
+                                    <i class="fas fa-gem mr-1"></i>Rare
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Recent Activity -->
+                {% if recent_activities %}
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-clock mr-2 text-blue-400"></i>Recent Activity
+                    </h3>
+                    <div class="space-y-3">
+                        {% for activity in recent_activities %}
+                        <div class="flex items-center space-x-3 p-3 bg-gray-700/40 rounded-lg">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-gray-300">{{ activity.description }}</p>
+                                <p class="text-xs text-gray-500">{{ activity.timestamp|timesince }} ago</p>
+                            </div>
+                            {% if activity.experience_gained > 0 %}
+                                <span class="text-green-400 text-xs font-semibold">+{{ activity.experience_gained }} XP</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Right Sidebar -->
+            <div class="space-y-6">
+                
+                <!-- Level Progress -->
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-lg font-bold text-white mb-4">
+                        <i class="fas fa-chart-line mr-2 text-green-400"></i>Level Progress
+                    </h3>
+                    <div class="text-center mb-4">
+                        <div class="text-3xl font-bold text-white">{{ profile.account_level }}</div>
+                        <div class="text-sm text-gray-400">Current Level</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm text-gray-400 mb-1">
+                            <span>{{ profile.experience_points }} XP</span>
+                            <span>{{ next_level_xp }} XP</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" 
+                                 style="width: {{ next_level_progress }}%;"></div>
+                        </div>
+                    </div>
+                    <p class="text-center text-xs text-gray-400">{{ xp_to_next_level }} XP to next level</p>
+                </div>
+                
+                <!-- All Achievements -->
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-lg font-bold text-white mb-4">
+                        <i class="fas fa-medal mr-2 text-yellow-400"></i>Achievements
+                        <span class="text-sm text-gray-400 ml-2">({{ achievements_count }}/{{ total_achievements }})</span>
+                    </h3>
+                    <div class="space-y-2 max-h-64 overflow-y-auto">
+                        {% for user_achievement in user_achievements %}
+                        <div class="flex items-center space-x-3 p-2 bg-gray-700/40 rounded hover:bg-gray-700/60 transition">
+                            <div class="text-lg flex-shrink-0" style="color: {{ user_achievement.achievement.color }}">
+                                <i class="{{ user_achievement.achievement.icon }}"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-semibold text-white">{{ user_achievement.achievement.name }}</div>
+                                <div class="text-xs text-gray-400">{{ user_achievement.earned_date|date:"M d, Y" }}</div>
+                            </div>
+                            {% if user_achievement.achievement.is_rare %}
+                                <i class="fas fa-gem text-purple-400 text-xs"></i>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Social Stats -->
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-600/30">
+                    <h3 class="text-lg font-bold text-white mb-4">
+                        <i class="fas fa-users mr-2 text-pink-400"></i>Social
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Followers</span>
+                            <span class="text-pink-400 font-semibold">{{ followers_count }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Following</span>
+                            <span class="text-blue-400 font-semibold">{{ following_count }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Profile Views</span>
+                            <span class="text-green-400 font-semibold">{{ profile.profile_views }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Member Since</span>
+                            <span class="text-gray-300 text-sm">{{ profile.join_date|date:"M Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back to Dashboard -->
+        <div class="mt-8 text-center">
+            <a href="{% url 'dashboard' %}" class="text-blue-400 hover:text-blue-300 underline">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Follow/Unfollow JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const followBtn = document.querySelector('.follow-btn');
+    if (followBtn) {
+        followBtn.addEventListener('click', function() {
+            // Add follow/unfollow functionality here
+            const isFollowing = this.textContent.includes('Following');
+            if (isFollowing) {
+                this.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Follow';
+                this.classList.remove('bg-green-600', 'hover:bg-green-700');
+                this.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                this.innerHTML = '<i class="fas fa-user-check mr-2"></i>Following';
+                this.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                this.classList.add('bg-green-600', 'hover:bg-green-700');
+            }
+        });
+    }
+});
+</script>
+
+<!-- Floating gaming particles -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-purple-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}

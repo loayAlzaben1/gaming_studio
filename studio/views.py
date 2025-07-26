@@ -1,17 +1,19 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
 from django.core.mail import send_mail
 from django.utils import timezone
+from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 import paypalrestsdk
 import os
 from dotenv import load_dotenv
 from .models import (ContactMessage, Donation, Game, TeamMember, SponsorTier, 
-                     DonationGoal, UserProfile, Achievement, UserAchievement, UserActivity)
+                     DonationGoal, UserProfile, Achievement, UserAchievement, UserActivity,
+                     UserFollow, GameReview, UserGameStats, GameSession, FeaturedAchievement)
 from .forms import DonationForm, UserProfileForm
 
 # Load environment variables
@@ -399,7 +401,7 @@ def dashboard(request):
 
 @login_required
 def profile_edit(request):
-    """Allow users to edit their gaming profile."""
+    """Enhanced profile editing with gaming features."""
     try:
         profile, created = UserProfile.objects.get_or_create(user=request.user)
         
@@ -410,38 +412,163 @@ def profile_edit(request):
                 
                 # Award achievements for profile completion
                 try:
-                    if profile.avatar and profile.bio:
+                    if profile.avatar and profile.bio and profile.custom_title:
                         profile.award_achievement('social_butterfly')
                     
                     # Create activity record
                     UserActivity.objects.create(
                         user=request.user,
                         activity_type='profile_update',
-                        description='Updated gaming profile',
+                        description='Updated gaming profile with new information',
                         experience_gained=25
                     )
                     
                     # Add experience for profile update
                     profile.add_experience(25)
+                    
+                    # Update profile views counter when profile is updated
+                    profile.profile_views += 1
+                    profile.save()
+                    
                 except Exception as e:
                     print(f"Achievement/Activity error: {e}")
                 
-                messages.success(request, 'Your gaming profile has been updated successfully!')
+                messages.success(request, '🎮 Your gaming profile has been updated successfully! (+25 XP)')
                 return redirect('dashboard')
         else:
             form = UserProfileForm(instance=profile)
         
+        # Get user achievements for showcase selection
+        user_achievements = UserAchievement.objects.filter(user=request.user).select_related('achievement').order_by('-earned_date')
+        
         context = {
             'form': form,
             'profile': profile,
+            'user_achievements': user_achievements[:10],  # Show recent 10 for selection
         }
         
-        return render(request, 'studio/profile_edit.html', context)
+        return render(request, 'studio/profile_edit_enhanced.html', context)
     
     except Exception as e:
         print(f"Profile edit error: {e}")
         messages.error(request, 'Profile editing is temporarily unavailable. Please try again later.')
         return redirect('dashboard')
+
+@login_required 
+def profile_view(request, username=None):
+    """Enhanced user profile view with gaming stats and social features."""
+    try:
+        if username:
+            profile_user = get_object_or_404(User, username=username)
+            profile = get_object_or_404(UserProfile, user=profile_user)
+            
+            # Check if profile is public or if it's the user's own profile
+            if not profile.is_profile_public and request.user != profile_user:
+                messages.error(request, "This profile is private.")
+                return redirect('dashboard')
+            
+            # Increment profile views (only if it's not the owner viewing)
+            if request.user != profile_user:
+                profile.profile_views += 1
+                profile.save()
+        else:
+            profile_user = request.user
+            profile, created = UserProfile.objects.get_or_create(user=profile_user)
+        
+        # Get user achievements
+        user_achievements = UserAchievement.objects.filter(user=profile_user).select_related('achievement').order_by('-earned_date')
+        showcased_achievements = user_achievements.filter(is_showcased=True)[:3]
+        achievements_count = user_achievements.count()
+        
+        # Get recent activities
+        recent_activities = UserActivity.objects.filter(user=profile_user)[:10]
+        
+        # Calculate level progress
+        next_level_xp = profile.account_level * 100
+        current_level_xp = (profile.account_level - 1) * 100
+        xp_to_next_level = next_level_xp - profile.experience_points
+        next_level_progress = profile.get_next_level_progress()
+        
+        # Get social stats
+        followers_count = UserFollow.objects.filter(following=profile_user).count()
+        following_count = UserFollow.objects.filter(follower=profile_user).count()
+        
+        # Get gaming stats
+        game_stats = UserGameStats.objects.filter(user=profile_user).select_related('game').order_by('-total_playtime_hours')[:5]
+        total_playtime = sum(stat.total_playtime_hours for stat in game_stats)
+        
+        context = {
+            'profile_user': profile_user,
+            'profile': profile,
+            'user_achievements': user_achievements[:12],
+            'showcased_achievements': showcased_achievements,
+            'achievements_count': achievements_count,
+            'total_achievements': Achievement.objects.count(),
+            'recent_activities': recent_activities,
+            'next_level_progress': next_level_progress,
+            'next_level_xp': next_level_xp,
+            'xp_to_next_level': max(0, xp_to_next_level),
+            'followers_count': followers_count,
+            'following_count': following_count,
+            'game_stats': game_stats,
+            'total_playtime': total_playtime,
+        }
+        
+        return render(request, 'studio/profile_enhanced.html', context)
+    
+    except Exception as e:
+        print(f"Profile view error: {e}")
+        messages.error(request, 'Profile viewing is temporarily unavailable.')
+        return redirect('dashboard')
+
+@login_required
+def follow_user(request, username):
+    """Follow/unfollow a user."""
+    if request.method == 'POST':
+        try:
+            user_to_follow = get_object_or_404(User, username=username)
+            
+            if user_to_follow == request.user:
+                return JsonResponse({'error': 'Cannot follow yourself'})
+            
+            follow_relationship, created = UserFollow.objects.get_or_create(
+                follower=request.user,
+                following=user_to_follow
+            )
+            
+            if not created:
+                # Unfollow
+                follow_relationship.delete()
+                is_following = False
+                action = 'unfollowed'
+            else:
+                # Follow
+                is_following = True
+                action = 'followed'
+                
+                # Create activity
+                UserActivity.objects.create(
+                    user=request.user,
+                    activity_type='social',
+                    description=f'Started following {user_to_follow.username}',
+                    experience_gained=5
+                )
+                
+                # Add experience for social interaction
+                profile = UserProfile.objects.get(user=request.user)
+                profile.add_experience(5)
+            
+            return JsonResponse({
+                'success': True,
+                'is_following': is_following,
+                'action': action,
+                'followers_count': UserFollow.objects.filter(following=user_to_follow).count()
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
+    
+    return JsonResponse({'error': 'Invalid request method'})
 
 @login_required
 def my_donations(request):

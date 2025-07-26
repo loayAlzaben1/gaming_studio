@@ -1,0 +1,288 @@
+{% extends 'studio/base.html' %}
+{% block title %}Edit Gaming Profile{% endblock %}
+
+{% block content %}
+<!-- Enhanced Profile Edit Page -->
+<section class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">
+                <i class="fas fa-user-edit mr-3 text-blue-400"></i>Edit Gaming Profile
+            </h1>
+            <p class="text-gray-300">Customize your gaming identity and showcase your achievements</p>
+        </div>
+        
+        <!-- Profile Edit Form -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-600/30">
+            <form method="post" enctype="multipart/form-data" class="p-6 space-y-8">
+                {% csrf_token %}
+                
+                <!-- Error Messages -->
+                {% if form.errors %}
+                    <div class="bg-red-600/20 border border-red-400/50 rounded-lg p-4 text-red-400">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Please fix the following errors:
+                        </h3>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <p class="text-sm">• {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Profile Images Section -->
+                <div class="bg-gray-700/40 rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-images mr-2 text-purple-400"></i>Profile Images
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Avatar -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">
+                                <i class="fas fa-user-circle mr-2 text-blue-400"></i>Avatar
+                            </label>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    {% if profile.avatar %}
+                                        <img src="{{ profile.avatar.url }}" alt="Current avatar" 
+                                             class="w-16 h-16 rounded-full object-cover border-2 border-gray-600">
+                                    {% else %}
+                                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center border-2 border-gray-600">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    {{ form.avatar }}
+                                    <p class="text-xs text-gray-400 mt-1">Recommended: 200x200px, JPG or PNG</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Banner -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">
+                                <i class="fas fa-image mr-2 text-purple-400"></i>Profile Banner
+                            </label>
+                            <div class="space-y-2">
+                                {% if profile.profile_banner %}
+                                    <div class="w-full h-20 rounded-lg bg-cover bg-center border border-gray-600" 
+                                         style="background-image: url('{{ profile.profile_banner.url }}');"></div>
+                                {% endif %}
+                                {{ form.profile_banner }}
+                                <p class="text-xs text-gray-400">Recommended: 1200x300px, JPG or PNG</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Basic Information -->
+                <div class="bg-gray-700/40 rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-id-card mr-2 text-yellow-400"></i>Basic Information
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Custom Title -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-crown mr-2 text-yellow-400"></i>{{ form.custom_title.label }}
+                            </label>
+                            {{ form.custom_title }}
+                            {% if form.custom_title.help_text %}
+                                <p class="text-xs text-gray-400 mt-1">{{ form.custom_title.help_text }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Theme Preference -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-palette mr-2 text-pink-400"></i>{{ form.theme_preference.label }}
+                            </label>
+                            {{ form.theme_preference }}
+                        </div>
+                        
+                        <!-- Bio -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-pen mr-2 text-green-400"></i>{{ form.bio.label }}
+                            </label>
+                            {{ form.bio }}
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>Tell us about your gaming journey</span>
+                                <span id="bio-counter">0/500</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gaming Preferences -->
+                <div class="bg-gray-700/40 rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-gamepad mr-2 text-green-400"></i>Gaming Preferences
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Gaming Style -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-chess mr-2 text-blue-400"></i>{{ form.gaming_style.label }}
+                            </label>
+                            {{ form.gaming_style }}
+                        </div>
+                        
+                        <!-- Gaming Hours -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-clock mr-2 text-yellow-400"></i>{{ form.gaming_hours_weekly.label }}
+                            </label>
+                            {{ form.gaming_hours_weekly }}
+                            {% if form.gaming_hours_weekly.help_text %}
+                                <p class="text-xs text-gray-400 mt-1">{{ form.gaming_hours_weekly.help_text }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Favorite Game -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-star mr-2 text-yellow-400"></i>{{ form.favorite_game.label }}
+                            </label>
+                            {{ form.favorite_game }}
+                        </div>
+                        
+                        <!-- Profile Privacy -->
+                        <div class="flex items-center space-x-3">
+                            {{ form.is_profile_public }}
+                            <label class="text-sm font-medium text-gray-300">
+                                <i class="fas fa-eye mr-2 text-green-400"></i>{{ form.is_profile_public.label }}
+                            </label>
+                        </div>
+                        
+                        <!-- Preferred Platforms -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-desktop mr-2 text-purple-400"></i>{{ form.preferred_platforms.label }}
+                            </label>
+                            {{ form.preferred_platforms }}
+                            {% if form.preferred_platforms.help_text %}
+                                <p class="text-xs text-gray-400 mt-1">{{ form.preferred_platforms.help_text }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Favorite Genres -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-tags mr-2 text-pink-400"></i>{{ form.favorite_genres.label }}
+                            </label>
+                            {{ form.favorite_genres }}
+                            {% if form.favorite_genres.help_text %}
+                                <p class="text-xs text-gray-400 mt-1">{{ form.favorite_genres.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Privacy Settings -->
+                <div class="bg-gray-700/40 rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-shield-alt mr-2 text-red-400"></i>Privacy Settings
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-600/40 rounded-lg">
+                            <div>
+                                <h3 class="text-white font-semibold">Public Profile</h3>
+                                <p class="text-sm text-gray-400">Allow other users to view your gaming profile and stats</p>
+                            </div>
+                            {{ form.is_profile_public }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 hover:from-green-700 hover:via-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500/50">
+                        <i class="fas fa-save mr-2"></i>Save Profile
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 text-center">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="mt-8 bg-blue-600/10 border border-blue-400/30 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-blue-400 mb-3">
+                <i class="fas fa-info-circle mr-2"></i>Profile Tips
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-300">
+                <li>• <strong>Custom Title:</strong> Choose a title that represents your gaming style or achievements</li>
+                <li>• <strong>Bio:</strong> Share your gaming journey, favorite memories, or what you're currently playing</li>
+                <li>• <strong>Platforms & Genres:</strong> Help other gamers find common interests with you</li>
+                <li>• <strong>Profile Banner:</strong> Use gaming screenshots or artwork that represents you</li>
+                <li>• <strong>Complete Profile:</strong> Fill out all sections to unlock the "Social Butterfly" achievement!</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Character Counter Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bio character counter
+    const bioField = document.querySelector('textarea[name="bio"]');
+    const bioCounter = document.getElementById('bio-counter');
+    
+    if (bioField && bioCounter) {
+        function updateCounter() {
+            const length = bioField.value.length;
+            bioCounter.textContent = `${length}/500`;
+            bioCounter.classList.toggle('text-red-400', length > 450);
+            bioCounter.classList.toggle('text-yellow-400', length > 400 && length <= 450);
+        }
+        
+        bioField.addEventListener('input', updateCounter);
+        updateCounter(); // Initial count
+    }
+    
+    // Image preview functionality
+    function previewImage(input, previewElement) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewElement.style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    const avatarInput = document.querySelector('input[name="avatar"]');
+    const bannerInput = document.querySelector('input[name="profile_banner"]');
+    
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function() {
+            const preview = document.querySelector('img[alt="Current avatar"]');
+            if (preview && this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+
+<!-- Gaming Background Animation -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-purple-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}

@@ -28,6 +28,39 @@ class UserProfile(models.Model):
     comments_count = models.IntegerField(default=0)
     likes_received = models.IntegerField(default=0)
     
+    # Enhanced Gaming Features
+    gaming_style = models.CharField(max_length=50, choices=[
+        ('casual', 'Casual Gamer'),
+        ('hardcore', 'Hardcore Gamer'),
+        ('competitive', 'Competitive Player'),
+        ('story_lover', 'Story Enthusiast'),
+        ('multiplayer', 'Multiplayer Focused'),
+        ('indie_supporter', 'Indie Game Supporter'),
+    ], default='casual', blank=True)
+    
+    preferred_platforms = models.CharField(max_length=200, blank=True, help_text="Comma-separated list of preferred gaming platforms")
+    favorite_genres = models.CharField(max_length=200, blank=True, help_text="Comma-separated list of favorite game genres")
+    gaming_hours_weekly = models.IntegerField(default=0, help_text="Average gaming hours per week")
+    
+    # Profile Customization
+    theme_preference = models.CharField(max_length=20, choices=[
+        ('dark', 'Dark Theme'),
+        ('light', 'Light Theme'),
+        ('auto', 'Auto Theme'),
+        ('gaming', 'Gaming Theme'),
+        ('neon', 'Neon Theme'),
+    ], default='dark')
+    
+    profile_banner = models.ImageField(upload_to='profile_banners/', null=True, blank=True)
+    custom_title = models.CharField(max_length=100, blank=True, help_text="Custom title to display on profile")
+    is_profile_public = models.BooleanField(default=True)
+    
+    # Social Features
+    followers = models.ManyToManyField('self', through='UserFollow', symmetrical=False, related_name='following_users')
+    
+    # Achievement Display
+    featured_achievements = models.ManyToManyField('Achievement', through='FeaturedAchievement', blank=True, related_name='featured_by_users')
+    
     def update_tier(self):
         """Update user's tier based on total donations"""
         if self.total_donated > 0:
@@ -377,3 +410,147 @@ class UserActivity(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.get_activity_type_display()}"
+
+# Enhanced Social Features
+class UserFollow(models.Model):
+    """User following system"""
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_relationships')
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_relationships')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['follower', 'following']
+    
+    def __str__(self):
+        return f"{self.follower.username} follows {self.following.username}"
+
+class FeaturedAchievement(models.Model):
+    """User's featured achievements on profile"""
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user_profile', 'achievement']
+        ordering = ['display_order']
+    
+    def __str__(self):
+        return f"{self.user_profile.user.username} features {self.achievement.name}"
+
+# Gaming Statistics and Records
+class GameSession(models.Model):
+    """Track user gaming sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_sessions')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='play_sessions')
+    start_time = models.DateTimeField(auto_now_add=True)
+    duration_minutes = models.PositiveIntegerField(help_text="Session duration in minutes")
+    experience_gained = models.IntegerField(default=0)
+    achievements_unlocked = models.ManyToManyField(Achievement, blank=True)
+    
+    def __str__(self):
+        return f"{self.user.username} played {self.game.title} for {self.duration_minutes}min"
+
+class UserGameStats(models.Model):
+    """Detailed gaming statistics for each user-game combination"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_stats')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='user_stats')
+    total_playtime_hours = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sessions_count = models.PositiveIntegerField(default=0)
+    achievements_earned = models.PositiveIntegerField(default=0)
+    favorite_game = models.BooleanField(default=False)
+    rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)], null=True, blank=True)
+    last_played = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ['user', 'game']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.game.title} Stats"
+
+# User Reviews and Community Features
+class GameReview(models.Model):
+    """User reviews for games"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_reviews')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)])
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    likes_count = models.PositiveIntegerField(default=0)
+    is_recommended = models.BooleanField(default=True)
+    playtime_hours = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'game']
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username}'s review of {self.game.title}"
+
+class ReviewLike(models.Model):
+    """Track likes on game reviews"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(GameReview, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'review']
+    
+    def __str__(self):
+        return f"{self.user.username} likes {self.review.title}"
+
+# Enhanced Achievement System
+class AchievementCategory(models.Model):
+    """Categories for organizing achievements"""
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, default='fas fa-trophy')
+    color = models.CharField(max_length=7, default='#FFD700')
+    
+    class Meta:
+        verbose_name_plural = "Achievement Categories"
+    
+    def __str__(self):
+        return self.name
+
+# Update Achievement model to include category
+# This will be added in a migration later
+class MilestoneAchievement(models.Model):
+    """Special milestone achievements with progression tracking"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='milestones')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    target_value = models.PositiveIntegerField()
+    current_value = models.PositiveIntegerField(default=0)
+    achievement_type = models.CharField(max_length=50, choices=[
+        ('donations', 'Total Donations'),
+        ('playtime', 'Total Playtime'),
+        ('achievements', 'Achievements Earned'),
+        ('social', 'Social Interactions'),
+        ('reviews', 'Reviews Written'),
+    ])
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    reward_experience = models.PositiveIntegerField(default=100)
+    
+    @property
+    def progress_percentage(self):
+        if self.target_value > 0:
+            return min(100, (self.current_value / self.target_value) * 100)
+        return 0
+    
+    def check_completion(self):
+        if not self.is_completed and self.current_value >= self.target_value:
+            self.is_completed = True
+            self.completed_at = timezone.now()
+            # Award experience to user
+            profile = UserProfile.objects.get(user=self.user)
+            profile.add_experience(self.reward_experience)
+            self.save()
+            return True
+        return False
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.title} ({self.current_value}/{self.target_value})"
