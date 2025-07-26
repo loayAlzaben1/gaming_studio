@@ -1,0 +1,345 @@
+{% extends 'studio/base.html' %}
+{% block title %}{{ game.title }} - Gaming Studio{% endblock %}
+
+{% block content %}
+<!-- Enhanced Game Detail Page -->
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <!-- Game Hero Section -->
+    <div class="relative bg-cover bg-center h-64 sm:h-80 lg:h-96" style="background-image: url('{% if game.cover_image %}{{ game.cover_image.url }}{% else %}https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop{% endif %}');">
+        <div class="absolute inset-0 bg-black bg-opacity-70 flex items-end">
+            <div class="container mx-auto px-4 py-8">
+                <div class="flex flex-col lg:flex-row items-start lg:items-end gap-6">
+                    <!-- Game Cover -->
+                    {% if game.cover_image %}
+                    <div class="flex-shrink-0">
+                        <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-32 h-48 sm:w-40 sm:h-60 lg:w-48 lg:h-72 object-cover rounded-lg border-4 border-white/20 shadow-2xl">
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Game Info -->
+                    <div class="flex-1">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            {% if game.is_featured %}
+                            <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+                                <i class="fas fa-star mr-1"></i>FEATURED
+                            </span>
+                            {% endif %}
+                            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                {{ game.get_status_display }}
+                            </span>
+                            {% if game.average_rating > 0 %}
+                            <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                <i class="fas fa-star mr-1"></i>{{ game.average_rating|floatformat:1 }}/5.0 ({{ game.total_reviews }} reviews)
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <h1 class="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-4">{{ game.title }}</h1>
+                        
+                        {% if game.short_description %}
+                        <p class="text-blue-200 text-lg mb-4 max-w-3xl">{{ game.short_description }}</p>
+                        {% endif %}
+                        
+                        <!-- Game Quick Stats -->
+                        <div class="flex flex-wrap items-center gap-4 text-sm">
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-desktop mr-2 text-blue-400"></i>
+                                <span>{{ game.get_platform_display }}</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-tags mr-2 text-purple-400"></i>
+                                <span>{{ game.get_genre_display }}</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-calendar mr-2 text-green-400"></i>
+                                <span>{{ game.release_date|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-eye mr-2 text-yellow-400"></i>
+                                <span>{{ game.play_count }} plays</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-heart mr-2 text-red-400"></i>
+                                <span id="wishlist-count">{{ game.wishlist_count }} wishlisted</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            {% if game.trailer_link %}
+                            <a href="{{ game.trailer_link }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="fab fa-youtube mr-2"></i>Watch Trailer
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.is_authenticated %}
+                            <button onclick="toggleWishlist({{ game.pk }})" id="wishlist-btn" class="wishlist-btn bg-gray-700 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart mr-2"></i>
+                                {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
+                            </button>
+                            {% endif %}
+                            
+                            <button onclick="shareGame()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="fas fa-share mr-2"></i>Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Game Description -->
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-info-circle mr-3 text-blue-400"></i>About This Game
+                    </h2>
+                    <div class="text-gray-300 leading-relaxed">
+                        {{ game.description|linebreaks }}
+                    </div>
+                </div>
+                
+                <!-- Game Screenshots -->
+                {% if game.photos.exists %}
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-images mr-3 text-green-400"></i>Screenshots
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for photo in game.photos.all %}
+                        <div class="cursor-pointer group" onclick="openImageModal('{{ photo.image.url }}', '{{ photo.caption|default:"Screenshot" }}')">
+                            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-40 object-cover rounded-lg group-hover:opacity-80 transition">
+                            {% if photo.caption %}
+                            <p class="text-gray-400 text-sm mt-2 text-center">{{ photo.caption }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Game Videos -->
+                {% if game.videos.exists %}
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-play-circle mr-3 text-red-400"></i>Videos
+                    </h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {% for video in game.videos.all %}
+                        <div class="bg-gray-700/60 p-4 rounded-lg">
+                            <h3 class="text-white font-semibold mb-2">{{ video.title }}</h3>
+                            <a href="{{ video.video_url }}" target="_blank" class="text-blue-400 hover:text-blue-300 flex items-center">
+                                <i class="fas fa-external-link-alt mr-2"></i>Watch Video
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Game Reviews -->
+                {% if reviews %}
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-star mr-3 text-yellow-400"></i>Player Reviews
+                    </h2>
+                    <div class="space-y-4">
+                        {% for review in reviews %}
+                        <div class="bg-gray-700/60 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                        {{ review.user.username|first|upper }}
+                                    </div>
+                                    <span class="text-white font-semibold">{{ review.user.username }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    {% for i in "12345"|make_list %}
+                                        <i class="fas fa-star text-{% if forloop.counter <= review.rating %}yellow{% else %}gray{% endif %}-400"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="text-gray-300">{{ review.comment }}</p>
+                            <p class="text-gray-500 text-sm mt-2">{{ review.created_at|timesince }} ago</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Game Details Card -->
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-gamepad mr-3 text-purple-400"></i>Game Details
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Genre:</span>
+                            <span class="text-white">{{ game.get_genre_display }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Platform:</span>
+                            <span class="text-white">{{ game.get_platform_display }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Release Date:</span>
+                            <span class="text-white">{{ game.release_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Status:</span>
+                            <span class="text-white">{{ game.get_status_display }}</span>
+                        </div>
+                        {% if game.min_players != game.max_players %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Players:</span>
+                            <span class="text-white">{{ game.min_players }}-{{ game.max_players }}</span>
+                        </div>
+                        {% endif %}
+                        {% if game.estimated_playtime %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Playtime:</span>
+                            <span class="text-white">{{ game.estimated_playtime }}</span>
+                        </div>
+                        {% endif %}
+                        {% if game.age_rating %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Age Rating:</span>
+                            <span class="text-white">{{ game.get_age_rating_display }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Game Tags -->
+                {% if game.get_tag_list %}
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-tags mr-3 text-green-400"></i>Tags
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in game.get_tag_list %}
+                        <span class="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm">
+                            #{{ tag }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Related Games -->
+                {% if related_games %}
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-gamepad mr-3 text-yellow-400"></i>Related Games
+                    </h3>
+                    <div class="space-y-3">
+                        {% for related_game in related_games %}
+                        <div class="flex items-center space-x-3 p-3 bg-gray-700/60 rounded-lg hover:bg-gray-700 transition">
+                            {% if related_game.cover_image %}
+                            <img src="{{ related_game.cover_image.url }}" alt="{{ related_game.title }}" class="w-12 h-16 object-cover rounded">
+                            {% else %}
+                            <div class="w-12 h-16 bg-gray-600 rounded flex items-center justify-center">
+                                <i class="fas fa-gamepad text-gray-400"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white font-semibold text-sm truncate">{{ related_game.title }}</h4>
+                                <p class="text-gray-400 text-xs">{{ related_game.get_genre_display }}</p>
+                            </div>
+                            <a href="{% url 'game_detail' related_game.pk %}" class="text-blue-400 hover:text-blue-300">
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Scripts -->
+<script>
+// Wishlist functionality
+{% if user.is_authenticated %}
+function toggleWishlist(gameId) {
+    fetch(`/games/${gameId}/wishlist/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const btn = document.getElementById('wishlist-btn');
+        const countSpan = document.getElementById('wishlist-count');
+        
+        if (data.in_wishlist) {
+            btn.innerHTML = '<i class="fas fa-heart mr-2"></i>Remove from Wishlist';
+            btn.classList.remove('bg-gray-700');
+            btn.classList.add('bg-red-600');
+        } else {
+            btn.innerHTML = '<i class="far fa-heart mr-2"></i>Add to Wishlist';
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-gray-700');
+        }
+        
+        countSpan.textContent = `${data.wishlist_count} wishlisted`;
+    })
+    .catch(error => console.error('Error:', error));
+}
+{% endif %}
+
+// Share functionality
+function shareGame() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ game.title }}',
+            text: '{{ game.short_description|default:game.description|truncatewords:20 }}',
+            url: window.location.href
+        });
+    } else {
+        // Fallback to copying URL
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Game URL copied to clipboard!');
+        });
+    }
+}
+
+// Image modal functionality
+function openImageModal(imageUrl, caption) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4';
+    modal.onclick = () => modal.remove();
+    
+    modal.innerHTML = `
+        <div class="max-w-6xl max-h-full relative">
+            <img src="${imageUrl}" alt="${caption}" class="max-w-full max-h-full object-contain rounded-lg">
+            <p class="text-white text-center mt-4 text-lg">${caption}</p>
+            <button class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center" onclick="event.stopPropagation(); this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+</script>
+
+<!-- Gaming Background Animation -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-purple-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}

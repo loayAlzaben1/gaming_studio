@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (Donation, Game, Photo, Video, DevlogVideo, TeamMember, SponsorTier, 
-                     DonationGoal, ContactMessage, UserProfile, Achievement, UserAchievement, UserActivity)
+                     DonationGoal, ContactMessage, UserProfile, Achievement, UserAchievement, UserActivity,
+                     GameWishlist, GameCollection, GameAnalytics, GameCategory, GameTag, GameDownload)
 from django.utils.html import format_html
 
 class PhotoInline(admin.TabularInline):
@@ -24,18 +25,43 @@ class DevlogVideoInline(admin.TabularInline):
 
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('title', 'platform', 'release_date', 'is_featured')
+    list_display = ('title', 'genre', 'platform', 'status', 'release_date', 'is_featured', 'featured_order', 'average_rating', 'play_count')
     inlines = [PhotoInline, VideoInline, DevlogVideoInline]
-    search_fields = ('title', 'platform')
-    list_filter = ('platform', 'release_date', 'is_featured')
+    search_fields = ('title', 'platform', 'tags', 'description')
+    list_filter = ('platform', 'genre', 'status', 'release_date', 'is_featured', 'created_at')
+    list_editable = ('is_featured', 'featured_order')
+    ordering = ('-created_at',)
+    
     fieldsets = (
-        (None, {
-            'fields': ('title', 'description', 'platform', 'release_date', 'is_featured')
+        ('Basic Information', {
+            'fields': ('title', 'short_description', 'description')
+        }),
+        ('Game Details', {
+            'fields': ('genre', 'platform', 'status', 'release_date', 'age_rating')
+        }),
+        ('Gameplay', {
+            'fields': ('min_players', 'max_players', 'estimated_playtime')
         }),
         ('Media', {
             'fields': ('cover_image', 'trailer_link')
         }),
+        ('Featured & Discovery', {
+            'fields': ('is_featured', 'featured_order', 'tags')
+        }),
+        ('Statistics', {
+            'fields': ('average_rating', 'total_reviews', 'play_count', 'wishlist_count', 'download_count'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+            'description': 'Automatically managed timestamps'
+        }),
     )
+    readonly_fields = ('average_rating', 'total_reviews', 'play_count', 'wishlist_count', 'download_count', 'created_at', 'updated_at')
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related().prefetch_related('photos', 'videos')
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
@@ -240,3 +266,84 @@ class UserActivityAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user')
+
+# Enhanced Game Management Admin
+
+@admin.register(GameCategory)
+class GameCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'parent', 'is_active', 'order', 'get_games_count')
+    list_filter = ('is_active', 'parent')
+    search_fields = ('name', 'description')
+    list_editable = ('is_active', 'order')
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ('order', 'name')
+    
+    def get_games_count(self, obj):
+        return obj.get_games_count()
+    get_games_count.short_description = 'Games Count'
+
+@admin.register(GameTag)
+class GameTagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'usage_count', 'get_games_count')
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ('usage_count',)
+    
+    def get_games_count(self, obj):
+        return obj.games.count()
+    get_games_count.short_description = 'Games Using Tag'
+
+@admin.register(GameWishlist)
+class GameWishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'game', 'priority', 'added_at')
+    list_filter = ('priority', 'added_at', 'game__genre', 'game__platform')
+    search_fields = ('user__username', 'game__title')
+    ordering = ('-added_at',)
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'game')
+
+@admin.register(GameCollection)
+class GameCollectionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'collection_type', 'is_public', 'get_games_count', 'updated_at')
+    list_filter = ('collection_type', 'is_public', 'created_at')
+    search_fields = ('name', 'user__username', 'description')
+    filter_horizontal = ('games',)
+    ordering = ('-updated_at',)
+    
+    def get_games_count(self, obj):
+        return obj.games.count()
+    get_games_count.short_description = 'Games Count'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user').prefetch_related('games')
+
+@admin.register(GameDownload)
+class GameDownloadAdmin(admin.ModelAdmin):
+    list_display = ('game', 'platform', 'version', 'download_count', 'file_size_mb', 'is_active', 'updated_at')
+    list_filter = ('platform', 'is_active', 'created_at')
+    search_fields = ('game__title', 'version')
+    list_editable = ('is_active',)
+    ordering = ('-updated_at',)
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('game')
+
+@admin.register(GameAnalytics)
+class GameAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('game', 'date', 'views', 'downloads', 'shares', 'wishlist_adds')
+    list_filter = ('date', 'game__genre', 'game__platform')
+    search_fields = ('game__title',)
+    date_hierarchy = 'date'
+    ordering = ('-date',)
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('game')
+    
+    def has_add_permission(self, request):
+        # Analytics are usually auto-generated, so restrict manual adding
+        return request.user.is_superuser
+    
+    def has_change_permission(self, request, obj=None):
+        # Analytics are usually auto-generated, so restrict manual editing
+        return request.user.is_superuser

@@ -115,18 +115,126 @@ class UserProfile(models.Model):
         return f"{self.user.get_full_name() or self.user.username} - Level {self.account_level} - {self.current_tier.get_name_display() if self.current_tier else 'No Tier'}"
 
 class Game(models.Model):
+    PLATFORM_CHOICES = [
+        ('pc', 'PC'),
+        ('playstation', 'PlayStation'),
+        ('xbox', 'Xbox'),
+        ('nintendo', 'Nintendo Switch'),
+        ('mobile', 'Mobile'),
+        ('web', 'Web Browser'),
+        ('vr', 'Virtual Reality'),
+        ('multiple', 'Multi-Platform'),
+    ]
+    
+    GENRE_CHOICES = [
+        ('action', 'Action'),
+        ('adventure', 'Adventure'),
+        ('rpg', 'RPG'),
+        ('strategy', 'Strategy'),
+        ('simulation', 'Simulation'),
+        ('puzzle', 'Puzzle'),
+        ('horror', 'Horror'),
+        ('racing', 'Racing'),
+        ('sports', 'Sports'),
+        ('fighting', 'Fighting'),
+        ('shooter', 'Shooter'),
+        ('platformer', 'Platformer'),
+        ('mmorpg', 'MMORPG'),
+        ('indie', 'Indie'),
+        ('casual', 'Casual'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('development', 'In Development'),
+        ('alpha', 'Alpha'),
+        ('beta', 'Beta'),
+        ('released', 'Released'),
+        ('coming_soon', 'Coming Soon'),
+        ('early_access', 'Early Access'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
     title = models.CharField(max_length=200)
     description = models.TextField()
-    platform = models.CharField(max_length=100)
+    short_description = models.CharField(max_length=300, blank=True, help_text="Brief description for cards and previews")
+    platform = models.CharField(max_length=100, choices=PLATFORM_CHOICES, default='pc')
+    genre = models.CharField(max_length=50, choices=GENRE_CHOICES, default='action')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='development')
     release_date = models.DateField()
     cover_image = models.ImageField(upload_to='game_covers/', null=True, blank=True)
     trailer_link = models.URLField(max_length=200, null=True, blank=True)
     photos = models.ManyToManyField('Photo', related_name='games', blank=True)
     videos = models.ManyToManyField('Video', related_name='games', blank=True)
     is_featured = models.BooleanField(default=False, help_text="Designates whether this game is featured on the home page.")
-
+    
+    # Enhanced Game Features
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+    total_reviews = models.IntegerField(default=0)
+    play_count = models.IntegerField(default=0, help_text="Number of times this game has been played")
+    wishlist_count = models.IntegerField(default=0)
+    download_count = models.IntegerField(default=0)
+    
+    # Game Details
+    min_players = models.IntegerField(default=1)
+    max_players = models.IntegerField(default=1)
+    estimated_playtime = models.CharField(max_length=50, blank=True, help_text="e.g., '2-4 hours', '50+ hours'")
+    age_rating = models.CharField(max_length=10, choices=[
+        ('E', 'Everyone'),
+        ('E10+', 'Everyone 10+'),
+        ('T', 'Teen'),
+        ('M', 'Mature 17+'),
+        ('AO', 'Adults Only'),
+        ('RP', 'Rating Pending'),
+    ], default='E', blank=True)
+    
+    # SEO and Discovery
+    tags = models.CharField(max_length=300, blank=True, help_text="Comma-separated tags for better discovery")
+    featured_order = models.IntegerField(default=0, help_text="Order for featured games (0 = not featured)")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['genre']),
+            models.Index(fields=['platform']),
+            models.Index(fields=['-average_rating']),
+            models.Index(fields=['-featured_order']),
+        ]
+    
+    def get_rating_display(self):
+        """Get star rating display"""
+        if self.average_rating > 0:
+            return f"{self.average_rating}/5.0"
+        return "No ratings yet"
+    
+    def get_tag_list(self):
+        """Get tags as a list"""
+        if self.tags:
+            return [tag.strip() for tag in self.tags.split(',')]
+        return []
+    
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('game_detail', kwargs={'pk': self.pk})
+    
+    def update_average_rating(self):
+        """Update average rating based on reviews"""
+        reviews = self.reviews.all()
+        if reviews.exists():
+            total_rating = sum(review.rating for review in reviews)
+            self.average_rating = round(total_rating / reviews.count(), 2)
+            self.total_reviews = reviews.count()
+        else:
+            self.average_rating = 0.00
+            self.total_reviews = 0
+        self.save(update_fields=['average_rating', 'total_reviews'])
+    
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.get_status_display()})"
 
 class Photo(models.Model):
     image = models.ImageField(upload_to='game_photos/')
@@ -446,6 +554,137 @@ class GameSession(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     duration_minutes = models.PositiveIntegerField(help_text="Session duration in minutes")
     experience_gained = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"{self.user.username} played {self.game.title} for {self.duration_minutes}min"
+
+# Game Collections and Wishlists
+class GameCollection(models.Model):
+    """User-created game collections"""
+    COLLECTION_TYPES = [
+        ('personal', 'Personal Collection'),
+        ('wishlist', 'Wishlist'),
+        ('favorites', 'Favorites'),
+        ('completed', 'Completed Games'),
+        ('playing', 'Currently Playing'),
+        ('custom', 'Custom Collection'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_collections')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    collection_type = models.CharField(max_length=20, choices=COLLECTION_TYPES, default='custom')
+    games = models.ManyToManyField(Game, related_name='collections', blank=True)
+    is_public = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'name']
+        ordering = ['-updated_at']
+    
+    def __str__(self):
+        return f"{self.user.username}'s {self.name}"
+
+class GameWishlist(models.Model):
+    """Simple wishlist for games"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlist_items')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='wishlist_entries')
+    added_at = models.DateTimeField(auto_now_add=True)
+    priority = models.IntegerField(choices=[
+        (1, 'Low'),
+        (2, 'Medium'),
+        (3, 'High'),
+        (4, 'Must Have'),
+    ], default=2)
+    
+    class Meta:
+        unique_together = ['user', 'game']
+        ordering = ['-priority', '-added_at']
+    
+    def __str__(self):
+        return f"{self.user.username} wants {self.game.title}"
+
+# Enhanced Game Analytics
+class GameAnalytics(models.Model):
+    """Daily analytics for games"""
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='analytics')
+    date = models.DateField(auto_now_add=True)
+    views = models.IntegerField(default=0)
+    downloads = models.IntegerField(default=0)
+    shares = models.IntegerField(default=0)
+    wishlist_adds = models.IntegerField(default=0)
+    
+    class Meta:
+        unique_together = ['game', 'date']
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"{self.game.title} analytics for {self.date}"
+
+# Game Categories and Tags
+class GameCategory(models.Model):
+    """Hierarchical game categories"""
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
+    icon = models.CharField(max_length=50, blank=True, help_text="Font Awesome icon class")
+    color = models.CharField(max_length=7, default='#6366f1', help_text="Hex color code")
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name_plural = 'Game Categories'
+    
+    def __str__(self):
+        return self.name
+    
+    def get_games_count(self):
+        return self.games.filter(status='released').count()
+
+class GameTag(models.Model):
+    """Flexible tagging system for games"""
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    games = models.ManyToManyField(Game, related_name='game_tags', blank=True)
+    usage_count = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-usage_count', 'name']
+    
+    def __str__(self):
+        return f"#{self.name} ({self.usage_count})"
+
+# Game Download and Distribution
+class GameDownload(models.Model):
+    """Track game downloads"""
+    PLATFORM_CHOICES = [
+        ('windows', 'Windows'),
+        ('mac', 'macOS'),
+        ('linux', 'Linux'),
+        ('android', 'Android'),
+        ('ios', 'iOS'),
+        ('web', 'Web Browser'),
+    ]
+    
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='downloads')
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    version = models.CharField(max_length=20, default='1.0.0')
+    file_url = models.URLField(max_length=500, blank=True)
+    file_size_mb = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    download_count = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['game', 'platform', 'version']
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.game.title} - {self.get_platform_display()} v{self.version}"
     achievements_unlocked = models.ManyToManyField(Achievement, blank=True)
     
     def __str__(self):

@@ -13,7 +13,8 @@ import os
 from dotenv import load_dotenv
 from .models import (ContactMessage, Donation, Game, TeamMember, SponsorTier, 
                      DonationGoal, UserProfile, Achievement, UserAchievement, UserActivity,
-                     UserFollow, GameReview, UserGameStats, GameSession, FeaturedAchievement)
+                     UserFollow, GameReview, UserGameStats, GameSession, FeaturedAchievement,
+                     GameWishlist, GameCollection, GameAnalytics)
 from .forms import DonationForm, UserProfileForm
 
 # Load environment variables
@@ -47,8 +48,75 @@ def home(request):
     return render(request, 'studio/home.html', {'featured_games': featured_games})
 
 def games(request):
-    games = Game.objects.all().prefetch_related('photos', 'videos', 'devlog_video_entries')
-    return render(request, 'studio/games.html', {'games': games})
+    """Enhanced games showcase with filtering, search, and pagination."""
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+    
+    # Get all games with related data
+    games_list = Game.objects.all().prefetch_related('photos', 'videos', 'devlog_video_entries')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        games_list = games_list.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(platform__icontains=search_query) |
+            Q(tags__icontains=search_query)
+        )
+    
+    # Filter by genre
+    genre_filter = request.GET.get('genre', '').strip()
+    if genre_filter:
+        games_list = games_list.filter(genre=genre_filter)
+    
+    # Filter by platform
+    platform_filter = request.GET.get('platform', '').strip()
+    if platform_filter:
+        games_list = games_list.filter(platform=platform_filter)
+    
+    # Filter by status
+    status_filter = request.GET.get('status', '').strip()
+    if status_filter:
+        games_list = games_list.filter(status=status_filter)
+    
+    # Sorting
+    sort_by = request.GET.get('sort', '-created_at')
+    valid_sorts = ['-created_at', 'created_at', '-average_rating', '-play_count', 'title', '-title']
+    if sort_by in valid_sorts:
+        games_list = games_list.order_by(sort_by)
+    else:
+        games_list = games_list.order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(games_list, 12)  # Show 12 games per page
+    page_number = request.GET.get('page')
+    games = paginator.get_page(page_number)
+    
+    # Get featured games separately
+    featured_games = Game.objects.filter(is_featured=True).order_by('-featured_order', '-created_at')[:6]
+    
+    # Get filter choices for template
+    genre_choices = Game.GENRE_CHOICES
+    platform_choices = Game.PLATFORM_CHOICES
+    status_choices = Game.STATUS_CHOICES
+    
+    context = {
+        'games': games,
+        'featured_games': featured_games,
+        'genre_choices': genre_choices,
+        'platform_choices': platform_choices,
+        'status_choices': status_choices,
+        'search_query': search_query,
+        'current_filters': {
+            'genre': genre_filter,
+            'platform': platform_filter,
+            'status': status_filter,
+            'sort': sort_by,
+        }
+    }
+    
+    return render(request, 'studio/games.html', context)
 
 def donate(request):
     """Handle donation via PayPal with advanced features."""
@@ -639,3 +707,154 @@ def settings(request):
             'error': 'Profile system temporarily unavailable'
         }
         return render(request, 'studio/settings.html', context)
+
+# Enhanced Game Management Views
+def game_detail(request, pk):
+    """Detailed view for individual game with analytics tracking."""
+    game = get_object_or_404(Game, pk=pk)
+    
+    # Track game view (simple analytics)
+    game.play_count += 1
+    game.save(update_fields=['play_count'])
+    
+    # Get related games (same genre or platform)
+    related_games = Game.objects.filter(
+        Q(genre=game.genre) | Q(platform=game.platform)
+    ).exclude(pk=game.pk)[:4]
+    
+    # Get user's wishlist status if authenticated
+    in_wishlist = False
+    if request.user.is_authenticated:
+        in_wishlist = GameWishlist.objects.filter(
+            user=request.user, game=game
+        ).exists()
+    
+    # Get reviews for this game
+    reviews = GameReview.objects.filter(game=game).select_related('user').order_by('-created_at')[:10]
+    
+    context = {
+        'game': game,
+        'related_games': related_games,
+        'in_wishlist': in_wishlist,
+        'reviews': reviews,
+        'user_can_review': request.user.is_authenticated and not reviews.filter(user=request.user).exists(),
+    }
+    
+    return render(request, 'studio/game_detail.html', context)
+
+@login_required
+def toggle_wishlist(request, pk):
+    """Toggle game in user's wishlist via AJAX."""
+    if request.method == 'POST':
+        game = get_object_or_404(Game, pk=pk)
+        wishlist_item, created = GameWishlist.objects.get_or_create(
+            user=request.user,
+            game=game,
+            defaults={'priority': 2}
+        )
+        
+        if not created:
+            wishlist_item.delete()
+            in_wishlist = False
+            # Decrement wishlist count
+            game.wishlist_count = max(0, game.wishlist_count - 1)
+        else:
+            in_wishlist = True
+            # Increment wishlist count
+            game.wishlist_count += 1
+        
+        game.save(update_fields=['wishlist_count'])
+        
+        return JsonResponse({
+            'in_wishlist': in_wishlist,
+            'wishlist_count': game.wishlist_count
+        })
+    
+    return JsonResponse({'error': 'Invalid request method'})
+
+@login_required
+def user_wishlist(request):
+    """Display user's wishlist."""
+    wishlist_items = GameWishlist.objects.filter(user=request.user).select_related('game').order_by('-priority', '-added_at')
+    
+    # Group by priority
+    high_priority = wishlist_items.filter(priority=4)
+    medium_priority = wishlist_items.filter(priority__in=[2, 3])
+    low_priority = wishlist_items.filter(priority=1)
+    
+    context = {
+        'wishlist_items': wishlist_items,
+        'high_priority': high_priority,
+        'medium_priority': medium_priority,
+        'low_priority': low_priority,
+    }
+    
+    return render(request, 'studio/wishlist.html', context)
+
+@login_required
+def game_collection_list(request):
+    """Display user's game collections."""
+    collections = GameCollection.objects.filter(user=request.user).prefetch_related('games').order_by('-updated_at')
+    
+    # Get collection stats
+    total_games = sum(collection.games.count() for collection in collections)
+    
+    context = {
+        'collections': collections,
+        'total_games': total_games,
+    }
+    
+    return render(request, 'studio/collections.html', context)
+
+@login_required
+def create_game_collection(request):
+    """Create a new game collection."""
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        collection_type = request.POST.get('collection_type', 'custom')
+        is_public = request.POST.get('is_public') == 'on'
+        
+        if name:
+            collection = GameCollection.objects.create(
+                user=request.user,
+                name=name,
+                description=description,
+                collection_type=collection_type,
+                is_public=is_public
+            )
+            messages.success(request, f'Collection "{collection.name}" created successfully!')
+            return redirect('game_collection_list')
+        else:
+            messages.error(request, 'Collection name is required.')
+    
+    return redirect('game_collection_list')
+
+# Game Analytics Views (for future admin dashboard)
+def game_analytics_summary(request):
+    """Basic analytics summary for games."""
+    if not request.user.is_staff:
+        return redirect('home')
+    
+    from django.db.models import Avg, Count
+    
+    # Game statistics
+    total_games = Game.objects.count()
+    featured_games_count = Game.objects.filter(is_featured=True).count()
+    avg_rating = Game.objects.aggregate(avg=Avg('average_rating'))['avg'] or 0
+    
+    # Popular games
+    popular_games = Game.objects.order_by('-play_count')[:10]
+    
+    # Recent games
+    recent_games = Game.objects.order_by('-created_at')[:10]
+    
+    context = {
+        'total_games': total_games,
+        'featured_games_count': featured_games_count,
+        'avg_rating': round(avg_rating, 2),
+        'popular_games': popular_games,
+        'recent_games': recent_games,
+    }
+    
+    return render(request, 'studio/admin/game_analytics.html', context)

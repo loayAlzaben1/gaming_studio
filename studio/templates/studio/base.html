@@ -166,8 +166,17 @@
                     <a href="#" class="hover:text-neon transition-colors duration-200">Games</a>
                     <div class="dropdown-content">
                         <a href="{% url 'games' %}">All Games</a>
-                        <a href="#">Featured</a>
-                        <a href="#">Upcoming</a>
+                        <a href="{% url 'games' %}?status=featured">Featured</a>
+                        <a href="{% url 'games' %}?status=coming_soon">Upcoming</a>
+                        {% if user.is_authenticated %}
+                            <hr class="border-gray-600 my-1">
+                            <a href="{% url 'user_wishlist' %}">
+                                <i class="fas fa-heart mr-2 text-red-400"></i>My Wishlist
+                            </a>
+                            <a href="{% url 'game_collection_list' %}">
+                                <i class="fas fa-folder mr-2 text-blue-400"></i>Collections
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
                 <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Team</a>
@@ -191,6 +200,14 @@
                             <a href="{% url 'dashboard' %}">Dashboard</a>
                             <a href="{% url 'my_donations' %}">My Donations</a>
                             <a href="{% url 'profile_edit' %}">Profile</a>
+                            <hr class="border-gray-600 my-1">
+                            <a href="{% url 'user_wishlist' %}">
+                                <i class="fas fa-heart mr-2 text-red-400"></i>Wishlist
+                            </a>
+                            <a href="{% url 'game_collection_list' %}">
+                                <i class="fas fa-folder mr-2 text-blue-400"></i>Collections
+                            </a>
+                            <hr class="border-gray-600 my-1">
                             <a href="{% url 'account_logout' %}">Logout</a>
                         </div>
                     </div>

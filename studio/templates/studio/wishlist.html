@@ -1,0 +1,167 @@
+{% extends 'studio/base.html' %}
+{% block title %}My Wishlist - Gaming Studio{% endblock %}
+
+{% block content %}
+<!-- Enhanced Wishlist Page -->
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <!-- Hero Section -->
+    <div class="relative bg-cover bg-center h-48" style="background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                    <i class="fas fa-heart mr-3 text-red-400"></i>My Wishlist
+                </h1>
+                <p class="text-blue-200 text-lg">Games you want to play</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        {% if wishlist_items %}
+            <!-- Priority Sections -->
+            {% if high_priority %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-red-400 mb-4 flex items-center">
+                    <i class="fas fa-fire mr-3"></i>Must Have Games
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for item in high_priority %}
+                    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg overflow-hidden border border-red-400/30 hover:border-red-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="relative">
+                            {% if item.game.cover_image %}
+                                <img src="{{ item.game.cover_image.url }}" alt="{{ item.game.title }}" class="w-full h-40 object-cover">
+                            {% else %}
+                                <div class="w-full h-40 bg-gradient-to-br from-red-600 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-gamepad text-4xl text-white opacity-50"></i>
+                                </div>
+                            {% endif %}
+                            <div class="absolute top-2 left-2">
+                                <span class="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                                    <i class="fas fa-exclamation mr-1"></i>MUST HAVE
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-lg font-bold text-white mb-2">{{ item.game.title }}</h3>
+                            <p class="text-gray-400 text-sm mb-3">{{ item.game.short_description|default:item.game.description|truncatewords:10 }}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-400">Added {{ item.added_at|timesince }} ago</span>
+                                <a href="{% url 'game_detail' item.game.pk %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm transition">
+                                    <i class="fas fa-eye mr-1"></i>View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if medium_priority %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="fas fa-star mr-3"></i>High Interest Games
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% for item in medium_priority %}
+                    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg overflow-hidden border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="relative">
+                            {% if item.game.cover_image %}
+                                <img src="{{ item.game.cover_image.url }}" alt="{{ item.game.title }}" class="w-full h-32 object-cover">
+                            {% else %}
+                                <div class="w-full h-32 bg-gradient-to-br from-yellow-600 to-orange-600 flex items-center justify-center">
+                                    <i class="fas fa-gamepad text-2xl text-white opacity-50"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <h3 class="text-md font-semibold text-white mb-1">{{ item.game.title }}</h3>
+                            <p class="text-gray-400 text-xs mb-2">{{ item.game.get_genre_display }}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-400">{{ item.added_at|date:"M d" }}</span>
+                                <a href="{% url 'game_detail' item.game.pk %}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded text-xs transition">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if low_priority %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-blue-400 mb-4 flex items-center">
+                    <i class="fas fa-clock mr-3"></i>Maybe Later
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {% for item in low_priority %}
+                    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg overflow-hidden border border-blue-400/30 hover:border-blue-400/60 transition-all duration-300 shadow-lg">
+                        <div class="relative">
+                            {% if item.game.cover_image %}
+                                <img src="{{ item.game.cover_image.url }}" alt="{{ item.game.title }}" class="w-full h-24 object-cover">
+                            {% else %}
+                                <div class="w-full h-24 bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                                    <i class="fas fa-gamepad text-lg text-white opacity-50"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="p-2">
+                            <h3 class="text-sm font-semibold text-white mb-1 truncate">{{ item.game.title }}</h3>
+                            <a href="{% url 'game_detail' item.game.pk %}" class="text-blue-400 hover:text-blue-300 text-xs">
+                                View Game
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Wishlist Stats -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                    <i class="fas fa-chart-bar mr-3 text-green-400"></i>Wishlist Statistics
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-400">{{ high_priority.count }}</div>
+                        <div class="text-gray-400 text-sm">Must Have</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-yellow-400">{{ medium_priority.count }}</div>
+                        <div class="text-gray-400 text-sm">High Interest</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-400">{{ low_priority.count }}</div>
+                        <div class="text-gray-400 text-sm">Maybe Later</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">{{ wishlist_items.count }}</div>
+                        <div class="text-gray-400 text-sm">Total Games</div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty Wishlist -->
+            <div class="text-center py-12">
+                <i class="fas fa-heart text-6xl text-gray-600 mb-4"></i>
+                <h3 class="text-2xl font-semibold text-gray-400 mb-4">Your Wishlist is Empty</h3>
+                <p class="text-gray-500 mb-6">Start adding games you'd like to play!</p>
+                <a href="{% url 'games' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition">
+                    <i class="fas fa-gamepad mr-2"></i>Browse Games
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Gaming Background Animation -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-red-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-yellow-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-blue-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-purple-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}
