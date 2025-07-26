@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,4 +13,8 @@ urlpatterns = [
     path('community/', views.community, name='community'),
     path('cancel/', views.cancel, name='cancel'),
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
+    path('my-donations/', views.my_donations, name='my_donations'),
+    path('settings/', lambda request: redirect('/accounts/email/'), name='account_settings'),
 ]

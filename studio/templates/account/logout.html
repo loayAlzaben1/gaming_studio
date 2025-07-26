@@ -1,0 +1,54 @@
+{% extends 'studio/base.html' %}
+{% block title %}Logout - Gaming Studio{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen flex items-center justify-center">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-red-900 to-purple-900 opacity-50"></div>
+    
+    <div class="relative z-10 w-full max-w-md mx-auto p-6">
+        <!-- Logout Card -->
+        <div class="bg-gray-900 bg-opacity-90 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-red-600 to-purple-600 p-6 text-center">
+                <div class="text-4xl mb-2">
+                    <i class="fas fa-sign-out-alt text-white"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-1">Sign Out</h1>
+                <p class="text-red-100 text-sm">Are you sure you want to sign out?</p>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 text-center">
+                <p class="text-gray-300 mb-6">
+                    You'll need to sign in again to access your supporter dashboard and donation history.
+                </p>
+                
+                <!-- Logout Form -->
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <div class="flex space-x-4">
+                        <!-- Cancel Button -->
+                        <a href="{% url 'home' %}" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 text-center">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </a>
+                        
+                        <!-- Confirm Logout Button -->
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Back to Home -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition duration-300 text-sm">
+                <i class="fas fa-arrow-left mr-1"></i>Back to Gaming Studio
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Your Donation!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .donation-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+        .emoji {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Gaming Studio</h1>
+            <p>Thank You for Your Support!</p>
+        </div>
+        
+        <div class="content">
+            <h2>Dear {{ donor_name }},</h2>
+            
+            <p>We are incredibly grateful for your generous donation! Your support helps us continue creating amazing games and building our community.</p>
+            
+            <div class="donation-info">
+                <p><strong>Donation Details:</strong></p>
+                <p>Amount: <span class="amount">${{ amount }}</span></p>
+                <p>Type: {{ donation_type }}</p>
+                {% if sponsor_tier %}
+                    <p>Your Supporter Tier: 
+                        <span class="tier-badge" style="background-color: {{ sponsor_tier.color }};">
+                            <i class="{{ sponsor_tier.icon }}"></i> {{ sponsor_tier.get_name_display }}
+                        </span>
+                    </p>
+                {% endif %}
+                {% if donation_goal %}
+                    <p>Supporting Goal: <strong>{{ donation_goal.title }}</strong></p>
+                {% endif %}
+            </div>
+            
+            {% if sponsor_tier %}
+            <div style="background-color: #e7f3ff; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                <h3 style="color: #0066cc; margin-top: 0;">🌟 Your Supporter Benefits</h3>
+                <div style="font-size: 14px; line-height: 1.8;">
+                    {{ perks_html|safe }}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if is_recurring %}
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                <p><strong>🔄 Recurring Donation</strong></p>
+                <p>This is a recurring donation that will automatically renew. Thank you for your ongoing support!</p>
+            </div>
+            {% endif %}
+            
+            <p>Your contribution makes a real difference in our ability to:</p>
+            <ul>
+                <li>🎯 Develop innovative games</li>
+                <li>🚀 Upgrade our development tools</li>
+                <li>🌟 Build an amazing gaming community</li>
+                <li>📚 Create educational content</li>
+            </ul>
+            
+            <p>You can track our progress and see how your donation is making an impact by visiting our <a href="https://gaming-studio.onrender.com/community" style="color: #667eea;">community page</a>.</p>
+            
+            <p>Once again, thank you for believing in our vision and supporting Gaming Studio!</p>
+            
+            <p style="margin-top: 30px;">
+                With heartfelt gratitude,<br>
+                <strong>The Gaming Studio Team</strong> 🎮
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>🎮 Gaming Studio | <a href="https://gaming-studio.onrender.com">Visit Our Website</a></p>
+            <p style="font-size: 12px; margin-top: 15px;">
+                This email was sent because you made a donation to Gaming Studio.<br>
+                If you have any questions, please contact us at support@gaming-studio.com
+            </p>
+        </div>
+    </div>
+</body>
+</html>

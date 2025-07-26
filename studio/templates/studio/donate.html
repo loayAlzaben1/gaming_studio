@@ -8,78 +8,222 @@
             <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-white animate-pulse text-center">Support Gaming Studio</h1>
         </div>
     </div>
-    <div class="container mx-auto p-3 sm:p-6 max-w-2xl">
-        <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-6">
-            <!-- Donation Form -->
-            <div class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl transform transition duration-300 hover:shadow-2xl">
-                <h2 class="text-xl sm:text-2xl lg:text-3xl font-semibold text-center mb-4 sm:mb-6 text-yellow-400">Make a Donation</h2>
-                <form method="post" class="space-y-4 sm:space-y-6">
-                    {% csrf_token %}
-                    <div class="space-y-3 sm:space-y-4">
-                        {% if form.errors %}
-                            <div class="text-red-400 text-center text-sm sm:text-base">
-                                {% for error in form.non_field_errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
+    
+    <div class="container mx-auto p-3 sm:p-6 max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Donation Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-3 sm:p-6">
+                    <!-- Sponsor Tiers -->
+                    {% if sponsor_tiers %}
+                    <div class="mb-4 sm:mb-6">
+                        <h2 class="text-lg sm:text-xl font-bold text-center mb-3 text-yellow-400">🌟 Supporter Tiers</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+                            {% for tier in sponsor_tiers %}
+                            <div class="bg-gray-800 p-2 sm:p-3 rounded-lg border border-gray-700 hover:border-blue-400 transition duration-300 text-center">
+                                <div class="text-lg mb-1" style="color: {{ tier.color }}">
+                                    <i class="{{ tier.icon }}"></i>
+                                </div>
+                                <h3 class="font-semibold text-xs sm:text-sm" style="color: {{ tier.color }}">{{ tier.get_name_display }}</h3>
+                                <p class="text-xs text-gray-400">${{ tier.min_amount }}+</p>
                             </div>
-                        {% endif %}
-                        {% if error %}
-                            <div class="text-red-400 text-center text-sm sm:text-base">{{ error }}</div>
-                        {% endif %}
-                        <div>
-                            <label for="id_donor_name" class="block text-sm font-medium text-gray-300 mb-2">Your Name (Optional)</label>
-                            {{ form.donor_name }}
+                            {% endfor %}
                         </div>
-                        <div>
-                            <label for="id_amount" class="block text-sm font-medium text-gray-300 mb-2">Donation Amount (USD)</label>
-                            {{ form.amount }}
-                        </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-                            Donate Now
-                        </button>
                     </div>
-                </form>
+                    {% endif %}
+                    
+                    <!-- Donation Form -->
+                    <div class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
+                        <h2 class="text-xl sm:text-2xl lg:text-3xl font-semibold text-center mb-4 sm:mb-6 text-yellow-400">Make a Donation</h2>
+                        <form method="post" class="space-y-4 sm:space-y-6">
+                            {% csrf_token %}
+                            
+                            <!-- Error Messages -->
+                            {% if form.errors %}
+                                <div class="bg-red-600 bg-opacity-20 border border-red-400 rounded-lg p-3 text-red-400 text-sm">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <p>• {{ error }}</p>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="space-y-4">
+                                <!-- Amount -->
+                                <div>
+                                    {{ form.amount.label_tag }}
+                                    {{ form.amount }}
+                                </div>
+                                
+                                <!-- Donation Type -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-3">{{ form.donation_type.label }}</label>
+                                    <div class="space-y-2">
+                                        {% for choice in form.donation_type %}
+                                            <label class="flex items-center space-x-3 p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition">
+                                                {{ choice.tag }}
+                                                <span class="text-gray-300">{{ choice.choice_label }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Donation Goal -->
+                                <div>
+                                    {{ form.donation_goal.label_tag }}
+                                    {{ form.donation_goal }}
+                                </div>
+                                
+                                <!-- Donor Name -->
+                                <div>
+                                    {{ form.donor_name.label_tag }}
+                                    {{ form.donor_name }}
+                                </div>
+                                
+                                <!-- Donor Email -->
+                                <div>
+                                    {{ form.donor_email.label_tag }}
+                                    {{ form.donor_email }}
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                                    💝 Donate Now
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <!-- Messages -->
-            {% if messages %}
-                <div class="mt-4 sm:mt-6">
-                    {% for message in messages %}
-                        <p class="text-center {% if message.tags == 'error' %}text-red-400{% else %}text-green-400{% endif %} p-3 rounded-lg bg-gray-700 text-sm sm:text-base">
-                            {{ message }}
-                        </p>
+            
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Active Goals -->
+                {% if active_goals %}
+                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-bold text-yellow-400 mb-4">🎯 Active Goals</h3>
+                    {% for goal in active_goals %}
+                    <div class="bg-gray-800 p-4 rounded-lg mb-4 last:mb-0">
+                        {% if goal.image %}
+                            <img src="{{ goal.image.url }}" alt="{{ goal.title }}" class="w-full h-32 object-cover rounded mb-3">
+                        {% endif %}
+                        <h4 class="font-semibold text-white mb-2">{{ goal.title }}</h4>
+                        <p class="text-gray-400 text-sm mb-3">{{ goal.description|truncatewords:15 }}</p>
+                        <div class="w-full bg-gray-700 rounded-full h-3 mb-2">
+                            <div class="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" style="width: {{ goal.progress_percentage }}%;"></div>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-green-400">${{ goal.current_amount }}</span>
+                            <span class="text-gray-400">${{ goal.target_amount }} ({{ goal.progress_percentage|floatformat:1 }}%)</span>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
-            {% endif %}
-            <!-- Donation Progress -->
-            <div class="mt-6 sm:mt-8 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
-                <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-center mb-3 sm:mb-4 text-yellow-400">Donation Progress</h2>
-                <p class="text-center text-base sm:text-lg text-gray-300">Total Donated: <span class="text-green-400 font-bold">${{ total_donations|floatformat:2 }}</span></p>
-                <p class="text-center text-base sm:text-lg text-gray-300">Goal: <span class="text-yellow-400 font-bold">$1000.00</span></p>
-                <div class="w-full bg-gray-700 rounded-full h-4 sm:h-6 mt-4 overflow-hidden">
-                    <div class="bg-blue-600 h-4 sm:h-6 rounded-full transition-all duration-500" style="width: {{ progress }}%;"></div>
-                </div>
-                <p class="text-center mt-2 text-base sm:text-lg text-gray-300">{{ progress }}% towards goal</p>
-            </div>
-            <!-- Recent Donations -->
-            <div class="mt-6 sm:mt-8 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
-                <h3 class="text-lg sm:text-xl lg:text-2xl font-semibold text-center mb-3 sm:mb-4 text-green-400">Recent Donations</h3>
-                {% if donations %}
-                    <ul class="space-y-2 sm:space-y-3">
-                        {% for donation in donations %}
-                            <li class="bg-gray-700 p-3 sm:p-4 rounded-lg flex justify-between items-center hover:bg-gray-600 transition duration-300">
-                                <span class="text-sm sm:text-base lg:text-lg font-medium text-gray-300">{{ donation.donor_name }} - ${{ donation.amount|floatformat:2 }}</span>
-                                <span class="text-xs sm:text-sm text-gray-400">{{ donation.donated_at|date:"Y-m-d H:i" }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="text-center text-gray-400 text-sm sm:text-base lg:text-lg italic">No donations yet. Be the first to support us!</p>
                 {% endif %}
+                
+                <!-- General Progress -->
+                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-bold text-yellow-400 mb-4">📊 Overall Progress</h3>
+                    <p class="text-center text-base sm:text-lg text-gray-300 mb-2">Total Donated: <span class="text-green-400 font-bold">${{ total_donations|floatformat:2 }}</span></p>
+                    <p class="text-center text-base sm:text-lg text-gray-300 mb-4">Goal: <span class="text-yellow-400 font-bold">$1000.00</span></p>
+                    <div class="w-full bg-gray-700 rounded-full h-4 sm:h-6 overflow-hidden">
+                        <div class="bg-blue-600 h-4 sm:h-6 rounded-full transition-all duration-500" style="width: {{ general_progress }}%;"></div>
+                    </div>
+                    <p class="text-center mt-2 text-base sm:text-lg text-gray-300">{{ general_progress|floatformat:1 }}% towards goal</p>
+                </div>
+                
+                <!-- Recent Donors -->
+                <div class="bg-gray-900 bg-opacity-80 rounded-lg p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-bold text-green-400 mb-4">🙏 Recent Supporters</h3>
+                    {% if donations %}
+                        <div class="space-y-3">
+                            {% for donation in donations %}
+                                <div class="bg-gray-800 p-3 rounded-lg {% if donation.sponsor_tier %}border-l-4{% endif %}" {% if donation.sponsor_tier %}style="border-left-color: {{ donation.sponsor_tier.color }};"{% endif %}>
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex items-center space-x-3">
+                                            {% if donation.sponsor_tier %}
+                                                <div class="flex-shrink-0">
+                                                    <span class="text-xl" style="color: {{ donation.sponsor_tier.color }}">
+                                                        <i class="{{ donation.sponsor_tier.icon }}"></i>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-sm font-medium text-white">{{ donation.donor_name }}</span>
+                                                        <span class="text-xs px-2 py-1 rounded-full text-white font-semibold" style="background-color: {{ donation.sponsor_tier.color }}">
+                                                            {{ donation.sponsor_tier.get_name_display }}
+                                                        </span>
+                                                    </div>
+                                                    {% if donation.is_recurring %}
+                                                        <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded mt-1 inline-block">{{ donation.get_donation_type_display }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <div class="flex-shrink-0">
+                                                    <span class="text-lg text-gray-400">
+                                                        <i class="fas fa-heart"></i>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-sm font-medium text-gray-300">{{ donation.donor_name }}</span>
+                                                    {% if donation.is_recurring %}
+                                                        <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded ml-1">{{ donation.get_donation_type_display }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <span class="text-green-400 font-semibold">${{ donation.amount|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-400 text-sm italic">No donations yet. Be the first to support us!</p>
+                    {% endif %}
+                </div>
             </div>
-            <div class="mt-4 sm:mt-6 text-center">
-                <a href="{% url 'home' %}" class="text-blue-400 hover:text-blue-300 underline text-sm sm:text-base">Back to Home</a>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+            <div class="mt-6">
+                {% for message in messages %}
+                    <div class="bg-{{ message.tags }}-600 bg-opacity-20 border border-{{ message.tags }}-400 rounded-lg p-4 text-{{ message.tags }}-400 text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             </div>
+        {% endif %}
+        
+        <div class="mt-6 text-center">
+            <a href="{% url 'home' %}" class="text-blue-400 hover:text-blue-300 underline text-sm sm:text-base">← Back to Home</a>
         </div>
     </div>
 </section>
+
+<script>
+    // Add donation amount quick select buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const amountInput = document.getElementById('id_amount');
+        if (amountInput) {
+            const quickAmounts = [5, 10, 25, 50, 100];
+            const quickButtonsContainer = document.createElement('div');
+            quickButtonsContainer.className = 'grid grid-cols-5 gap-2 mt-2';
+            
+            quickAmounts.forEach(amount => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = `$${amount}`;
+                button.className = 'bg-gray-600 hover:bg-blue-600 text-white py-2 px-3 rounded text-sm transition';
+                button.onclick = () => {
+                    amountInput.value = amount;
+                    amountInput.focus();
+                };
+                quickButtonsContainer.appendChild(button);
+            });
+            
+            amountInput.parentNode.appendChild(quickButtonsContainer);
+        }
+    });
+</script>
 {% endblock %}

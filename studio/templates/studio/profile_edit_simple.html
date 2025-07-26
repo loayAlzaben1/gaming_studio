@@ -1,0 +1,94 @@
+{% extends 'studio/base.html' %}
+{% block title %}Edit Profile - Gaming Studio{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 max-w-4xl">
+    <div class="bg-gray-900 rounded-lg p-6 text-white">
+        <h1 class="text-3xl font-bold mb-6 text-center">Edit Your Gaming Profile</h1>
+        
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="bg-green-600 bg-opacity-20 border border-green-400 rounded-lg p-3 mb-2">
+                        <p class="text-green-400">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Current Profile Info -->
+        <div class="mb-6 text-center">
+            <h2 class="text-xl font-semibold">Current Profile</h2>
+            <p>Username: {{ user.username }}</p>
+            <p>Level: {{ profile.account_level }}</p>
+            <p>Experience: {{ profile.experience_points }} XP</p>
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="Profile Picture" class="w-20 h-20 rounded-full mx-auto mt-2">
+            {% endif %}
+        </div>
+        
+        <!-- Profile Edit Form -->
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Display form errors -->
+            {% if form.errors %}
+                <div class="bg-red-600 bg-opacity-20 border border-red-400 rounded-lg p-3 mb-4">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <p class="text-red-400">{{ field }}: {{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Avatar Upload -->
+            <div>
+                <label for="{{ form.avatar.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Profile Picture
+                </label>
+                {{ form.avatar }}
+                <p class="text-gray-400 text-xs mt-1">Upload JPG, PNG, or GIF (max 5MB)</p>
+            </div>
+            
+            <!-- Bio -->
+            <div>
+                <label for="{{ form.bio.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Gaming Bio
+                </label>
+                {{ form.bio }}
+                <p class="text-gray-400 text-xs mt-1">Tell other gamers about yourself!</p>
+            </div>
+            
+            <!-- Favorite Game -->
+            <div>
+                <label for="{{ form.favorite_game.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Favorite Game
+                </label>
+                {{ form.favorite_game }}
+                <p class="text-gray-400 text-xs mt-1">Select your favorite game from our collection</p>
+            </div>
+            
+            <!-- Submit Buttons -->
+            <div class="flex space-x-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                    Save Profile
+                </button>
+                <a href="{% url 'dashboard' %}" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+        
+        <!-- Tips -->
+        <div class="mt-8 bg-blue-600 bg-opacity-20 border border-blue-400 rounded-lg p-4">
+            <h4 class="text-blue-400 font-semibold mb-2">💡 Profile Tips</h4>
+            <ul class="text-gray-300 text-sm space-y-1">
+                <li>• Complete your profile to earn 25 XP</li>
+                <li>• Add both avatar and bio to unlock "Social Butterfly" achievement</li>
+                <li>• Choose your favorite game to show your preference</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
