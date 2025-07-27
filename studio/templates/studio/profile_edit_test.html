@@ -1,0 +1,18 @@
+{% extends 'studio/base.html' %}
+{% block title %}Test Profile Edit - Gaming Studio{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 max-w-2xl bg-gray-900 text-white">
+    <h1 class="text-3xl font-bold mb-6">Profile Edit Test</h1>
+    
+    <p>User: {{ user.username }}</p>
+    <p>Profile exists: {{ profile }}</p>
+    <p>Form: {{ form }}</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+    </form>
+</div>
+{% endblock %}
