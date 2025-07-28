@@ -3,15 +3,11 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from studio.media_views import serve_media
-from studio.temp_auth_views import temporary_login, temporary_signup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('studio.urls')),
-    # Temporary auth URLs until allauth tables are created
-    path('accounts/login/', temporary_login, name='account_login'),
-    path('accounts/signup/', temporary_signup, name='account_signup'),
-    # path('accounts/', include('allauth.urls')),  # Commented out temporarily
+    path('accounts/', include('allauth.urls')),  # Restored full allauth functionality
 ]
 
 # Serve media files

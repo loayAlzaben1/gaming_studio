@@ -14,35 +14,51 @@ def ensure_tables_exist():
     """Ensure critical tables exist when Django starts"""
     try:
         with connection.cursor() as cursor:
-            # Check if studio_game table exists
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='studio_game';")
-            if cursor.fetchone():
-                # Also check for allauth tables
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='account_emailaddress';")
-                allauth_exists = cursor.fetchone()
-                
-                if allauth_exists:
-                    logger.info("All database tables verified successfully")
-                    return True
-                else:
-                    logger.info("Django-allauth tables missing, running migrations...")
-                
-            else:
-                logger.info("Running database migrations...")
+            # Check critical tables for full functionality
+            critical_tables = {
+                'studio_game': 'Studio app tables',
+                'auth_user': 'Django auth tables', 
+                'account_emailaddress': 'Django-allauth tables',
+                'socialaccount_socialapp': 'Social auth tables',
+                'django_site': 'Sites framework'
+            }
             
-            # Try to run migrations
+            missing_tables = []
+            existing_tables = []
+            
+            for table, description in critical_tables.items():
+                cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}';")
+                if cursor.fetchone():
+                    existing_tables.append(table)
+                else:
+                    missing_tables.append(f"{table} ({description})")
+            
+            if not missing_tables:
+                logger.info(f"All critical tables exist: {existing_tables}")
+                return True
+                
+            logger.info(f"Missing tables: {missing_tables}")
+            logger.info("Running complete database migrations...")
+            
+            # Try to run all migrations
             from django.core.management import execute_from_command_line
             
             old_argv = sys.argv
             try:
+                # Run migrations for all apps
                 sys.argv = ['manage.py', 'migrate']
                 execute_from_command_line(sys.argv)
-                logger.info("Database migrations completed successfully")
+                
+                # Specifically ensure sites framework is set up
+                sys.argv = ['manage.py', 'migrate', 'sites']
+                execute_from_command_line(sys.argv)
+                
+                logger.info("All database migrations completed successfully")
                 return True
             except Exception as migration_error:
-                logger.warning(f"Migrations failed: {migration_error}")
+                logger.warning(f"Some migrations failed: {migration_error}")
                 
-                # Only create studio_game table if it doesn't exist
+                # Manual fallback only for studio_game table
                 cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='studio_game';")
                 if not cursor.fetchone():
                     cursor.execute("""
@@ -73,9 +89,9 @@ def ensure_tables_exist():
                         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
                     );
                     """)
-                    logger.info("studio_game table created manually")
+                    logger.info("Created studio_game table manually")
                 
-                logger.info("Fallback table creation completed")
+                logger.info("Partial setup completed - some features may not work until full migrations succeed")
                 return True
             finally:
                 sys.argv = old_argv
