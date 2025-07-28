@@ -114,16 +114,55 @@
         }
         /* Button Styles */
         .btn-neon {
-            background: linear-gradient(45deg, #00ffcc, #ff00ff);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
             transition: all 0.3s ease;
-            text-shadow: 0 0 5px #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-neon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-neon:hover::before {
+            left: 100%;
         }
         .btn-neon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px #00ffcc;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Responsive adjustments for donate button */
+        @media (max-width: 768px) {
+            .btn-neon {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .btn-neon span {
+                display: none;
+            }
+            .btn-neon {
+                padding: 0.5rem;
+                min-width: 2.5rem;
+                justify-content: center;
+            }
         }
         .btn-neon-outline {
             border: 2px solid #00ffcc;
@@ -236,7 +275,10 @@
                     </a>
                 {% endif %}
                 
-                <a href="{% url 'donate' %}" class="btn-neon">Donate</a>
+                <a href="{% url 'donate' %}" class="btn-neon flex items-center">
+                    <i class="fas fa-heart mr-2 text-red-300"></i>
+                    <span>Donate</span>
+                </a>
                 
                 <!-- Authentication Links -->
                 {% if user.is_authenticated %}
@@ -379,10 +421,10 @@
                         </a>
                     {% endif %}
                     
-                    <a href="{% url 'donate' %}" class="mobile-menu-link special">
-                        <i class="fas fa-heart"></i>
-                        <span>Donate</span>
-                        <i class="fas fa-chevron-right"></i>
+                    <a href="{% url 'donate' %}" class="mobile-menu-link special bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/30">
+                        <i class="fas fa-heart text-red-300"></i>
+                        <span class="text-purple-300 font-semibold">Donate</span>
+                        <i class="fas fa-chevron-right text-purple-400"></i>
                     </a>
                     
                     <!-- Authentication Links for Mobile -->
