@@ -47,11 +47,9 @@ def news(request):
     return render(request, 'studio/news.html', {})
 
 def home(request):
-    # Minimal home view to ensure stability
-    context = {
-        'featured_games': [],  # Empty for now to avoid any DB issues
-    }
-    return render(request, 'studio/home.html', context)
+    # Temporary redirect to games page until home template issues are resolved
+    from django.shortcuts import redirect
+    return redirect('games')
 
 def games(request):
     """Enhanced games showcase with filtering, search, and pagination."""
