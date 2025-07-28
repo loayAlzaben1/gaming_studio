@@ -20,23 +20,10 @@ def health_check(request):
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='studio_game';")
             game_table_exists = bool(cursor.fetchone())
             
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='auth_user';")
-            auth_table_exists = bool(cursor.fetchone())
-            
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='account_emailaddress';")
-            allauth_table_exists = bool(cursor.fetchone())
-            
-            # Get total table count
-            cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table';")
-            total_tables = cursor.fetchone()[0]
-            
         return JsonResponse({
             'status': 'healthy',
             'database': db_status,
             'game_table_exists': game_table_exists,
-            'auth_table_exists': auth_table_exists,
-            'allauth_table_exists': allauth_table_exists,
-            'total_tables': total_tables,
             'timestamp': timezone.now().isoformat()
         })
     except Exception as e:
