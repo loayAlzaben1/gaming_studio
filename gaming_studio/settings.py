@@ -189,3 +189,10 @@ SOCIALACCOUNT_PROVIDERS = {
         'OAUTH_PKCE_ENABLED': True,
     }
 }
+
+# Import auto-setup to ensure tables exist
+try:
+    from . import auto_setup
+    print("Auto-setup module loaded successfully")
+except Exception as e:
+    print(f"Error loading auto-setup: {e}")
