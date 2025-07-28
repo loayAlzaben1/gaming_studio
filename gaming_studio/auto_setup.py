@@ -59,6 +59,13 @@ def ensure_tables_exist():
         logger.error(f"Error ensuring tables exist: {e}")
         return False
 
-# Run when this module is imported
-if 'runserver' in sys.argv or 'wsgi' in sys.argv or os.environ.get('RUN_MAIN'):
+# Run when this module is imported - always run in production
+if 'wsgi' in sys.argv or 'gunicorn' in str(sys.argv) or os.environ.get('DJANGO_SETTINGS_MODULE'):
+    print("Running auto-setup for production environment...")
+    ensure_tables_exist()
+elif 'runserver' in sys.argv or os.environ.get('RUN_MAIN'):
+    print("Running auto-setup for development environment...")
+    ensure_tables_exist()
+else:
+    print("Auto-setup conditions not met, forcing execution anyway...")
     ensure_tables_exist()
