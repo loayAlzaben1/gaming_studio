@@ -15,7 +15,6 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('donate/', views.donate, name='donate'),
     path('donate/success/', views.donate_success, name='donate_success'),
-    path('community/', views.community, name='community'),
     path('cancel/', views.cancel, name='cancel'),
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -28,4 +27,30 @@ urlpatterns = [
     path('account-settings/', lambda request: redirect('/accounts/email/'), name='account_settings'),
     # Admin analytics (staff only)
     path('admin/analytics/games/', views.game_analytics_summary, name='game_analytics_summary'),
+    
+    # Help and Guide Pages
+    path('help/reviews/', views.review_guide, name='review_guide'),
+    
+    # Community Hub Pages
+    path('hub/reviews/', views.review_hub, name='review_hub'),
+    path('hub/ratings/', views.rating_hub, name='rating_hub'),
+    path('hub/forums/', views.forum_hub, name='forum_hub'),
+    
+    # Community Features URLs
+    path('games/<int:game_id>/review/', views.write_review, name='write_review'),
+    path('games/<int:game_id>/forum/', views.game_forum, name='game_forum'),
+    path('games/<int:game_id>/rate/', views.rate_game, name='rate_game'),
+    path('games/<int:game_id>/upload/', views.upload_ugc, name='upload_ugc'),
+    path('forum/<int:forum_id>/create-topic/', views.create_topic, name='create_topic'),
+    path('topic/<int:topic_id>/', views.forum_topic, name='forum_topic'),
+    path('comment/<str:content_type>/<int:object_id>/', views.add_comment, name='add_comment'),
+    path('community/', views.community_showcase, name='community_showcase'),
+    path('review/<int:review_id>/like/', views.like_review, name='like_review'),
+    path('ugc/<int:content_id>/like/', views.like_ugc, name='like_ugc'),
+    path('comment/<int:comment_id>/like/', views.like_comment, name='like_comment'),
+    
+    # Guide Pages
+    path('guides/review/', views.review_guide, name='review_guide'),
+    path('guides/rating/', views.rating_guide, name='rating_guide'),
+    path('forum/rules/', views.forum_rules, name='forum_rules'),
 ]

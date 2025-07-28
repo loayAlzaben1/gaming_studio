@@ -1,0 +1,117 @@
+{% extends 'studio/base.html' %}
+{% block title %}My Collections - Gaming Studio{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                <i class="fas fa-folder mr-3 text-blue-400"></i>My Game Collections
+            </h1>
+            <p class="text-blue-200 text-lg">Organize your favorite games into custom collections</p>
+        </div>
+
+        <!-- Collection Stats -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 mb-8 border border-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div>
+                    <div class="text-2xl font-bold text-blue-400">{{ collections.count }}</div>
+                    <div class="text-gray-400">Collection{{ collections.count|pluralize }}</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-green-400">{{ total_games }}</div>
+                    <div class="text-gray-400">Total Game{{ total_games|pluralize }}</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-purple-400">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="text-gray-400">Organized</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create New Collection Button -->
+        <div class="text-center mb-8">
+            <a href="{% url 'create_game_collection' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold text-lg transition transform hover:scale-105">
+                <i class="fas fa-plus mr-2"></i>Create New Collection
+            </a>
+        </div>
+
+        <!-- Collections Grid -->
+        {% if collections %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for collection in collections %}
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700 hover:border-blue-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-white mb-2">{{ collection.name }}</h3>
+                        <p class="text-gray-400 text-sm mb-4">{{ collection.description|truncatewords:20 }}</p>
+                        
+                        <!-- Collection Stats -->
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm">
+                                <i class="fas fa-gamepad mr-1"></i>{{ collection.games.count }} Game{{ collection.games.count|pluralize }}
+                            </span>
+                            <span class="text-gray-500 text-xs">
+                                <i class="fas fa-clock mr-1"></i>{{ collection.updated_at|date:"M d, Y" }}
+                            </span>
+                        </div>
+
+                        <!-- Game Preview -->
+                        {% if collection.games.exists %}
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                {% for game in collection.games.all|slice:":3" %}
+                                    <div class="relative">
+                                        {% if game.cover_image %}
+                                            <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-16 object-cover rounded">
+                                        {% else %}
+                                            <div class="w-full h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded flex items-center justify-center">
+                                                <i class="fas fa-gamepad text-gray-500 text-sm"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-8 border-2 border-dashed border-gray-600 rounded-lg">
+                                <i class="fas fa-plus text-gray-500 text-2xl mb-2"></i>
+                                <p class="text-gray-500 text-sm">No games added yet</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2">
+                            <button class="flex-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 px-4 py-2 rounded text-sm font-semibold transition">
+                                <i class="fas fa-eye mr-1"></i>View
+                            </button>
+                            <button class="flex-1 bg-green-600/20 hover:bg-green-600/30 text-green-300 px-4 py-2 rounded text-sm font-semibold transition">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <i class="fas fa-folder-open text-6xl text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-400 mb-2">No Collections Yet</h3>
+                <p class="text-gray-500 mb-6">Create your first collection to organize your favorite games!</p>
+                <a href="{% url 'create_game_collection' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition transform hover:scale-105">
+                    <i class="fas fa-plus mr-2"></i>Create Your First Collection
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Gaming Background Animation -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-purple-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-green-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-yellow-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}

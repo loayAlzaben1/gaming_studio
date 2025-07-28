@@ -1,0 +1,259 @@
+{% extends 'studio/base.html' %}
+{% block title %}{{ game.title }} Forum{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 mb-6 border border-blue-400/20">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    {% if game.cover_image %}
+                        <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-16 h-16 rounded-lg object-cover">
+                    {% endif %}
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">{{ forum.name }}</h1>
+                        <p class="text-gray-400">{{ forum.description }}</p>
+                        <p class="text-sm text-blue-400">{{ topics.count }} topics • Community discussions</p>
+                    </div>
+                </div>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_topic' forum.id %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-plus mr-2"></i>New Topic
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Forum Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-blue-400/20">
+                <div class="flex items-center">
+                    <i class="fas fa-comments text-blue-400 text-2xl mr-3"></i>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{{ topics|length }}</p>
+                        <p class="text-sm text-gray-400">Topics</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-green-400/20">
+                <div class="flex items-center">
+                    <i class="fas fa-reply text-green-400 text-2xl mr-3"></i>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{{ total_posts }}</p>
+                        <p class="text-sm text-gray-400">Posts</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-purple-400/20">
+                <div class="flex items-center">
+                    <i class="fas fa-users text-purple-400 text-2xl mr-3"></i>
+                    <div>
+                        <p class="text-2xl font-bold text-white">{{ active_users }}</p>
+                        <p class="text-sm text-gray-400">Active Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-yellow-400/20">
+                <div class="flex items-center">
+                    <i class="fas fa-fire text-yellow-400 text-2xl mr-3"></i>
+                    <div>
+                        <p class="text-2xl font-bold text-white">Active</p>
+                        <p class="text-sm text-gray-400">Community</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Categories -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 mb-6 border border-blue-400/20">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center">
+                <i class="fas fa-list text-blue-400 mr-2"></i>Browse Topics
+            </h2>
+            
+            <!-- Filter and Sort Options -->
+            <div class="flex flex-wrap items-center gap-4 mb-4">
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm text-gray-300">Category:</label>
+                    <select id="categoryFilter" class="bg-gray-700 text-white text-sm px-3 py-1 rounded">
+                        <option value="">All Categories</option>
+                        {% for cat_key, cat_name, cat_icon, cat_color in topic_categories %}
+                            <option value="{{ cat_key }}" {% if category_filter == cat_key %}selected{% endif %}>{{ cat_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm text-gray-300">Sort by:</label>
+                    <select id="sortFilter" class="bg-gray-700 text-white text-sm px-3 py-1 rounded">
+                        <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>Most Recent</option>
+                        <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+                        <option value="replies" {% if sort_by == 'replies' %}selected{% endif %}>Most Replies</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Category Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {% for cat_key, cat_name, cat_icon, cat_color in topic_categories %}
+                <a href="?category={{ cat_key }}" class="bg-gray-700/50 hover:bg-gray-700/70 rounded-lg p-3 flex items-center transition duration-300 {% if category_filter == cat_key %}ring-2 ring-{{ cat_color }}-400{% endif %}">
+                    <i class="{{ cat_icon }} text-{{ cat_color }}-400 mr-3"></i>
+                    <span class="text-white">{{ cat_name }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- User's Topics (if authenticated) -->
+        {% if user.is_authenticated and user_topics %}
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 mb-6 border border-green-400/20">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center">
+                <i class="fas fa-user text-green-400 mr-2"></i>Your Recent Topics
+            </h2>
+            <div class="space-y-3">
+                {% for topic in user_topics %}
+                <div class="bg-gray-700/50 rounded-lg p-3 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        {% if topic.topic_type == 'help' %}
+                            <i class="fas fa-question-circle text-green-400"></i>
+                        {% elif topic.topic_type == 'bug' %}
+                            <i class="fas fa-bug text-red-400"></i>
+                        {% elif topic.topic_type == 'feature' %}
+                            <i class="fas fa-lightbulb text-yellow-400"></i>
+                        {% elif topic.topic_type == 'guide' %}
+                            <i class="fas fa-book text-purple-400"></i>
+                        {% elif topic.topic_type == 'showcase' %}
+                            <i class="fas fa-trophy text-orange-400"></i>
+                        {% else %}
+                            <i class="fas fa-chat text-blue-400"></i>
+                        {% endif %}
+                        <div>
+                            <a href="{% url 'forum_topic' topic.id %}" class="text-white hover:text-blue-400 font-medium">{{ topic.title }}</a>
+                            <div class="text-xs text-gray-400">{{ topic.created_at|timesince }} ago • {{ topic.posts.count }} replies</div>
+                        </div>
+                    </div>
+                    <a href="{% url 'forum_topic' topic.id %}" class="text-blue-400 hover:text-blue-300">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Topics -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-clock text-blue-400 mr-2"></i>
+                    {% if category_filter %}
+                        {{ category_filter|title }} Topics
+                    {% else %}
+                        All Topics
+                    {% endif %}
+                    <span class="text-sm text-gray-400 ml-2">({{ topics|length }} shown)</span>
+                </h2>
+                {% if category_filter or sort_by != 'recent' %}
+                <a href="?" class="text-blue-400 hover:text-blue-300 text-sm">
+                    <i class="fas fa-times mr-1"></i>Clear Filters
+                </a>
+                {% endif %}
+            </div>
+
+            {% if topics %}
+                <div class="space-y-4">
+                    {% for topic in topics %}
+                        <div class="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700/70 transition duration-300">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        {% if topic.is_pinned %}
+                                            <i class="fas fa-thumbtack text-yellow-400"></i>
+                                        {% endif %}
+                                        {% if topic.topic_type == 'help' %}
+                                            <i class="fas fa-question-circle text-green-400"></i>
+                                        {% elif topic.topic_type == 'bug' %}
+                                            <i class="fas fa-bug text-red-400"></i>
+                                        {% elif topic.topic_type == 'feature' %}
+                                            <i class="fas fa-lightbulb text-yellow-400"></i>
+                                        {% elif topic.topic_type == 'guide' %}
+                                            <i class="fas fa-book text-purple-400"></i>
+                                        {% elif topic.topic_type == 'showcase' %}
+                                            <i class="fas fa-trophy text-orange-400"></i>
+                                        {% else %}
+                                            <i class="fas fa-chat text-blue-400"></i>
+                                        {% endif %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-blue-600 text-white">
+                                            {{ topic.get_topic_type_display }}
+                                        </span>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-white mb-2 hover:text-blue-400 transition duration-300">
+                                        <a href="{% url 'forum_topic' topic.id %}">{{ topic.title }}</a>
+                                    </h3>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-400">
+                                        <span><i class="fas fa-user mr-1"></i>{{ topic.author.username }}</span>
+                                        <span><i class="fas fa-clock mr-1"></i>{{ topic.created_at|timesince }} ago</span>
+                                        <span><i class="fas fa-eye mr-1"></i>{{ topic.view_count }} views</span>
+                                        <span><i class="fas fa-comments mr-1"></i>{{ topic.posts.count }} replies</span>
+                                    </div>
+                                </div>
+                                {% if topic.is_locked %}
+                                    <i class="fas fa-lock text-red-400 ml-4"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-comments text-gray-500 text-4xl mb-4"></i>
+                    <p class="text-gray-400 mb-4">No topics yet. Be the first to start a discussion!</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'create_topic' forum.id %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                            Start First Topic
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Back to Game -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'game_detail' game.id %}" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>Back to {{ game.title }}
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+// Forum filtering functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    
+    function updateFilters() {
+        const category = categoryFilter.value;
+        const sort = sortFilter.value;
+        
+        const url = new URL(window.location);
+        
+        if (category) {
+            url.searchParams.set('category', category);
+        } else {
+            url.searchParams.delete('category');
+        }
+        
+        if (sort !== 'recent') {
+            url.searchParams.set('sort', sort);
+        } else {
+            url.searchParams.delete('sort');
+        }
+        
+        window.location.href = url.toString();
+    }
+    
+    categoryFilter.addEventListener('change', updateFilters);
+    sortFilter.addEventListener('change', updateFilters);
+});
+</script>
+{% endblock %}

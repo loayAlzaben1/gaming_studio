@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (Donation, Game, Photo, Video, DevlogVideo, TeamMember, SponsorTier, 
                      DonationGoal, ContactMessage, UserProfile, Achievement, UserAchievement, UserActivity,
-                     GameWishlist, GameCollection, GameAnalytics, GameCategory, GameTag, GameDownload)
+                     GameWishlist, GameCollection, GameAnalytics, GameCategory, GameTag, GameDownload,
+                     UserGeneratedContent, CommunityGameReview, AdvancedGameRating, GameForum, ForumTopic, ForumPost)
 from django.utils.html import format_html
 
 class PhotoInline(admin.TabularInline):
@@ -347,3 +348,68 @@ class GameAnalyticsAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         # Analytics are usually auto-generated, so restrict manual editing
         return request.user.is_superuser
+
+# Community Features Admin
+
+@admin.register(UserGeneratedContent)
+class UserGeneratedContentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'game', 'content_type', 'is_approved', 'is_featured', 'created_at', 'like_count')
+    list_filter = ('content_type', 'is_approved', 'is_featured', 'created_at', 'game')
+    search_fields = ('title', 'description', 'user__username', 'game__title')
+    list_editable = ('is_approved', 'is_featured')
+    readonly_fields = ('created_at', 'view_count', 'like_count')
+    actions = ['approve_content', 'unapprove_content', 'feature_content']
+    
+    fieldsets = (
+        ('Content Information', {
+            'fields': ('user', 'game', 'content_type', 'title', 'description')
+        }),
+        ('Media', {
+            'fields': ('image', 'video_url', 'file_upload')
+        }),
+        ('Status', {
+            'fields': ('is_approved', 'is_featured', 'created_at')
+        }),
+        ('Statistics', {
+            'fields': ('view_count', 'like_count')
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'game')
+    
+    def approve_content(self, request, queryset):
+        updated = queryset.update(is_approved=True)
+        self.message_user(request, f'{updated} content items were approved.')
+    approve_content.short_description = "Approve selected content"
+    
+    def unapprove_content(self, request, queryset):
+        updated = queryset.update(is_approved=False)
+        self.message_user(request, f'{updated} content items were unapproved.')
+    unapprove_content.short_description = "Unapprove selected content"
+    
+    def feature_content(self, request, queryset):
+        updated = queryset.update(is_featured=True, is_approved=True)
+        self.message_user(request, f'{updated} content items were featured and approved.')
+    feature_content.short_description = "Feature and approve selected content"
+
+@admin.register(CommunityGameReview)
+class CommunityGameReviewAdmin(admin.ModelAdmin):
+    list_display = ('game', 'user', 'rating', 'is_featured', 'created_at', 'helpful_count')
+    list_filter = ('rating', 'is_featured', 'created_at', 'game')
+    search_fields = ('game__title', 'user__username', 'title', 'content')
+    list_editable = ('is_featured',)
+    readonly_fields = ('created_at', 'helpful_count')
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'game')
+
+@admin.register(AdvancedGameRating)
+class AdvancedGameRatingAdmin(admin.ModelAdmin):
+    list_display = ('game', 'user', 'overall_rating', 'gameplay', 'graphics', 'created_at')
+    list_filter = ('overall_rating', 'created_at', 'game')
+    search_fields = ('game__title', 'user__username')
+    readonly_fields = ('created_at',)
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'game')

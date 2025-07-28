@@ -179,9 +179,63 @@
                         {% endif %}
                     </div>
                 </div>
+                
+                <!-- Community Dropdown with Review Features -->
+                <div class="dropdown relative">
+                    <a href="#" class="hover:text-neon transition-colors duration-200 flex items-center">
+                        Community
+                        {% if user.is_authenticated %}
+                            <span class="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+                                NEW
+                            </span>
+                        {% endif %}
+                    </a>
+                    <div class="dropdown-content min-w-56">
+                        <a href="{% url 'community_showcase' %}">
+                            <i class="fas fa-users mr-2 text-blue-400"></i>Community Hub
+                        </a>
+                        {% if user.is_authenticated %}
+                            <hr class="border-gray-600 my-1">
+                            <div class="px-3 py-2 text-xs text-gray-400 font-semibold">REVIEW FEATURES</div>
+                            <a href="{% url 'review_hub' %}" class="text-yellow-300 hover:text-yellow-200">
+                                <i class="fas fa-star mr-2 text-yellow-400"></i>Write Reviews
+                            </a>
+                            <a href="{% url 'rating_hub' %}" class="text-purple-300 hover:text-purple-200">
+                                <i class="fas fa-chart-bar mr-2 text-purple-400"></i>Rate Games
+                            </a>
+                            <a href="{% url 'forum_hub' %}" class="text-green-300 hover:text-green-200">
+                                <i class="fas fa-comments mr-2 text-green-400"></i>Game Forums
+                            </a>
+                            <a href="{% url 'games' %}" class="text-red-300 hover:text-red-200" onclick="showDesktopToast('upload')">
+                                <i class="fas fa-upload mr-2 text-red-400"></i>Upload Content
+                            </a>
+                            <hr class="border-gray-600 my-1">
+                            <a href="{% url 'review_guide' %}" class="text-blue-300 hover:text-blue-200">
+                                <i class="fas fa-question-circle mr-2 text-blue-400"></i>Review Guide
+                            </a>
+                        {% else %}
+                            <hr class="border-gray-600 my-1">
+                            <a href="{% url 'account_login' %}" class="text-yellow-300">
+                                <i class="fas fa-sign-in-alt mr-2 text-yellow-400"></i>Login to Review
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
                 <a href="{% url 'team' %}" class="{% if request.path == '/team/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Team</a>
-                <a href="{% url 'community' %}" class="{% if request.path == '/community/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Community</a>
                 <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Contact</a>
+                
+                <!-- Review Badge Button -->
+                {% if user.is_authenticated %}
+                    <a href="{% url 'review_guide' %}" class="relative bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center transform hover:scale-105">
+                        <i class="fas fa-star mr-2"></i>
+                        <span class="hidden xl:inline">Review</span>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
+                            !
+                        </span>
+                    </a>
+                {% endif %}
+                
                 <a href="{% url 'donate' %}" class="btn-neon">Donate</a>
                 
                 <!-- Authentication Links -->
@@ -251,14 +305,63 @@
                         <span>Games</span>
                         <i class="fas fa-chevron-right"></i>
                     </a>
+                    
+                    <!-- Community Section with Review Features -->
+                    <div class="border-t border-gray-600 my-2 pt-2">
+                        <div class="px-4 py-2 text-xs text-gray-400 font-semibold flex items-center">
+                            <i class="fas fa-users mr-2 text-blue-400"></i>
+                            COMMUNITY FEATURES
+                            {% if user.is_authenticated %}
+                                <span class="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+                                    NEW
+                                </span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'community_showcase' %}" class="mobile-menu-link">
+                            <i class="fas fa-users text-blue-400"></i>
+                            <span>Community Hub</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        
+                        {% if user.is_authenticated %}
+                            <!-- Review Features for Mobile -->
+                            <a href="{% url 'review_hub' %}" class="mobile-menu-link">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span>Write Reviews</span>
+                                <span class="ml-auto bg-yellow-500 text-black text-xs px-2 py-1 rounded-full">HOT</span>
+                            </a>
+                            <a href="{% url 'rating_hub' %}" class="mobile-menu-link">
+                                <i class="fas fa-chart-bar text-purple-400"></i>
+                                <span>Rate Games</span>
+                                <span class="ml-auto bg-purple-500 text-white text-xs px-2 py-1 rounded-full">NEW</span>
+                            </a>
+                            <a href="{% url 'forum_hub' %}" class="mobile-menu-link">
+                                <i class="fas fa-comments text-green-400"></i>
+                                <span>Game Forums</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="{% url 'games' %}" class="mobile-menu-link" onclick="showReviewToast('upload')">
+                                <i class="fas fa-upload text-red-400"></i>
+                                <span>Upload Content</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="{% url 'review_guide' %}" class="mobile-menu-link special">
+                                <i class="fas fa-question-circle text-blue-400"></i>
+                                <span>Review Guide</span>
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'account_login' %}" class="mobile-menu-link special">
+                                <i class="fas fa-sign-in-alt text-yellow-400"></i>
+                                <span>Login to Review</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                    
                     <a href="{% url 'team' %}" class="mobile-menu-link {% if request.path == '/team/' %}active{% endif %}">
                         <i class="fas fa-users"></i>
                         <span>Team</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                    <a href="{% url 'community' %}" class="mobile-menu-link {% if request.path == '/community/' %}active{% endif %}">
-                        <i class="fas fa-comments"></i>
-                        <span>Community</span>
                         <i class="fas fa-chevron-right"></i>
                     </a>
                     <a href="{% url 'contact' %}" class="mobile-menu-link {% if request.path == '/contact/' %}active{% endif %}">
@@ -266,6 +369,16 @@
                         <span>Contact</span>
                         <i class="fas fa-chevron-right"></i>
                     </a>
+                    
+                    <!-- Review Badge for Mobile -->
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'review_guide' %}" class="mobile-menu-link special bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-400/30">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <span class="text-yellow-300 font-semibold">Review Guide</span>
+                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-bounce">!</span>
+                        </a>
+                    {% endif %}
+                    
                     <a href="{% url 'donate' %}" class="mobile-menu-link special">
                         <i class="fas fa-heart"></i>
                         <span>Donate</span>
@@ -612,6 +725,111 @@
                     document.body.style.overflow = 'auto';
                 }
             });
+        });
+        
+        // Review toast function for mobile
+        function showReviewToast(type) {
+            const messages = {
+                'reviews': '✨ Select a game below and click the yellow "Review" button to write your review!',
+                'ratings': '⭐ Choose a game below and click "Rate" to give it a rating!',
+                'forums': '💬 Pick a game below and click "Forum" to join the discussion!',
+                'upload': '📤 Visit a game below and click "Upload" to share your content!'
+            };
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 left-4 right-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg shadow-lg z-50 transform translate-y-full transition-transform duration-300';
+            toast.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle mr-3 text-yellow-400"></i>
+                        <span class="font-medium">${messages[type]}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-yellow-400">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Auto remove after 7 seconds (longer for better readability)
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100%)';
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 7000);
+        }
+
+        // Desktop toast function
+        function showDesktopToast(type) {
+            const messages = {
+                'reviews': '✨ Look for the yellow "Review" button on each game card below!',
+                'ratings': '⭐ Find the "Rate" button on any game card to give it a rating!',
+                'forums': '💬 Click the "Forum" button on game cards to join discussions!',
+                'upload': '📤 Use the "Upload" button on game cards to share content!'
+            };
+            
+            // Create desktop toast element
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg shadow-xl z-50 transform translate-x-full transition-transform duration-300 max-w-sm';
+            toast.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex items-start">
+                        <i class="fas fa-lightbulb mr-3 text-yellow-400 mt-1"></i>
+                        <div>
+                            <div class="font-semibold mb-1">Review Tip!</div>
+                            <div class="text-sm">${messages[type]}</div>
+                        </div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-yellow-400 ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto remove after 6 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 6000);
+        }
+
+        // Community dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.querySelector('.community-dropdown');
+            const dropdownContent = document.querySelector('.community-dropdown-content');
+            
+            if (dropdown && dropdownContent) {
+                dropdown.addEventListener('mouseenter', () => {
+                    dropdownContent.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+                    dropdownContent.classList.add('opacity-100', 'visible', 'translate-y-0');
+                });
+                
+                dropdown.addEventListener('mouseleave', () => {
+                    dropdownContent.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                    dropdownContent.classList.remove('opacity-100', 'visible', 'translate-y-0');
+                });
+            }
         });
         
         // Optimize particles for mobile devices

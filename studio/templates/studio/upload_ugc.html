@@ -1,0 +1,270 @@
+{% extends 'studio/base.html' %}
+{% block title %}Upload Content{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-4 flex items-center justify-center">
+                <i class="fas fa-upload text-blue-400 mr-3"></i>Upload Your Content
+            </h1>
+            <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                Share your gaming experiences with the community! Upload screenshots, videos, guides, fan art, and more.
+            </p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-blue-400/20">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Game Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-gamepad text-blue-400 mr-2"></i>Uploading for Game
+                    </label>
+                    <div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                        <div class="flex items-center space-x-4">
+                            {% if game.cover_image %}
+                                <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-12 h-12 rounded-lg object-cover">
+                            {% else %}
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-gamepad text-white"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="text-white font-semibold">{{ game.title }}</h3>
+                                <p class="text-gray-400 text-sm">{{ game.genre|default:"Game" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Type -->
+                <div>
+                    <label for="{{ form.content_type.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-tags text-purple-400 mr-2"></i>Content Type
+                    </label>
+                    {{ form.content_type }}
+                    {% if form.content_type.errors %}
+                        <div class="mt-1 text-red-400 text-sm">
+                            {% for error in form.content_type.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Title -->
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-heading text-green-400 mr-2"></i>Title
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="mt-1 text-red-400 text-sm">
+                            {% for error in form.title.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-align-left text-yellow-400 mr-2"></i>Description
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="mt-1 text-red-400 text-sm">
+                            {% for error in form.description.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-400">Describe your content, share tips, or tell your story behind this creation.</p>
+                </div>
+
+                <!-- Image Upload -->
+                <div>
+                    <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-image text-red-400 mr-2"></i>Upload Image
+                    </label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-lg hover:border-blue-400 transition duration-300">
+                        <div class="space-y-1 text-center">
+                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-4"></i>
+                            <div class="flex text-sm text-gray-400">
+                                <label for="{{ form.image.id_for_label }}" class="relative cursor-pointer rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
+                                    <span>Upload a file</span>
+                                    {{ form.image }}
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                        </div>
+                    </div>
+                    {% if form.image.errors %}
+                        <div class="mt-1 text-red-400 text-sm">
+                            {% for error in form.image.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Video URL -->
+                <div>
+                    <label for="{{ form.video_url.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-video text-red-500 mr-2"></i>Video URL (Optional)
+                    </label>
+                    {{ form.video_url }}
+                    {% if form.video_url.errors %}
+                        <div class="mt-1 text-red-400 text-sm">
+                            {% for error in form.video_url.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-400">YouTube, Twitch, or other video platform URL</p>
+                </div>
+
+                <!-- Additional Content -->
+                <div>
+                    <label for="{{ form.additional_content.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-plus-circle text-indigo-400 mr-2"></i>Additional Content (Optional)
+                    </label>
+                    {{ form.additional_content }}
+                    {% if form.additional_content.errors %}
+                        <div class="mt-1 text-red-400 text-sm">
+                            {% for error in form.additional_content.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-400">Additional details, tips, code snippets, or related information</p>
+                </div>
+
+                <!-- Upload Guidelines -->
+                <div class="bg-blue-900/30 border border-blue-400/20 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>Upload Guidelines
+                    </h3>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Content should be original or properly credited</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Keep content gaming-related and appropriate</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>High-quality images and videos are preferred</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>All uploads are reviewed before being published</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex justify-between items-center pt-6">
+                    <a href="{% url 'community_showcase' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Showcase
+                    </a>
+                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-upload mr-2"></i>Upload Content
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Recent Uploads Preview -->
+        {% if user.is_authenticated %}
+        <div class="mt-12">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+                <i class="fas fa-history text-blue-400 mr-2"></i>Your Recent Uploads
+            </h2>
+            {% if user_recent_uploads %}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% for upload in user_recent_uploads %}
+                    <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-600/20">
+                        {% if upload.image %}
+                            <div class="h-32 overflow-hidden">
+                                <img src="{{ upload.image.url }}" alt="{{ upload.title }}" class="w-full h-full object-cover">
+                            </div>
+                        {% endif %}
+                        <div class="p-3">
+                            <h4 class="text-white font-semibold mb-1 line-clamp-1">{{ upload.title }}</h4>
+                            <p class="text-gray-400 text-sm mb-2">{{ upload.game.title }}</p>
+                            <div class="flex items-center justify-between text-xs text-gray-500">
+                                <span class="px-2 py-1 rounded-full bg-{{ upload.is_approved|yesno:'green,yellow' }}-600/20 text-{{ upload.is_approved|yesno:'green,yellow' }}-400">
+                                    {{ upload.is_approved|yesno:'Approved,Pending' }}
+                                </span>
+                                <span><i class="fas fa-heart text-red-400 mr-1"></i>{{ upload.like_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-images text-gray-500 text-3xl mb-4"></i>
+                    <p class="text-gray-400">No uploads yet. Start sharing your gaming content!</p>
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+// File upload preview
+document.getElementById('{{ form.image.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Create preview if doesn't exist
+            let preview = document.getElementById('image-preview');
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.id = 'image-preview';
+                preview.className = 'mt-4';
+                e.target.closest('.space-y-1').appendChild(preview);
+            }
+            preview.innerHTML = `
+                <div class="relative inline-block">
+                    <img src="${e.target.result}" alt="Preview" class="max-w-xs max-h-32 rounded-lg border border-gray-600">
+                    <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700">
+                        ×
+                    </button>
+                </div>
+            `;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const image = document.getElementById('{{ form.image.id_for_label }}').files[0];
+    const videoUrl = document.getElementById('{{ form.video_url.id_for_label }}').value;
+    
+    if (!image && !videoUrl) {
+        e.preventDefault();
+        alert('Please upload an image or provide a video URL');
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

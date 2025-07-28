@@ -1,0 +1,247 @@
+{% extends 'studio/base.html' %}
+{% block title %}How to Write Reviews - Gaming Studio{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-white mb-4 flex items-center justify-center">
+                <i class="fas fa-question-circle text-blue-400 mr-3"></i>How to Write Reviews
+            </h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                Learn how to share your gaming experiences with our community through reviews and ratings!
+            </p>
+        </div>
+
+        <!-- Step-by-Step Guide -->
+        <div class="space-y-8">
+            <!-- Step 1 -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-blue-400/20">
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        1
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-white mb-4">Navigate to Any Game Page</h2>
+                        <p class="text-gray-300 mb-4">Start by visiting the game you want to review:</p>
+                        <div class="bg-gray-700/50 rounded-lg p-4 mb-4">
+                            <div class="flex items-center space-x-2 text-sm">
+                                <span class="text-blue-400">🔗</span>
+                                <span class="text-gray-300">Go to:</span>
+                                <code class="bg-gray-600 px-2 py-1 rounded text-blue-300">http://127.0.0.1:8000/games/</code>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm">Browse our games library and click on any game that interests you.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-green-400/20">
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        2
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-white mb-4">Look for Review Buttons</h2>
+                        <p class="text-gray-300 mb-4">On the game detail page, you'll find several review options:</p>
+                        
+                        <!-- Button Examples -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center justify-center">
+                                <i class="fas fa-star mr-2"></i>Write Review
+                            </div>
+                            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center justify-center">
+                                <i class="fas fa-chart-bar mr-2"></i>Rate Game
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-900/30 rounded-lg p-4">
+                            <h4 class="text-blue-400 font-semibold mb-2">📍 Where to Find These Buttons:</h4>
+                            <ul class="text-gray-300 text-sm space-y-1">
+                                <li>• <strong>Main Hero Section:</strong> Below the game title and description</li>
+                                <li>• <strong>Community Sidebar:</strong> In the right sidebar under "Community Features"</li>
+                                <li>• <strong>Mobile:</strong> Buttons stack vertically on smaller screens</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-yellow-400/20">
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        3
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-white mb-4">Choose Your Review Type</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Simple Review -->
+                            <div class="bg-yellow-900/20 border border-yellow-400/20 rounded-lg p-4">
+                                <h4 class="text-yellow-400 font-semibold mb-2 flex items-center">
+                                    <i class="fas fa-star mr-2"></i>Write Review (Simple)
+                                </h4>
+                                <ul class="text-gray-300 text-sm space-y-1">
+                                    <li>• Overall star rating (1-5 stars)</li>
+                                    <li>• Written review with title</li>
+                                    <li>• Quick and easy to complete</li>
+                                    <li>• Perfect for casual feedback</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Advanced Rating -->
+                            <div class="bg-purple-900/20 border border-purple-400/20 rounded-lg p-4">
+                                <h4 class="text-purple-400 font-semibold mb-2 flex items-center">
+                                    <i class="fas fa-chart-bar mr-2"></i>Rate Game (Advanced)
+                                </h4>
+                                <ul class="text-gray-300 text-sm space-y-1">
+                                    <li>• 6 detailed rating categories</li>
+                                    <li>• Gameplay, Graphics, Sound, Story</li>
+                                    <li>• Innovation, Replayability ratings</li>
+                                    <li>• Perfect for detailed feedback</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-purple-400/20">
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        4
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-white mb-4">Login Required</h2>
+                        <p class="text-gray-300 mb-4">You must be logged in to write reviews and ratings.</p>
+                        
+                        <div class="bg-red-900/20 border border-red-400/20 rounded-lg p-4 mb-4">
+                            <h4 class="text-red-400 font-semibold mb-2 flex items-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Not Logged In?
+                            </h4>
+                            <p class="text-gray-300 text-sm mb-3">If you're not logged in, you'll see a "Login to Review" button instead.</p>
+                            <a href="{% url 'account_login' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Login Now
+                            </a>
+                        </div>
+                        
+                        <div class="bg-green-900/20 border border-green-400/20 rounded-lg p-4">
+                            <h4 class="text-green-400 font-semibold mb-2 flex items-center">
+                                <i class="fas fa-user-plus mr-2"></i>Need an Account?
+                            </h4>
+                            <p class="text-gray-300 text-sm mb-3">Don't have an account yet? Create one for free!</p>
+                            <a href="{% url 'account_signup' %}" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                                <i class="fas fa-user-plus mr-2"></i>Sign Up Free
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-green-400/20">
+                <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        5
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-white mb-4">Fill Out Your Review</h2>
+                        <p class="text-gray-300 mb-4">Once you click a review button, you'll be taken to the review form where you can:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-white font-semibold mb-3">📝 For Simple Reviews:</h4>
+                                <ul class="text-gray-300 text-sm space-y-2">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Rate with 1-5 stars</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Write a review title</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Share your thoughts</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-white font-semibold mb-3">⭐ For Advanced Ratings:</h4>
+                                <ul class="text-gray-300 text-sm space-y-2">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-star text-yellow-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Rate 6 different categories</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-star text-yellow-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Interactive star rating system</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-star text-yellow-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Detailed category breakdown</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                    <i class="fas fa-rocket mr-3 text-blue-400"></i>Quick Access Links
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="{% url 'games' %}" class="block bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 px-4 py-3 rounded-lg text-center transition">
+                        <i class="fas fa-gamepad mb-2 text-2xl block"></i>
+                        Browse Games
+                    </a>
+                    <a href="{% url 'community_showcase' %}" class="block bg-green-600/20 hover:bg-green-600/30 text-green-300 px-4 py-3 rounded-lg text-center transition">
+                        <i class="fas fa-users mb-2 text-2xl block"></i>
+                        Community Hub
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="block bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 px-4 py-3 rounded-lg text-center transition">
+                        <i class="fas fa-tachometer-alt mb-2 text-2xl block"></i>
+                        Your Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-question-circle mr-3 text-yellow-400"></i>Frequently Asked Questions
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <h4 class="text-white font-semibold mb-2">Q: Can I edit my review after submitting it?</h4>
+                        <p class="text-gray-300 text-sm">A: Yes! You can update your review by visiting the same game page and clicking the review button again.</p>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <h4 class="text-white font-semibold mb-2">Q: Can I review the same game multiple times?</h4>
+                        <p class="text-gray-300 text-sm">A: You can have one active review per game, but you can update it anytime as your opinion evolves.</p>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <h4 class="text-white font-semibold mb-2">Q: Do I earn experience for writing reviews?</h4>
+                        <p class="text-gray-300 text-sm">A: Yes! Writing reviews and participating in the community earns you experience points and achievements.</p>
+                    </div>
+                    
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <h4 class="text-white font-semibold mb-2">Q: What other community features are available?</h4>
+                        <p class="text-gray-300 text-sm">A: You can also join game forums, upload screenshots/videos, and rate games with detailed category breakdowns!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

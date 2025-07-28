@@ -1,0 +1,166 @@
+{% extends 'studio/base.html' %}
+{% block title %}Rating Hub - Gaming Studio{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-blue-900 py-8">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <!-- Hero Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl lg:text-5xl font-bold text-white mb-4">
+                <i class="fas fa-chart-bar mr-3 text-green-400"></i>Rating Hub
+            </h1>
+            <p class="text-green-200 text-lg mb-6">Rate games and discover what the community thinks!</p>
+            
+            {% if user.is_authenticated %}
+                <div class="flex justify-center gap-4 text-sm">
+                    <span class="bg-green-500/20 text-green-300 px-4 py-2 rounded-lg">
+                        <i class="fas fa-thumbs-up mr-1"></i>{{ user_ratings_count }} Game{{ user_ratings_count|pluralize }} Rated
+                    </span>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+            <!-- User's Recent Ratings -->
+            {% if recent_ratings %}
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-green-400 mb-4 flex items-center">
+                        <i class="fas fa-star mr-3"></i>Your Recent Ratings
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for rating in recent_ratings %}
+                            <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 border border-gray-700 hover:border-green-400/60 transition">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-semibold text-white">{{ rating.game.title }}</h3>
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                            <i class="fas fa-star text-sm {% if forloop.counter <= rating.rating %}text-yellow-400{% else %}text-gray-600{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center text-xs text-gray-500">
+                                    <span>{{ rating.created_at|date:"M d, Y" }}</span>
+                                    <a href="{% url 'game_detail' rating.game.id %}" class="text-blue-400 hover:text-blue-300">View Game</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <!-- Top Rated Games -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="fas fa-trophy mr-3"></i>Top Rated Games
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for game in top_rated_games %}
+                    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700 hover:border-yellow-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <div class="relative">
+                            {% if game.cover_image %}
+                                <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-40 object-cover">
+                            {% else %}
+                                <div class="w-full h-40 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                                    <i class="fas fa-gamepad text-3xl text-gray-500"></i>
+                                </div>
+                            {% endif %}
+                            <!-- Rating Badge -->
+                            <div class="absolute top-2 right-2 bg-yellow-500 text-black px-2 py-1 rounded-lg text-xs font-bold flex items-center">
+                                <i class="fas fa-star mr-1"></i>{{ game.average_rating|floatformat:1 }}
+                            </div>
+                        </div>
+                        
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-white mb-2 line-clamp-1">{{ game.title }}</h3>
+                            <p class="text-gray-400 text-sm mb-3 line-clamp-2">{{ game.description|truncatewords:10 }}</p>
+                            
+                            <!-- Rating Info -->
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center">
+                                    {% for i in "12345" %}
+                                        <i class="fas fa-star text-sm {% if forloop.counter <= game.average_rating %}text-yellow-400{% else %}text-gray-600{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <span class="text-xs text-gray-400">{{ game.rating_count }} rating{{ game.rating_count|pluralize }}</span>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <a href="{% url 'game_detail' game.id %}" 
+                                   class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-2 rounded text-sm font-semibold text-center hover:from-blue-700 hover:to-purple-700 transition">
+                                    <i class="fas fa-eye mr-1"></i>View
+                                </a>
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'rate_game' game.id %}" 
+                                       class="flex-1 bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-2 rounded text-sm font-semibold text-center hover:from-green-600 hover:to-teal-600 transition">
+                                        <i class="fas fa-thumbs-up mr-1"></i>Rate
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- All Games for Rating -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-blue-400 mb-4 flex items-center">
+                <i class="fas fa-gamepad mr-3"></i>All Games Available for Rating
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for game in games %}
+                    <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700 hover:border-blue-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <div class="relative">
+                            {% if game.cover_image %}
+                                <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-full h-40 object-cover">
+                            {% else %}
+                                <div class="w-full h-40 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                                    <i class="fas fa-gamepad text-3xl text-gray-500"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-white mb-2 line-clamp-1">{{ game.title }}</h3>
+                            <p class="text-gray-400 text-sm mb-3 line-clamp-2">{{ game.description|truncatewords:10 }}</p>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <a href="{% url 'game_detail' game.id %}" 
+                                   class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-2 rounded text-sm font-semibold text-center hover:from-blue-700 hover:to-purple-700 transition">
+                                    <i class="fas fa-eye mr-1"></i>View
+                                </a>
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'rate_game' game.id %}" 
+                                       class="flex-1 bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-2 rounded text-sm font-semibold text-center hover:from-green-600 hover:to-teal-600 transition">
+                                        <i class="fas fa-thumbs-up mr-1"></i>Rate
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Rating Guide CTA -->
+        <div class="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-400/30 rounded-lg p-6 text-center">
+            <h3 class="text-xl font-bold text-green-300 mb-2">How to Rate Games Effectively</h3>
+            <p class="text-green-200 mb-4">Learn how to give meaningful ratings that help other gamers make informed decisions!</p>
+            <a href="{% url 'rating_guide' %}" class="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-lg font-semibold transition">
+                <i class="fas fa-info-circle mr-2"></i>Rating Guide
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Gaming Background Animation -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-20 left-10 w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+    <div class="absolute top-40 right-20 w-1 h-1 bg-teal-400 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-32 left-1/4 w-1 h-1 bg-yellow-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 right-1/3 w-2 h-2 bg-blue-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+</div>
+{% endblock %}

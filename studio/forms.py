@@ -1,5 +1,6 @@
 from django import forms
-from .models import DonationGoal, UserProfile, GameReview
+from .models import (DonationGoal, UserProfile, GameReview, CommunityGameReview, 
+                     ForumTopic, ForumPost, Comment, UserGeneratedContent, AdvancedGameRating)
 
 class DonationForm(forms.Form):
     DONATION_TYPE_CHOICES = [
@@ -187,4 +188,94 @@ class GameReviewForm(forms.ModelForm):
                 'step': '0.1',
                 'min': '0'
             })
+        }
+
+# Community Features Forms
+
+class CommunityGameReviewForm(forms.ModelForm):
+    """Enhanced game review form with detailed ratings"""
+    class Meta:
+        model = CommunityGameReview
+        fields = ['rating', 'title', 'content', 'gameplay_rating', 'graphics_rating', 'story_rating', 'sound_rating']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'title': forms.TextInput(attrs={'class': 'gaming-input w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20', 'placeholder': 'Review title...'}),
+            'content': forms.Textarea(attrs={'class': 'gaming-textarea w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20 h-32', 'placeholder': 'Write your detailed review...'}),
+            'gameplay_rating': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'graphics_rating': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'story_rating': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'sound_rating': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+        }
+
+class ForumTopicForm(forms.ModelForm):
+    """Forum topic creation form"""
+    class Meta:
+        model = ForumTopic
+        fields = ['title', 'topic_type', 'content']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border-2 border-gray-600 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition duration-200',
+                'placeholder': 'Topic title...'
+            }),
+            'topic_type': forms.Select(attrs={
+                'class': 'w-full px-4 py-3 rounded-lg bg-gray-700 text-white border-2 border-gray-600 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition duration-200'
+            }),
+            'content': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border-2 border-gray-600 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 resize-vertical transition duration-200',
+                'placeholder': 'Start the discussion...',
+                'rows': 8
+            }),
+        }
+
+class ForumPostForm(forms.ModelForm):
+    """Forum post reply form"""
+    class Meta:
+        model = ForumPost
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border-2 border-gray-600 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 resize-vertical transition duration-200',
+                'placeholder': 'Write your reply...',
+                'rows': 6
+            }),
+        }
+
+class CommentForm(forms.ModelForm):
+    """Universal comment form"""
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border-2 border-gray-600 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 resize-vertical transition duration-200',
+                'placeholder': 'Add a comment...',
+                'rows': 4
+            }),
+        }
+
+class UGCForm(forms.ModelForm):
+    """User-generated content upload form"""
+    class Meta:
+        model = UserGeneratedContent
+        fields = ['content_type', 'title', 'description', 'image', 'video_url', 'file_upload']
+        widgets = {
+            'content_type': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'title': forms.TextInput(attrs={'class': 'gaming-input w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20', 'placeholder': 'Content title...'}),
+            'description': forms.Textarea(attrs={'class': 'gaming-textarea w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20 h-32', 'placeholder': 'Describe your content...'}),
+            'video_url': forms.URLInput(attrs={'class': 'gaming-input w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-blue-400/20', 'placeholder': 'YouTube/Vimeo URL...'}),
+        }
+
+class AdvancedGameRatingForm(forms.ModelForm):
+    """Advanced multi-category game rating form"""
+    class Meta:
+        model = AdvancedGameRating
+        fields = ['overall_rating', 'gameplay', 'graphics', 'story', 'sound', 'innovation', 'replayability']
+        widgets = {
+            'overall_rating': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'gameplay': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'graphics': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'story': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'sound': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'innovation': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
+            'replayability': forms.Select(attrs={'class': 'gaming-select w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-blue-400/20'}),
         }

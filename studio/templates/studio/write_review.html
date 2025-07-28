@@ -1,0 +1,119 @@
+{% extends 'studio/base.html' %}
+{% block title %}Write Review - {{ game.title }}{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">
+                {% if existing_review %}Edit Review{% else %}Write Review{% endif %}
+            </h1>
+            <p class="text-gray-300">Share your thoughts about {{ game.title }}</p>
+        </div>
+
+        <!-- Game Info -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 mb-6 border border-blue-400/20">
+            <div class="flex items-center space-x-4">
+                {% if game.cover_image %}
+                    <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-20 h-20 rounded-lg object-cover">
+                {% endif %}
+                <div>
+                    <h2 class="text-xl font-bold text-white">{{ game.title }}</h2>
+                    <p class="text-gray-400">{{ game.get_platform_display }} • {{ game.get_status_display }}</p>
+                    <p class="text-sm text-blue-400">{{ game.get_genre_display }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Overall Rating -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-star text-yellow-400 mr-2"></i>Overall Rating
+                    </label>
+                    {{ form.rating }}
+                </div>
+
+                <!-- Review Title -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-heading text-blue-400 mr-2"></i>Review Title
+                    </label>
+                    {{ form.title }}
+                </div>
+
+                <!-- Review Content -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-edit text-green-400 mr-2"></i>Your Review
+                    </label>
+                    {{ form.content }}
+                </div>
+
+                <!-- Detailed Ratings -->
+                <div class="bg-gray-700/50 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i class="fas fa-chart-bar text-purple-400 mr-2"></i>Detailed Ratings
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-gamepad text-red-400 mr-1"></i>Gameplay
+                            </label>
+                            {{ form.gameplay_rating }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-palette text-green-400 mr-1"></i>Graphics
+                            </label>
+                            {{ form.graphics_rating }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-book text-blue-400 mr-1"></i>Story
+                            </label>
+                            {{ form.story_rating }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-volume-up text-yellow-400 mr-1"></i>Sound
+                            </label>
+                            {{ form.sound_rating }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        {% if existing_review %}Update Review{% else %}Submit Review{% endif %}
+                    </button>
+                    <a href="{% url 'game_detail' game.id %}" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 text-center flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Review Guidelines -->
+        <div class="bg-blue-900/20 backdrop-blur-sm rounded-lg p-6 mt-6 border border-blue-400/20">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-info-circle text-blue-400 mr-2"></i>Review Guidelines
+            </h3>
+            <ul class="text-gray-300 space-y-2 text-sm">
+                <li><i class="fas fa-check text-green-400 mr-2"></i>Be honest and constructive in your feedback</li>
+                <li><i class="fas fa-check text-green-400 mr-2"></i>Focus on the game's mechanics, story, and overall experience</li>
+                <li><i class="fas fa-check text-green-400 mr-2"></i>Avoid spoilers in your review content</li>
+                <li><i class="fas fa-check text-green-400 mr-2"></i>Rate each category based on your personal experience</li>
+                <li><i class="fas fa-check text-green-400 mr-2"></i>Keep your language respectful and family-friendly</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}

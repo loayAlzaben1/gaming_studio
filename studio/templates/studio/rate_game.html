@@ -1,0 +1,355 @@
+{% extends 'studio/base.html' %}
+{% block title %}Rate {{ game.title }}{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-4 flex items-center justify-center">
+                <i class="fas fa-star text-yellow-400 mr-3"></i>Rate {{ game.title }}
+            </h1>
+            <p class="text-lg text-gray-300">
+                Share your detailed rating and help other gamers discover great content!
+            </p>
+        </div>
+
+        <!-- Game Preview -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20 mb-8">
+            <div class="flex items-center space-x-6">
+                {% if game.cover_image %}
+                    <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-20 h-20 rounded-lg object-cover border border-gray-600">
+                {% else %}
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-gamepad text-white text-2xl"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <h2 class="text-xl font-bold text-white">{{ game.title }}</h2>
+                    <p class="text-gray-400">{{ game.genre|default:"Game" }}</p>
+                    <div class="flex items-center mt-2">
+                        {% if game.average_rating %}
+                            <div class="flex items-center">
+                                {% for i in "12345" %}
+                                    <i class="fas fa-star {% if forloop.counter <= game.average_rating %}text-yellow-400{% else %}text-gray-600{% endif %}"></i>
+                                {% endfor %}
+                                <span class="text-gray-400 ml-2">({{ game.review_count }} reviews)</span>
+                            </div>
+                        {% else %}
+                            <span class="text-gray-400">No ratings yet</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Form -->
+        <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-8 border border-blue-400/20">
+            {% if existing_rating %}
+                <div class="bg-yellow-900/30 border border-yellow-400/20 rounded-lg p-4 mb-6">
+                    <p class="text-yellow-400 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        You have already rated this game. You can update your rating below.
+                    </p>
+                </div>
+            {% endif %}
+
+            <form method="post" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Overall Rating -->
+                <div class="text-center">
+                    <label class="block text-lg font-medium text-white mb-4">Overall Rating</label>
+                    <div class="flex justify-center items-center space-x-2 mb-4">
+                        {% for i in "12345" %}
+                            <button type="button" class="star-btn text-4xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="overall_rating">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        {% endfor %}
+                    </div>
+                    {{ form.overall_rating }}
+                    <p class="text-sm text-gray-400">Click the stars to rate</p>
+                </div>
+
+                <!-- Detailed Ratings -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Gameplay Rating -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-gamepad text-blue-400 mr-2"></i>Gameplay
+                        </label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            {% for i in "12345" %}
+                                <button type="button" class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="gameplay">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                        {{ form.gameplay }}
+                        <p class="text-xs text-gray-500">Controls, mechanics, fun factor</p>
+                    </div>
+
+                    <!-- Graphics Rating -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-palette text-purple-400 mr-2"></i>Graphics
+                        </label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            {% for i in "12345" %}
+                                <button type="button" class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="graphics">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                        {{ form.graphics }}
+                        <p class="text-xs text-gray-500">Visual quality, art style, effects</p>
+                    </div>
+
+                    <!-- Sound Rating -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-volume-up text-green-400 mr-2"></i>Sound
+                        </label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            {% for i in "12345" %}
+                                <button type="button" class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="sound">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                        {{ form.sound }}
+                        <p class="text-xs text-gray-500">Music, sound effects, voice acting</p>
+                    </div>
+
+                    <!-- Story Rating -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-book text-red-400 mr-2"></i>Story
+                        </label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            {% for i in "12345" %}
+                                <button type="button" class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="story">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                        {{ form.story }}
+                        <p class="text-xs text-gray-500">Plot, characters, narrative</p>
+                    </div>
+
+                    <!-- Innovation Rating -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>Innovation
+                        </label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            {% for i in "12345" %}
+                                <button type="button" class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="innovation">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                        {{ form.innovation }}
+                        <p class="text-xs text-gray-500">Originality, creativity, new ideas</p>
+                    </div>
+
+                    <!-- Replayability Rating -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-redo text-indigo-400 mr-2"></i>Replayability
+                        </label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            {% for i in "12345" %}
+                                <button type="button" class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition duration-200" data-rating="{{ forloop.counter }}" data-field="replayability">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            {% endfor %}
+                        </div>
+                        {{ form.replayability }}
+                        <p class="text-xs text-gray-500">Long-term engagement, replay value</p>
+                    </div>
+                </div>
+
+                <!-- Rating Summary -->
+                <div class="bg-gray-700/50 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i class="fas fa-chart-line text-blue-400 mr-2"></i>Rating Summary
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Overall:</span>
+                            <span id="overall-display" class="text-yellow-400 font-bold">-/5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Gameplay:</span>
+                            <span id="gameplay-display" class="text-blue-400">-/5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Graphics:</span>
+                            <span id="graphics-display" class="text-purple-400">-/5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Sound:</span>
+                            <span id="sound-display" class="text-green-400">-/5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Story:</span>
+                            <span id="story-display" class="text-red-400">-/5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Innovation:</span>
+                            <span id="innovation-display" class="text-yellow-400">-/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex justify-between items-center pt-6">
+                    <a href="{% url 'game_detail' game.id %}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Game
+                    </a>
+                    <button type="submit" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-star mr-2"></i>{{ existing_rating|yesno:"Update Rating,Submit Rating" }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Rating Guidelines -->
+        <div class="bg-blue-900/30 border border-blue-400/20 rounded-lg p-6 mt-8">
+            <h3 class="text-lg font-semibold text-blue-400 mb-4 flex items-center">
+                <i class="fas fa-info-circle mr-2"></i>Rating Guidelines
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-300">
+                <div>
+                    <h4 class="font-semibold text-white mb-2">Star Meanings:</h4>
+                    <ul class="space-y-1">
+                        <li><span class="text-yellow-400">★★★★★</span> - Exceptional, outstanding</li>
+                        <li><span class="text-yellow-400">★★★★☆</span> - Very good, highly recommended</li>
+                        <li><span class="text-yellow-400">★★★☆☆</span> - Good, solid experience</li>
+                        <li><span class="text-yellow-400">★★☆☆☆</span> - Fair, has issues</li>
+                        <li><span class="text-yellow-400">★☆☆☆☆</span> - Poor, not recommended</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-2">Tips:</h4>
+                    <ul class="space-y-1">
+                        <li>• Be honest and constructive</li>
+                        <li>• Consider the game's target audience</li>
+                        <li>• Rate based on your actual experience</li>
+                        <li>• Each category is independent</li>
+                        <li>• Your ratings help other gamers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Star rating functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const starButtons = document.querySelectorAll('.star-btn');
+    
+    starButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const rating = parseInt(this.dataset.rating);
+            const field = this.dataset.field;
+            const container = this.parentElement;
+            const hiddenInput = document.getElementById(`id_${field}`);
+            
+            // Update hidden input value
+            hiddenInput.value = rating;
+            
+            // Update visual stars
+            const stars = container.querySelectorAll('.star-btn');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('text-gray-600');
+                    star.classList.add('text-yellow-400');
+                } else {
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-gray-600');
+                }
+            });
+            
+            // Update display
+            const display = document.getElementById(`${field.replace('_rating', '')}-display`);
+            if (display) {
+                display.textContent = `${rating}/5`;
+            }
+            
+            // Calculate and update average if overall rating
+            if (field === 'overall_rating') {
+                updateOverallDisplay();
+            }
+        });
+        
+        // Hover effects
+        button.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.rating);
+            const container = this.parentElement;
+            const stars = container.querySelectorAll('.star-btn');
+            
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('text-yellow-300');
+                }
+            });
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            const container = this.parentElement;
+            const stars = container.querySelectorAll('.star-btn');
+            stars.forEach(star => {
+                star.classList.remove('text-yellow-300');
+            });
+        });
+    });
+    
+    function updateOverallDisplay() {
+        const overallDisplay = document.getElementById('overall-display');
+        const overallInput = document.getElementById('id_overall_rating');
+        if (overallInput.value) {
+            overallDisplay.textContent = `${overallInput.value}/5`;
+        }
+    }
+    
+    // Load existing ratings if any
+    {% if existing_rating %}
+        const existingRatings = {
+            'overall_rating': {{ existing_rating.overall_rating|default:0 }},
+            'gameplay': {{ existing_rating.gameplay|default:0 }},
+            'graphics': {{ existing_rating.graphics|default:0 }},
+            'sound': {{ existing_rating.sound|default:0 }},
+            'story': {{ existing_rating.story|default:0 }},
+            'innovation': {{ existing_rating.innovation|default:0 }},
+            'replayability': {{ existing_rating.replayability|default:0 }}
+        };
+        
+        Object.entries(existingRatings).forEach(([field, rating]) => {
+            if (rating) {
+                const buttons = document.querySelectorAll(`[data-field="${field}"]`);
+                buttons.forEach((button, index) => {
+                    if (index < rating) {
+                        button.classList.remove('text-gray-600');
+                        button.classList.add('text-yellow-400');
+                    }
+                });
+                
+                const hiddenInput = document.getElementById(`id_${field}`);
+                if (hiddenInput) {
+                    hiddenInput.value = rating;
+                }
+                
+                const display = document.getElementById(`${field.replace('_rating', '')}-display`);
+                if (display) {
+                    display.textContent = `${rating}/5`;
+                }
+            }
+        });
+    {% endif %}
+});
+</script>
+{% endblock %}

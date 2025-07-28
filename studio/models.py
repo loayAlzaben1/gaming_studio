@@ -223,7 +223,7 @@ class Game(models.Model):
     
     def update_average_rating(self):
         """Update average rating based on reviews"""
-        reviews = self.reviews.all()
+        reviews = self.community_reviews.all()
         if reviews.exists():
             total_rating = sum(review.rating for review in reviews)
             self.average_rating = round(total_rating / reviews.count(), 2)
@@ -793,3 +793,197 @@ class MilestoneAchievement(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.title} ({self.current_value}/{self.target_value})"
+
+# Community Features - Reviews, Forums, Rating Systems, Comments, UGC
+
+class CommunityGameReview(models.Model):
+    """Enhanced game reviews with detailed ratings"""
+    RATING_CHOICES = [(i, i) for i in range(1, 6)]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='community_reviews')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    
+    # Advanced Rating Categories
+    gameplay_rating = models.IntegerField(choices=RATING_CHOICES, default=5)
+    graphics_rating = models.IntegerField(choices=RATING_CHOICES, default=5)
+    story_rating = models.IntegerField(choices=RATING_CHOICES, default=5)
+    sound_rating = models.IntegerField(choices=RATING_CHOICES, default=5)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_featured = models.BooleanField(default=False)
+    helpful_count = models.IntegerField(default=0)
+    
+    class Meta:
+        unique_together = ('user', 'game')
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f'{self.user.username} - {self.game.title} ({self.rating}★)'
+
+class ReviewHelpful(models.Model):
+    """Track helpful votes on reviews"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(CommunityGameReview, on_delete=models.CASCADE)
+    is_helpful = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'review')
+
+class GameForum(models.Model):
+    """Game-specific discussion forums"""
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='forum')
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    moderators = models.ManyToManyField(User, related_name='moderated_forums', blank=True)
+    
+    def __str__(self):
+        return f'{self.game.title} Forum'
+
+class ForumTopic(models.Model):
+    """Forum discussion topics"""
+    TOPIC_TYPES = [
+        ('discussion', 'General Discussion'),
+        ('help', 'Help & Support'), 
+        ('bug', 'Bug Reports'),
+        ('feature', 'Feature Requests'),
+        ('guide', 'Guides & Tips'),
+        ('showcase', 'Player Showcase'),
+    ]
+    
+    forum = models.ForeignKey(GameForum, on_delete=models.CASCADE, related_name='topics')
+    title = models.CharField(max_length=200)
+    topic_type = models.CharField(max_length=20, choices=TOPIC_TYPES, default='discussion')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_pinned = models.BooleanField(default=False)
+    is_locked = models.BooleanField(default=False)
+    view_count = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-is_pinned', '-updated_at']
+    
+    def __str__(self):
+        return self.title
+
+class ForumPost(models.Model):
+    """Forum topic replies"""
+    topic = models.ForeignKey(ForumTopic, on_delete=models.CASCADE, related_name='posts')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_solution = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f'Post by {self.author.username} in {self.topic.title}'
+
+class Comment(models.Model):
+    """Universal comment system for games, news, reviews"""
+    CONTENT_TYPES = [
+        ('game', 'Game'),
+        ('news', 'News'),
+        ('review', 'Review'),
+        ('topic', 'Forum Topic'),
+    ]
+    
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
+    object_id = models.PositiveIntegerField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=True)
+    likes_count = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f'Comment by {self.author.username}'
+
+class CommentLike(models.Model):
+    """Like/dislike system for comments"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
+    is_like = models.BooleanField(default=True)  # True for like, False for dislike
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'comment')
+
+class UserGeneratedContent(models.Model):
+    """User-generated content - screenshots, videos, guides"""
+    CONTENT_TYPES = [
+        ('screenshot', 'Screenshot'),
+        ('video', 'Video'),
+        ('guide', 'Guide'),
+        ('artwork', 'Fan Art'),
+        ('mod', 'Game Mod'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='user_content')
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    
+    # Media fields
+    image = models.ImageField(upload_to='ugc/images/', null=True, blank=True)
+    video_url = models.URLField(null=True, blank=True)
+    file_upload = models.FileField(upload_to='ugc/files/', null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_featured = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
+    view_count = models.IntegerField(default=0)
+    like_count = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f'{self.title} by {self.user.username}'
+
+class UGCLike(models.Model):
+    """Likes for user-generated content"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.ForeignKey(UserGeneratedContent, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'content')
+
+class AdvancedGameRating(models.Model):
+    """Advanced multi-category game rating system"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='advanced_ratings')
+    overall_rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    
+    # Detailed rating categories
+    gameplay = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    graphics = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    story = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    sound = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    innovation = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    replayability = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('user', 'game')
+    
+    def __str__(self):
+        return f'{self.user.username} - {self.game.title} ({self.overall_rating}★)'

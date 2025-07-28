@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -13,9 +13,12 @@ import os
 from dotenv import load_dotenv
 from .models import (ContactMessage, Donation, Game, TeamMember, SponsorTier, 
                      DonationGoal, UserProfile, Achievement, UserAchievement, UserActivity,
-                     UserFollow, GameReview, UserGameStats, GameSession, FeaturedAchievement,
-                     GameWishlist, GameCollection, GameAnalytics)
-from .forms import DonationForm, UserProfileForm
+                     UserFollow, UserGameStats, GameSession, FeaturedAchievement,
+                     GameWishlist, GameCollection, GameAnalytics, CommunityGameReview, 
+                     ReviewHelpful, GameForum, ForumTopic, ForumPost, Comment, CommentLike,
+                     UserGeneratedContent, UGCLike, AdvancedGameRating)
+from .forms import (DonationForm, UserProfileForm, CommunityGameReviewForm, ForumTopicForm,
+                   ForumPostForm, CommentForm, UGCForm, AdvancedGameRatingForm)
 
 # Load environment variables
 load_dotenv()
@@ -730,14 +733,72 @@ def game_detail(request, pk):
         ).exists()
     
     # Get reviews for this game
-    reviews = GameReview.objects.filter(game=game).select_related('user').order_by('-created_at')[:10]
+    reviews = CommunityGameReview.objects.filter(game=game).select_related('user', 'user__profile').order_by('-created_at')[:10]
+    
+    # Get ratings for this game
+    ratings = AdvancedGameRating.objects.filter(game=game).select_related('user', 'user__profile').order_by('-created_at')[:10]
+    
+    # Calculate average ratings
+    ratings_summary = None
+    if ratings.exists():
+        from django.db.models import Avg
+        avg_data = AdvancedGameRating.objects.filter(game=game).aggregate(
+            overall=Avg('overall_rating'),
+            gameplay=Avg('gameplay'),
+            graphics=Avg('graphics'),
+            sound=Avg('sound'),
+            story=Avg('story'),
+            innovation=Avg('innovation'),
+            replayability=Avg('replayability')
+        )
+        ratings_summary = {
+            'overall': round(avg_data['overall'] or 0, 1),
+            'gameplay': round(avg_data['gameplay'] or 0, 1),
+            'graphics': round(avg_data['graphics'] or 0, 1),
+            'sound': round(avg_data['sound'] or 0, 1),
+            'story': round(avg_data['story'] or 0, 1),
+            'innovation': round(avg_data['innovation'] or 0, 1),
+            'replayability': round(avg_data['replayability'] or 0, 1),
+            'count': ratings.count()
+        }
+    
+    # Get UGC content for this game
+    ugc_content = UserGeneratedContent.objects.filter(game=game, is_approved=True).select_related('user', 'user__profile').order_by('-created_at')[:10]
+    
+    # Add like information for authenticated users
+    if request.user.is_authenticated:
+        # Get user's likes for these content items
+        user_likes = set(UGCLike.objects.filter(
+            user=request.user,
+            content__in=ugc_content
+        ).values_list('content_id', flat=True))
+        
+        # Add is_liked attribute to each content
+        for content in ugc_content:
+            content.is_liked = content.id in user_likes
+    else:
+        # For anonymous users, set is_liked to False
+        for content in ugc_content:
+            content.is_liked = False
+    
+    # Get user's own UGC content (even if not approved)
+    user_ugc_content = []
+    if request.user.is_authenticated:
+        user_ugc_content = UserGeneratedContent.objects.filter(game=game, user=request.user).select_related('user', 'user__profile').order_by('-created_at')[:5]
+    
+    # Check if user can review (separate query to avoid slice issue)
+    user_can_review = request.user.is_authenticated and not CommunityGameReview.objects.filter(game=game, user=request.user).exists()
     
     context = {
         'game': game,
         'related_games': related_games,
         'in_wishlist': in_wishlist,
         'reviews': reviews,
-        'user_can_review': request.user.is_authenticated and not reviews.filter(user=request.user).exists(),
+        'ratings': ratings,
+        'ratings_summary': ratings_summary,
+        'ugc_content': ugc_content,
+        'user_ugc_content': user_ugc_content,
+        'user_can_review': user_can_review,
     }
     
     return render(request, 'studio/game_detail.html', context)
@@ -858,3 +919,455 @@ def game_analytics_summary(request):
     }
     
     return render(request, 'studio/admin/game_analytics.html', context)
+
+# Community Features Views
+
+@login_required
+def write_review(request, game_id):
+    """Write or edit a game review with detailed ratings"""
+    game = get_object_or_404(Game, id=game_id)
+    existing_review = CommunityGameReview.objects.filter(user=request.user, game=game).first()
+    
+    if request.method == 'POST':
+        form = CommunityGameReviewForm(request.POST, instance=existing_review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.game = game
+            review.save()
+            
+            # Update game's average rating
+            game.update_average_rating()
+            
+            # Award achievement and experience
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            if not existing_review:  # Only for new reviews
+                UserActivity.objects.create(
+                    user=request.user,
+                    activity_type='review',
+                    description=f'Reviewed {game.title}',
+                    experience_gained=50
+                )
+                profile.add_experience(50)
+                profile.award_achievement('game_critic')
+            
+            messages.success(request, 'Review submitted successfully!')
+            return redirect('game_detail', pk=game.id)
+        else:
+            # Debug: Show form errors
+            messages.error(request, f'Form errors: {form.errors}')
+    else:
+        form = CommunityGameReviewForm(instance=existing_review)
+    
+    return render(request, 'studio/write_review.html', {
+        'form': form,
+        'game': game,
+        'existing_review': existing_review
+    })
+
+def game_forum(request, game_id):
+    """Game-specific forum with discussion topics"""
+    game = get_object_or_404(Game, id=game_id)
+    forum, created = GameForum.objects.get_or_create(
+        game=game,
+        defaults={'name': f'{game.title} Forum', 'description': f'Discussion forum for {game.title}'}
+    )
+    
+    # Get filter parameters
+    category_filter = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', 'recent')
+    
+    # Base queryset for topics
+    topics_queryset = forum.topics.select_related('author').prefetch_related('posts')
+    
+    # Apply category filter
+    if category_filter:
+        topics_queryset = topics_queryset.filter(topic_type=category_filter)
+    
+    # Apply sorting
+    if sort_by == 'recent':
+        topics = topics_queryset.order_by('-is_pinned', '-updated_at')
+    elif sort_by == 'popular':
+        topics = topics_queryset.order_by('-is_pinned', '-view_count')
+    elif sort_by == 'replies':
+        from django.db.models import Count
+        topics = topics_queryset.annotate(reply_count=Count('posts')).order_by('-is_pinned', '-reply_count')
+    else:
+        topics = topics_queryset.order_by('-is_pinned', '-created_at')
+    
+    # Limit to recent 20 topics for main view
+    topics = topics[:20]
+    
+    # Get user's topics if authenticated
+    user_topics = []
+    if request.user.is_authenticated:
+        user_topics = forum.topics.filter(author=request.user).order_by('-created_at')[:5]
+    
+    # Get topic categories for filtering
+    topic_categories = [
+        ('discussion', 'General Discussion', 'fas fa-chat', 'blue'),
+        ('help', 'Help & Support', 'fas fa-question-circle', 'green'),
+        ('bug', 'Bug Reports', 'fas fa-bug', 'red'),
+        ('feature', 'Feature Requests', 'fas fa-lightbulb', 'yellow'),
+        ('guide', 'Guides & Tips', 'fas fa-book', 'purple'),
+        ('showcase', 'Player Showcase', 'fas fa-trophy', 'orange'),
+    ]
+    
+    # Calculate forum stats
+    total_posts = sum(topic.posts.count() for topic in forum.topics.all())
+    active_users = forum.topics.values('author').distinct().count()
+    
+    return render(request, 'studio/game_forum.html', {
+        'game': game,
+        'forum': forum,
+        'topics': topics,
+        'user_topics': user_topics,
+        'topic_categories': topic_categories,
+        'category_filter': category_filter,
+        'sort_by': sort_by,
+        'total_posts': total_posts,
+        'active_users': active_users,
+    })
+
+@login_required
+def create_topic(request, forum_id):
+    """Create a new forum topic"""
+    forum = get_object_or_404(GameForum, id=forum_id)
+    
+    if request.method == 'POST':
+        form = ForumTopicForm(request.POST)
+        if form.is_valid():
+            try:
+                topic = form.save(commit=False)
+                topic.forum = forum
+                topic.author = request.user
+                topic.save()
+                
+                # Award experience for community participation
+                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                UserActivity.objects.create(
+                    user=request.user,
+                    activity_type='forum',
+                    description=f'Started discussion: {topic.title}',
+                    experience_gained=25
+                )
+                profile.add_experience(25)
+                profile.award_achievement('discussion_starter')
+                
+                messages.success(request, 'Discussion topic created successfully!')
+                return redirect('forum_topic', topic_id=topic.id)
+            except Exception as e:
+                messages.error(request, f'Error creating topic: {e}')
+        else:
+            # Show form errors for debugging
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = ForumTopicForm()
+
+    return render(request, 'studio/create_topic.html', {
+        'form': form,
+        'forum': forum,
+        'game': forum.game,
+        'recent_topics': forum.topics.all()[:5]
+    })
+
+def forum_topic(request, topic_id):
+    """View forum topic with replies"""
+    topic = get_object_or_404(ForumTopic, id=topic_id)
+    posts = topic.posts.all()
+    
+    # Increment view count
+    topic.view_count += 1
+    topic.save(update_fields=['view_count'])
+    
+    if request.method == 'POST' and request.user.is_authenticated:
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.topic = topic
+            post.author = request.user
+            post.save()
+            topic.updated_at = timezone.now()
+            topic.save(update_fields=['updated_at'])
+            
+            # Award experience for participation
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile.add_experience(10)
+            
+            return redirect('forum_topic', topic_id=topic.id)
+    else:
+        form = ForumPostForm()
+    
+    return render(request, 'studio/forum_topic.html', {
+        'topic': topic,
+        'posts': posts,
+        'form': form
+    })
+
+@login_required
+def add_comment(request, content_type, object_id):
+    """Add comment to games, news, reviews, etc."""
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.content_type = content_type
+            comment.object_id = object_id
+            comment.author = request.user
+            comment.save()
+            
+            # Award experience for engagement
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile.add_experience(5)
+            
+            # Redirect back to the content
+            if content_type == 'game':
+                return redirect('game_detail', pk=object_id)
+            elif content_type == 'news':
+                return redirect('news_detail', pk=object_id)
+    
+    return redirect('home')
+
+@login_required
+def upload_ugc(request, game_id):
+    """Upload user-generated content"""
+    game = get_object_or_404(Game, id=game_id)
+    
+    if request.method == 'POST':
+        form = UGCForm(request.POST, request.FILES)
+        if form.is_valid():
+            ugc = form.save(commit=False)
+            ugc.user = request.user
+            ugc.game = game
+            ugc.save()
+            
+            # Award experience for content creation
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            UserActivity.objects.create(
+                user=request.user,
+                activity_type='ugc',
+                description=f'Uploaded {ugc.get_content_type_display()}: {ugc.title}',
+                experience_gained=75
+            )
+            profile.add_experience(75)
+            profile.award_achievement('content_creator')
+            
+            messages.success(request, 'Content uploaded successfully! It will be reviewed before appearing publicly.')
+            return redirect('game_detail', pk=game.id)
+        else:
+            # Debug: Show form errors
+            messages.error(request, f'UGC form errors: {form.errors}')
+    else:
+        form = UGCForm()
+    
+    return render(request, 'studio/upload_ugc.html', {
+        'form': form,
+        'game': game
+    })
+
+def community_showcase(request):
+    """Community content showcase"""
+    featured_content = UserGeneratedContent.objects.filter(is_featured=True, is_approved=True)[:6]
+    recent_content = UserGeneratedContent.objects.filter(is_approved=True).exclude(is_featured=True)[:12]
+    
+    # Get top contributors
+    from django.db.models import Count
+    top_contributors = User.objects.annotate(
+        content_count=Count('usergeneratedcontent')
+    ).filter(content_count__gt=0).order_by('-content_count')[:5]
+    
+    return render(request, 'studio/community_showcase.html', {
+        'featured_content': featured_content,
+        'recent_content': recent_content,
+        'top_contributors': top_contributors
+    })
+
+def review_hub(request):
+    """Central hub for all review-related activities"""
+    # Get games that can be reviewed
+    games = Game.objects.all()[:12]  # Show 12 games
+    
+    # Get recent reviews if user is authenticated
+    recent_reviews = None
+    user_reviews_count = 0
+    if request.user.is_authenticated:
+        recent_reviews = CommunityGameReview.objects.filter(user=request.user).order_by('-created_at')[:5]
+        user_reviews_count = CommunityGameReview.objects.filter(user=request.user).count()
+    
+    return render(request, 'studio/review_hub.html', {
+        'games': games,
+        'recent_reviews': recent_reviews,
+        'user_reviews_count': user_reviews_count
+    })
+
+def rating_hub(request):
+    """Central hub for game rating activities"""
+    # Get games that can be rated
+    games = Game.objects.all()[:12]
+    
+    # Get user's recent ratings
+    user_ratings = None
+    user_ratings_count = 0
+    if request.user.is_authenticated:
+        user_ratings = AdvancedGameRating.objects.filter(user=request.user).order_by('-created_at')[:5]
+        user_ratings_count = AdvancedGameRating.objects.filter(user=request.user).count()
+    
+    return render(request, 'studio/rating_hub.html', {
+        'games': games,
+        'user_ratings': user_ratings,
+        'user_ratings_count': user_ratings_count
+    })
+
+def forum_hub(request):
+    """Hub page for forum features"""
+    games = Game.objects.all()
+    recent_posts = ForumTopic.objects.select_related('author', 'forum').order_by('-created_at')[:10]
+    
+    context = {
+        'games': games,
+        'recent_posts': recent_posts,
+    }
+    
+    if request.user.is_authenticated:
+        context['user_posts_count'] = ForumTopic.objects.filter(author=request.user).count()
+    
+    return render(request, 'studio/forum_hub.html', context)
+
+@login_required
+def rate_game(request, game_id):
+    """Advanced game rating with multiple categories"""
+    game = get_object_or_404(Game, id=game_id)
+    existing_rating = AdvancedGameRating.objects.filter(user=request.user, game=game).first()
+    
+    if request.method == 'POST':
+        form = AdvancedGameRatingForm(request.POST, instance=existing_rating)
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.user = request.user
+            rating.game = game
+            rating.save()
+            
+            # Update game's average rating
+            game.update_average_rating()
+            
+            # Award experience
+            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            if not existing_rating:
+                profile.add_experience(25)
+                profile.award_achievement('game_rater')
+            
+            messages.success(request, 'Rating submitted successfully!')
+            return redirect('game_detail', pk=game.id)
+        else:
+            # Debug: Show form errors
+            messages.error(request, f'Rating form errors: {form.errors}')
+    else:
+        form = AdvancedGameRatingForm(instance=existing_rating)
+    
+    return render(request, 'studio/rate_game.html', {
+        'form': form,
+        'game': game,
+        'existing_rating': existing_rating
+    })
+
+@login_required
+def like_review(request, review_id):
+    """Mark review as helpful/unhelpful via AJAX"""
+    if request.method == 'POST':
+        review = get_object_or_404(CommunityGameReview, id=review_id)
+        helpful, created = ReviewHelpful.objects.get_or_create(
+            user=request.user,
+            review=review,
+            defaults={'is_helpful': True}
+        )
+        
+        if not created:
+            helpful.delete()
+            review.helpful_count -= 1
+        else:
+            review.helpful_count += 1
+        
+        review.save(update_fields=['helpful_count'])
+        
+        return JsonResponse({
+            'helpful_count': review.helpful_count,
+            'is_liked': created
+        })
+    
+    return JsonResponse({'error': 'Invalid request'})
+
+@login_required
+def like_ugc(request, content_id):
+    """Like user-generated content via AJAX"""
+    if request.method == 'POST':
+        content = get_object_or_404(UserGeneratedContent, id=content_id)
+        like, created = UGCLike.objects.get_or_create(
+            user=request.user,
+            content=content
+        )
+        
+        if not created:
+            like.delete()
+            content.like_count -= 1
+        else:
+            content.like_count += 1
+        
+        content.save(update_fields=['like_count'])
+        
+        return JsonResponse({
+            'like_count': content.like_count,
+            'is_liked': created
+        })
+    
+    return JsonResponse({'error': 'Invalid request'})
+
+@login_required
+def like_comment(request, comment_id):
+    """Like/dislike comment via AJAX"""
+    if request.method == 'POST':
+        comment = get_object_or_404(Comment, id=comment_id)
+        is_like = request.POST.get('is_like', 'true') == 'true'
+        
+        like, created = CommentLike.objects.get_or_create(
+            user=request.user,
+            comment=comment,
+            defaults={'is_like': is_like}
+        )
+        
+        if not created:
+            if like.is_like == is_like:
+                like.delete()
+                # Update likes count
+                likes_count = CommentLike.objects.filter(comment=comment, is_like=True).count()
+                comment.likes_count = likes_count
+                comment.save(update_fields=['likes_count'])
+                return JsonResponse({'action': 'removed', 'likes_count': likes_count})
+            else:
+                like.is_like = is_like
+                like.save()
+        
+        # Update likes count
+        likes_count = CommentLike.objects.filter(comment=comment, is_like=True).count()
+        comment.likes_count = likes_count
+        comment.save(update_fields=['likes_count'])
+        
+        return JsonResponse({
+            'action': 'liked' if is_like else 'disliked',
+            'likes_count': likes_count
+        })
+    
+    return JsonResponse({'error': 'Invalid request'})
+
+def review_guide(request):
+    """Help guide for writing reviews"""
+    return render(request, 'studio/review_guide.html')
+
+def rating_guide(request):
+    """Guide for rating games"""
+    return render(request, 'studio/rating_guide.html')
+
+def forum_rules(request):
+    """Forum rules and guidelines"""
+    return render(request, 'studio/forum_rules.html')

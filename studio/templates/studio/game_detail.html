@@ -1,7 +1,9 @@
 {% extends 'studio/base.html' %}
+{% load static %}
 {% block title %}{{ game.title }} - Gaming Studio{% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <!-- Enhanced Game Detail Page -->
 <section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
     <!-- Game Hero Section -->
@@ -73,10 +75,28 @@
                             {% endif %}
                             
                             {% if user.is_authenticated %}
+                            <!-- Review & Rating Buttons -->
+                            <a href="{% url 'write_review' game.pk %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="fas fa-star mr-2"></i>Write Review
+                            </a>
+                            
+                            <a href="{% url 'rate_game' game.pk %}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="fas fa-chart-bar mr-2"></i>Rate Game
+                            </a>
+                            
+                            <a href="{% url 'game_forum' game.pk %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="fas fa-comments mr-2"></i>Forum
+                            </a>
+                            
                             <button onclick="toggleWishlist({{ game.pk }})" id="wishlist-btn" class="wishlist-btn bg-gray-700 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
                                 <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart mr-2"></i>
                                 {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
                             </button>
+                            {% else %}
+                            <!-- Login prompt for review features -->
+                            <a href="{% url 'account_login' %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                                <i class="fas fa-star mr-2"></i>Login to Review
+                            </a>
                             {% endif %}
                             
                             <button onclick="shareGame()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
@@ -152,9 +172,13 @@
                         <div class="bg-gray-700/60 p-4 rounded-lg">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
-                                        {{ review.user.username|first|upper }}
-                                    </div>
+                                    {% if review.user.profile.avatar %}
+                                        <img src="{{ review.user.profile.avatar.url }}" alt="{{ review.user.username }}" class="w-8 h-8 rounded-full mr-3 object-cover">
+                                    {% else %}
+                                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                            {{ review.user.username|first|upper }}
+                                        </div>
+                                    {% endif %}
                                     <span class="text-white font-semibold">{{ review.user.username }}</span>
                                 </div>
                                 <div class="flex items-center">
@@ -163,10 +187,315 @@
                                     {% endfor %}
                                 </div>
                             </div>
-                            <p class="text-gray-300">{{ review.comment }}</p>
+                            <p class="text-gray-300">{{ review.content }}</p>
                             <p class="text-gray-500 text-sm mt-2">{{ review.created_at|timesince }} ago</p>
                         </div>
                         {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Game Ratings -->
+                {% if ratings %}
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-chart-bar mr-3 text-purple-400"></i>Detailed Ratings
+                        {% if ratings_summary %}
+                        <span class="ml-auto text-sm text-gray-400">({{ ratings_summary.count }} ratings)</span>
+                        {% endif %}
+                    </h3>
+                    
+                    {% if ratings_summary %}
+                    <!-- Rating Summary -->
+                    <div class="bg-gray-700/60 p-4 rounded-lg mb-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-yellow-400">{{ ratings_summary.overall }}</div>
+                                <div class="text-sm text-gray-400">Overall Rating</div>
+                                <div class="flex justify-center mt-1">
+                                    {% for i in "12345" %}
+                                    <i class="fas fa-star text-{% if forloop.counter <= ratings_summary.overall %}yellow{% else %}gray{% endif %}-400"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Gameplay</span>
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-400 text-sm font-medium mr-2">{{ ratings_summary.gameplay }}</span>
+                                        <div class="flex">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star text-xs text-{% if forloop.counter <= ratings_summary.gameplay %}yellow{% else %}gray{% endif %}-400"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Graphics</span>
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-400 text-sm font-medium mr-2">{{ ratings_summary.graphics }}</span>
+                                        <div class="flex">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star text-xs text-{% if forloop.counter <= ratings_summary.graphics %}yellow{% else %}gray{% endif %}-400"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Sound</span>
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-400 text-sm font-medium mr-2">{{ ratings_summary.sound }}</span>
+                                        <div class="flex">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star text-xs text-{% if forloop.counter <= ratings_summary.sound %}yellow{% else %}gray{% endif %}-400"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Story</span>
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-400 text-sm font-medium mr-2">{{ ratings_summary.story }}</span>
+                                        <div class="flex">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star text-xs text-{% if forloop.counter <= ratings_summary.story %}yellow{% else %}gray{% endif %}-400"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Innovation</span>
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-400 text-sm font-medium mr-2">{{ ratings_summary.innovation }}</span>
+                                        <div class="flex">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star text-xs text-{% if forloop.counter <= ratings_summary.innovation %}yellow{% else %}gray{% endif %}-400"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Replayability</span>
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-400 text-sm font-medium mr-2">{{ ratings_summary.replayability }}</span>
+                                        <div class="flex">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star text-xs text-{% if forloop.counter <= ratings_summary.replayability %}yellow{% else %}gray{% endif %}-400"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Individual Ratings -->
+                    <div class="space-y-4 max-h-96 overflow-y-auto">
+                        {% for rating in ratings %}
+                        <div class="bg-gray-700/60 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center">
+                                    {% if rating.user.profile.avatar %}
+                                        <img src="{{ rating.user.profile.avatar.url }}" alt="{{ rating.user.username }}" class="w-8 h-8 rounded-full mr-3 object-cover">
+                                    {% else %}
+                                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                            {{ rating.user.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h4 class="text-white font-medium">{{ rating.user.username }}</h4>
+                                        <p class="text-xs text-gray-400">{{ rating.created_at|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-yellow-400 text-lg font-bold mr-2">{{ rating.overall_rating }}</span>
+                                    <div class="flex">
+                                        {% for i in "12345" %}
+                                        <i class="fas fa-star text-{% if forloop.counter <= rating.overall_rating %}yellow{% else %}gray{% endif %}-400"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-2 text-xs">
+                                <div class="text-center">
+                                    <div class="text-gray-400">Gameplay</div>
+                                    <div class="text-yellow-400 font-medium">{{ rating.gameplay }}/5</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-400">Graphics</div>
+                                    <div class="text-yellow-400 font-medium">{{ rating.graphics }}/5</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-400">Sound</div>
+                                    <div class="text-yellow-400 font-medium">{{ rating.sound }}/5</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-400">Story</div>
+                                    <div class="text-yellow-400 font-medium">{{ rating.story }}/5</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-400">Innovation</div>
+                                    <div class="text-yellow-400 font-medium">{{ rating.innovation }}/5</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-400">Replayability</div>
+                                    <div class="text-yellow-400 font-medium">{{ rating.replayability }}/5</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- User Generated Content -->
+                {% if ugc_content %}
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-images mr-3 text-green-400"></i>Community Content
+                    </h3>
+                    <div class="space-y-4">
+                        {% for content in ugc_content %}
+                        <div class="bg-gray-700/60 p-4 rounded-lg">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center">
+                                    {% if content.user.profile.avatar %}
+                                        <img src="{{ content.user.profile.avatar.url }}" alt="{{ content.user.username }}" class="w-8 h-8 rounded-full mr-3 object-cover">
+                                    {% else %}
+                                        <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                            {{ content.user.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <span class="text-white font-semibold">{{ content.user.username }}</span>
+                                        <p class="text-sm text-gray-400">{{ content.get_content_type_display }}</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-gray-500">{{ content.created_at|timesince }} ago</span>
+                            </div>
+                            <h4 class="text-white font-semibold mb-2">{{ content.title }}</h4>
+                            {% if content.description %}
+                                <p class="text-gray-300 mb-3">{{ content.description|truncatewords:20 }}</p>
+                            {% endif %}
+                            {% if content.image %}
+                                <div class="mb-3">
+                                    <img src="{{ content.image.url }}" alt="{{ content.title }}" class="max-w-full h-48 object-cover rounded-lg">
+                                </div>
+                            {% endif %}
+                            {% if content.video_url %}
+                                <div class="mb-3">
+                                    <a href="{{ content.video_url }}" target="_blank" class="text-blue-400 hover:text-blue-300 flex items-center">
+                                        <i class="fas fa-play mr-2"></i>Watch Video
+                                    </a>
+                                </div>
+                            {% endif %}
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span class="flex items-center likes-count">
+                                    <i class="fas fa-thumbs-up mr-1"></i>{{ content.like_count }} likes
+                                </span>
+                                {% if user.is_authenticated %}
+                                    <button onclick="likeUGC({{ content.id }})" data-content-id="{{ content.id }}" class="{% if content.is_liked %}text-red-400{% else %}text-blue-400{% endif %} hover:text-red-300 transition">
+                                        {% if content.is_liked %}
+                                            <i class="fas fa-heart mr-1 text-red-400"></i>Liked
+                                        {% else %}
+                                            <i class="far fa-heart mr-1"></i>Like
+                                        {% endif %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-6 border border-gray-700 text-center">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center justify-center">
+                        <i class="fas fa-images mr-3 text-green-400"></i>Community Content
+                    </h3>
+                    <p class="text-gray-400 mb-4">No community content yet. Be the first to share!</p>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'upload_ugc' game.pk %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-upload mr-2"></i>Upload Content
+                        </a>
+                    {% else %}
+                        <a href="/accounts/login/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login to Upload Content
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- User's Own Uploaded Content (Pending Approval) -->
+                {% if user.is_authenticated and user_ugc_content %}
+                <div class="bg-blue-900/20 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20 mt-6">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-clock mr-3 text-blue-400"></i>Your Uploaded Content
+                        <span class="text-sm text-blue-400 ml-2">(Pending Review)</span>
+                    </h3>
+                    <div class="space-y-4">
+                        {% for content in user_ugc_content %}
+                        <div class="bg-gray-700/40 p-4 rounded-lg border border-blue-400/20">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center">
+                                    {% if content.user.profile.avatar %}
+                                        <img src="{{ content.user.profile.avatar.url }}" alt="{{ content.user.username }}" class="w-8 h-8 rounded-full mr-3 object-cover">
+                                    {% else %}
+                                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                            {{ content.user.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <span class="text-white font-semibold">{{ content.user.username }}</span>
+                                        <p class="text-sm text-gray-400">{{ content.get_content_type_display }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-gray-500">{{ content.created_at|timesince }} ago</span>
+                                    {% if content.is_approved %}
+                                        <span class="block text-xs text-green-400 mt-1">
+                                            <i class="fas fa-check mr-1"></i>Approved
+                                        </span>
+                                    {% else %}
+                                        <span class="block text-xs text-yellow-400 mt-1">
+                                            <i class="fas fa-clock mr-1"></i>Pending Review
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <h4 class="text-white font-semibold mb-2">{{ content.title }}</h4>
+                            {% if content.description %}
+                                <p class="text-gray-300 mb-3">{{ content.description|truncatewords:20 }}</p>
+                            {% endif %}
+                            {% if content.image %}
+                                <div class="mb-3">
+                                    <img src="{{ content.image.url }}" alt="{{ content.title }}" class="max-w-full h-48 object-cover rounded-lg">
+                                </div>
+                            {% endif %}
+                            {% if content.video_url %}
+                                <div class="mb-3">
+                                    <a href="{{ content.video_url }}" target="_blank" class="text-blue-400 hover:text-blue-300 flex items-center">
+                                        <i class="fas fa-play mr-2"></i>Watch Video
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if content.file_upload %}
+                                <div class="mb-3">
+                                    <a href="{{ content.file_upload.url }}" target="_blank" class="text-purple-400 hover:text-purple-300 flex items-center">
+                                        <i class="fas fa-download mr-2"></i>Download File
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-900/30 rounded-lg">
+                        <p class="text-blue-300 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Your content is being reviewed and will appear publicly once approved by our moderators.
+                        </p>
                     </div>
                 </div>
                 {% endif %}
@@ -174,6 +503,50 @@
             
             <!-- Sidebar -->
             <div class="space-y-6">
+                <!-- Community Features Card -->
+                {% if user.is_authenticated %}
+                <div class="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-users mr-3 text-blue-400"></i>Community Features
+                    </h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'write_review' game.pk %}" class="block w-full bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 px-4 py-3 rounded-lg text-center transition flex items-center justify-center">
+                            <i class="fas fa-star mr-2"></i>Write Review
+                        </a>
+                        <a href="{% url 'rate_game' game.pk %}" class="block w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 px-4 py-3 rounded-lg text-center transition flex items-center justify-center">
+                            <i class="fas fa-chart-bar mr-2"></i>Detailed Rating
+                        </a>
+                        <a href="{% url 'game_forum' game.pk %}" class="block w-full bg-green-600/20 hover:bg-green-600/30 text-green-300 px-4 py-3 rounded-lg text-center transition flex items-center justify-center">
+                            <i class="fas fa-comments mr-2"></i>Discussion Forum
+                        </a>
+                        <a href="{% url 'upload_ugc' game.pk %}" class="block w-full bg-red-600/20 hover:bg-red-600/30 text-red-300 px-4 py-3 rounded-lg text-center transition flex items-center justify-center">
+                            <i class="fas fa-upload mr-2"></i>Upload Content
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="bg-gradient-to-br from-gray-600/20 to-gray-700/20 backdrop-blur-sm rounded-lg p-6 border border-gray-500/20">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-users mr-3 text-gray-400"></i>Join the Community
+                    </h3>
+                    <p class="text-gray-300 mb-4">Login to access community features:</p>
+                    <div class="space-y-2 text-sm text-gray-400">
+                        <div class="flex items-center">
+                            <i class="fas fa-star mr-2 text-yellow-400"></i>Write reviews & ratings
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-comments mr-2 text-green-400"></i>Join game discussions
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-upload mr-2 text-red-400"></i>Share screenshots & videos
+                        </div>
+                    </div>
+                    <a href="{% url 'account_login' %}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-center mt-4 transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login to Participate
+                    </a>
+                </div>
+                {% endif %}
+
                 <!-- Game Details Card -->
                 <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
                     <h3 class="text-xl font-bold text-white mb-4 flex items-center">
@@ -296,6 +669,42 @@ function toggleWishlist(gameId) {
         countSpan.textContent = `${data.wishlist_count} wishlisted`;
     })
     .catch(error => console.error('Error:', error));
+}
+{% endif %}
+
+// Like UGC functionality
+{% if user.is_authenticated %}
+function likeUGC(contentId) {
+    fetch(`/ugc/${contentId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Find the specific button and like count for this content
+        const button = document.querySelector(`button[data-content-id="${contentId}"]`);
+        const likeCountSpan = button.closest('.text-gray-500').querySelector('.likes-count');
+        
+        if (likeCountSpan) {
+            likeCountSpan.innerHTML = `<i class="fas fa-thumbs-up mr-1"></i>${data.like_count} likes`;
+        }
+        
+        // Update button appearance
+        if (data.is_liked) {
+            button.innerHTML = '<i class="fas fa-heart mr-1 text-red-400"></i>Liked';
+            button.className = button.className.replace('text-blue-400', 'text-red-400');
+        } else {
+            button.innerHTML = '<i class="far fa-heart mr-1"></i>Like';
+            button.className = button.className.replace('text-red-400', 'text-blue-400');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error liking content. Please try again.');
+    });
 }
 {% endif %}
 
