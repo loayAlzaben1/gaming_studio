@@ -3,18 +3,193 @@
 {% block title %}{{ game.title }} - Gaming Studio{% endblock %}
 
 {% block content %}
+<style>
+    /* Mobile-Responsive Game Detail Page */
+    @media (max-width: 768px) {
+        .game-hero {
+            height: 40vh !important;
+            min-height: 250px !important;
+        }
+        
+        .game-cover-mobile {
+            width: 120px !important;
+            height: 180px !important;
+        }
+        
+        .game-title-mobile {
+            font-size: 1.5rem !important;
+            line-height: 1.3 !important;
+        }
+        
+        .game-stats {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .game-stats > div {
+            font-size: 0.875rem !important;
+        }
+        
+        .action-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .action-buttons a, .action-buttons button {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .game-content-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        
+        .game-images-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.5rem !important;
+        }
+        
+        .game-images-grid img {
+            height: 200px !important;
+            object-fit: cover !important;
+        }
+        
+        .review-card {
+            padding: 1rem !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        .review-text {
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+        }
+        
+        .review-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+        }
+        
+        .rating-stars {
+            font-size: 0.875rem !important;
+        }
+        
+        .container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        
+        .p-8 {
+            padding: 1rem !important;
+        }
+        
+        .p-6 {
+            padding: 1rem !important;
+        }
+        
+        .mb-8 {
+            margin-bottom: 1.5rem !important;
+        }
+        
+        .mb-6 {
+            margin-bottom: 1rem !important;
+        }
+        
+        h1 {
+            font-size: 1.5rem !important;
+            line-height: 1.3 !important;
+        }
+        
+        h2 {
+            font-size: 1.25rem !important;
+            line-height: 1.4 !important;
+        }
+        
+        h3 {
+            font-size: 1.125rem !important;
+            line-height: 1.4 !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .game-hero {
+            height: 30vh !important;
+            min-height: 200px !important;
+        }
+        
+        .game-cover-mobile {
+            width: 100px !important;
+            height: 150px !important;
+        }
+        
+        .game-title-mobile {
+            font-size: 1.25rem !important;
+        }
+        
+        .flex-col.lg\\:flex-row {
+            flex-direction: column !important;
+        }
+        
+        .lg\\:flex-row {
+            flex-direction: column !important;
+        }
+        
+        .text-3xl {
+            font-size: 1.25rem !important;
+        }
+        
+        .text-2xl {
+            font-size: 1.125rem !important;
+        }
+        
+        .text-xl {
+            font-size: 1rem !important;
+        }
+        
+        .px-4 {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        
+        .py-8 {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+    }
+    
+    /* Touch-friendly improvements */
+    @media (max-width: 768px) {
+        a, button {
+            min-height: 44px !important;
+            touch-action: manipulation !important;
+        }
+        
+        .wishlist-btn, .review-btn, .rating-btn {
+            padding: 1rem !important;
+            font-size: 1rem !important;
+        }
+        
+        input, textarea, select {
+            font-size: 16px !important; /* Prevents zoom on iOS */
+        }
+    }
+</style>
+
 {% csrf_token %}
 <!-- Enhanced Game Detail Page -->
 <section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
     <!-- Game Hero Section -->
-    <div class="relative bg-cover bg-center h-64 sm:h-80 lg:h-96" style="background-image: url('{% if game.cover_image %}{{ game.cover_image.url }}{% else %}https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop{% endif %}');">
+    <div class="game-hero relative bg-cover bg-center h-64 sm:h-80 lg:h-96" style="background-image: url('{% if game.cover_image %}{{ game.cover_image.url }}{% else %}https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop{% endif %}');">
         <div class="absolute inset-0 bg-black bg-opacity-70 flex items-end">
             <div class="container mx-auto px-4 py-8">
                 <div class="flex flex-col lg:flex-row items-start lg:items-end gap-6">
                     <!-- Game Cover -->
                     {% if game.cover_image %}
                     <div class="flex-shrink-0">
-                        <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="w-32 h-48 sm:w-40 sm:h-60 lg:w-48 lg:h-72 object-cover rounded-lg border-4 border-white/20 shadow-2xl">
+                        <img src="{{ game.cover_image.url }}" alt="{{ game.title }}" class="game-cover-mobile w-32 h-48 sm:w-40 sm:h-60 lg:w-48 lg:h-72 object-cover rounded-lg border-4 border-white/20 shadow-2xl">
                     </div>
                     {% endif %}
                     
@@ -36,14 +211,14 @@
                             {% endif %}
                         </div>
                         
-                        <h1 class="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-4">{{ game.title }}</h1>
+                        <h1 class="game-title-mobile text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-4">{{ game.title }}</h1>
                         
                         {% if game.short_description %}
                         <p class="text-blue-200 text-lg mb-4 max-w-3xl">{{ game.short_description }}</p>
                         {% endif %}
                         
                         <!-- Game Quick Stats -->
-                        <div class="flex flex-wrap items-center gap-4 text-sm">
+                        <div class="game-stats flex flex-wrap items-center gap-4 text-sm">
                             <div class="flex items-center text-gray-300">
                                 <i class="fas fa-desktop mr-2 text-blue-400"></i>
                                 <span>{{ game.get_platform_display }}</span>
@@ -67,34 +242,37 @@
                         </div>
                         
                         <!-- Action Buttons -->
-                        <div class="flex flex-wrap gap-3 mt-6">
+                        <div class="action-buttons flex flex-wrap gap-3 mt-6">
                             {% if game.trailer_link %}
-                            <a href="{{ game.trailer_link }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
-                                <i class="fab fa-youtube mr-2"></i>Watch Trailer
+                            <a href="{{ game.trailer_link }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                                <i class="fab fa-youtube mr-2"></i>
+                                <span class="hidden sm:inline">Watch </span>Trailer
                             </a>
                             {% endif %}
                             
                             {% if user.is_authenticated %}
                             <!-- Review & Rating Buttons -->
-                            <a href="{% url 'write_review' game.pk %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
-                                <i class="fas fa-star mr-2"></i>Write Review
+                            <a href="{% url 'write_review' game.pk %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                                <i class="fas fa-star mr-2"></i>
+                                <span class="hidden sm:inline">Write </span>Review
                             </a>
                             
-                            <a href="{% url 'rate_game' game.pk %}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
-                                <i class="fas fa-chart-bar mr-2"></i>Rate Game
+                            <a href="{% url 'rate_game' game.pk %}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                                <i class="fas fa-chart-bar mr-2"></i>
+                                <span class="hidden sm:inline">Rate </span>Game
                             </a>
                             
-                            <a href="{% url 'game_forum' game.pk %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                            <a href="{% url 'game_forum' game.pk %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
                                 <i class="fas fa-comments mr-2"></i>Forum
                             </a>
                             
-                            <button onclick="toggleWishlist({{ game.pk }})" id="wishlist-btn" class="wishlist-btn bg-gray-700 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                            <button onclick="toggleWishlist({{ game.pk }})" id="wishlist-btn" class="wishlist-btn bg-gray-700 hover:bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
                                 <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart mr-2"></i>
-                                {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
+                                <span class="hidden sm:inline">{% if in_wishlist %}Remove from {% else %}Add to {% endif %}</span>Wishlist
                             </button>
                             {% else %}
                             <!-- Login prompt for review features -->
-                            <a href="{% url 'account_login' %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                            <a href="{% url 'account_login' %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center">
                                 <i class="fas fa-star mr-2"></i>Login to Review
                             </a>
                             {% endif %}
@@ -110,31 +288,31 @@
     </div>
     
     <div class="container mx-auto px-4 py-8 max-w-7xl">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="game-content-grid grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
             <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-8">
+            <div class="lg:col-span-2 space-y-6 lg:space-y-8">
                 <!-- Game Description -->
-                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
-                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 lg:p-6 border border-gray-700">
+                    <h2 class="text-xl lg:text-2xl font-bold text-white mb-4 flex items-center">
                         <i class="fas fa-info-circle mr-3 text-blue-400"></i>About This Game
                     </h2>
-                    <div class="text-gray-300 leading-relaxed">
+                    <div class="text-gray-300 leading-relaxed text-sm lg:text-base">
                         {{ game.description|linebreaks }}
                     </div>
                 </div>
                 
                 <!-- Game Screenshots -->
                 {% if game.photos.exists %}
-                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
-                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-4 lg:p-6 border border-gray-700">
+                    <h2 class="text-xl lg:text-2xl font-bold text-white mb-4 flex items-center">
                         <i class="fas fa-images mr-3 text-green-400"></i>Screenshots
                     </h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="game-images-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {% for photo in game.photos.all %}
                         <div class="cursor-pointer group" onclick="openImageModal('{{ photo.image.url }}', '{{ photo.caption|default:"Screenshot" }}')">
-                            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-40 object-cover rounded-lg group-hover:opacity-80 transition">
+                            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-32 sm:h-40 object-cover rounded-lg group-hover:opacity-80 transition">
                             {% if photo.caption %}
-                            <p class="text-gray-400 text-sm mt-2 text-center">{{ photo.caption }}</p>
+                            <p class="text-gray-400 text-xs lg:text-sm mt-2 text-center">{{ photo.caption }}</p>
                             {% endif %}
                         </div>
                         {% endfor %}
