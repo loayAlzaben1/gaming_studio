@@ -3,6 +3,31 @@
 
 set -o errexit  # Exit on error
 
+echo "==> Build script starting..."
+echo "Current directory: $(pwd)"
+echo "Files in directory: $(ls -la)"
+
+echo "==> Ensuring database exists first..."
+# Create a basic database file if it doesn't exist
+if [ ! -f "db.sqlite3" ]; then
+    echo "Creating initial database file..."
+    python -c "
+import sqlite3
+conn = sqlite3.connect('db.sqlite3')
+conn.close()
+print('Created empty database file')
+"
+fi
+
+echo "==> Running direct database setup immediately..."
+python direct_db_setup.py
+if [ $? -eq 0 ]; then
+    echo "Direct database setup completed"
+else
+    echo "Direct database setup failed"
+    exit 1
+fi
+
 echo "==> Forcing complete database recreation..."
 
 # Remove any existing database
