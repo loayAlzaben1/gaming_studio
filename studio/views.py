@@ -47,17 +47,9 @@ def news(request):
     return render(request, 'studio/news.html', {})
 
 def home(request):
-    try:
-        # Simplified query without complex relationships for now
-        featured_games = Game.objects.filter(is_featured=True)[:6]  # Limit to 6
-    except Exception as e:
-        # Handle case where tables don't exist yet
-        print(f"Database error in home view: {e}")
-        featured_games = []
-    
-    # Ensure we have a safe context
+    # Minimal home view to ensure stability
     context = {
-        'featured_games': featured_games,
+        'featured_games': [],  # Empty for now to avoid any DB issues
     }
     return render(request, 'studio/home.html', context)
 
