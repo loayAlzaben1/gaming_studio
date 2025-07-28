@@ -185,6 +185,109 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Gaming Logo Styles */
+        .gaming-logo {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+        .gaming-logo:hover {
+            transform: translateY(-2px) scale(1.02);
+            filter: drop-shadow(0 10px 20px rgba(59, 130, 246, 0.3));
+        }
+        .gaming-logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(59, 130, 246, 0.1), 
+                rgba(139, 92, 246, 0.1), 
+                rgba(6, 182, 212, 0.1), 
+                rgba(59, 130, 246, 0.1)
+            );
+            border-radius: 12px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+        .gaming-logo:hover::before {
+            opacity: 1;
+            animation: none;
+        }
+        .gaming-logo::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6);
+            border-radius: 13px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -2;
+            animation: rotate 3s linear infinite;
+        }
+        .gaming-logo:hover::after {
+            opacity: 0.4;
+        }
+        
+        /* Enhanced gamepad icon hover effects */
+        .gaming-logo:hover .fas.fa-gamepad {
+            animation: spin 2s linear infinite, pulse 1.5s ease-in-out infinite alternate;
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8));
+        }
+        
+        /* Text gradient animation on hover */
+        .gaming-logo:hover .bg-gradient-to-r {
+            animation: gradient-shift 2s ease-in-out infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        
+        /* Background size utilities for gradient animation */
+        .bg-size-200 {
+            background-size: 200% 200%;
+        }
+        .bg-pos-0 {
+            background-position: 0% 50%;
+        }
+        .bg-pos-100 {
+            background-position: 100% 50%;
+        }
+        
+        /* Icon container hover effects */
+        .icon-container:hover {
+            transform: rotate(10deg);
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Gaming Logo */
+        .gaming-logo-mobile {
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body class="text-white relative">
@@ -192,10 +295,23 @@
     <nav class="navbar">
         <div class="container mx-auto flex justify-between items-center relative px-4">
             <!-- Logo -->
-            <a href="{% url 'home' %}" class="text-xl sm:text-2xl font-bold flex items-center text-neon">
-                <i class="fas fa-gamepad mr-2 text-blue-400 animate-spin-slow"></i>
-                <span class="hidden sm:inline">Gaming Studio</span>
-                <span class="sm:hidden text-lg">GS</span>
+            <a href="{% url 'home' %}" class="gaming-logo group relative flex items-center">
+                <div class="relative icon-container">
+                    <i class="fas fa-gamepad text-2xl sm:text-3xl text-blue-400 group-hover:text-cyan-300 transition-all duration-500 animate-spin-slow"></i>
+                    <div class="absolute inset-0 rounded-full bg-blue-400 opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                    <div class="absolute inset-0 rounded-full bg-cyan-300 opacity-0 group-hover:opacity-10 animate-ping"></div>
+                </div>
+                <div class="ml-3 flex flex-col text-container">
+                    <span class="hidden sm:inline text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent group-hover:from-cyan-300 group-hover:via-blue-400 group-hover:to-purple-400 transition-all duration-500 bg-size-200 bg-pos-0 group-hover:bg-pos-100">
+                        Gaming Studio
+                    </span>
+                    <span class="sm:hidden text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent group-hover:from-cyan-300 group-hover:to-blue-400 transition-all duration-500">
+                        GS
+                    </span>
+                    <span class="hidden sm:inline text-xs text-gray-400 group-hover:text-cyan-200 transition-all duration-300 font-light tracking-wide opacity-80 group-hover:opacity-100">
+                        Epic Gaming Experiences
+                    </span>
+                </div>
             </a>
             
             <!-- Desktop Menu -->
@@ -332,9 +448,20 @@
             <!-- Mobile Menu -->
             <div id="mobileMenu" class="mobile-menu lg:hidden">
                 <div class="mobile-menu-header">
-                    <h3 class="text-lg font-bold text-neon mb-4">
-                        <i class="fas fa-gamepad mr-2"></i>Gaming Studio
-                    </h3>
+                    <div class="gaming-logo-mobile flex items-center mb-4">
+                        <div class="relative">
+                            <i class="fas fa-gamepad text-2xl text-blue-400 animate-spin-slow"></i>
+                            <div class="absolute inset-0 rounded-full bg-blue-400 opacity-20 animate-ping"></div>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
+                                Gaming Studio
+                            </h3>
+                            <p class="text-xs text-gray-400 font-light tracking-wide">
+                                Epic Gaming Experiences
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <nav class="mobile-menu-nav">
                     <a href="{% url 'home' %}" class="mobile-menu-link {% if request.path == '/' %}active{% endif %}">
