@@ -47,7 +47,12 @@ def news(request):
     return render(request, 'studio/news.html', {})
 
 def home(request):
-    featured_games = Game.objects.filter(is_featured=True).prefetch_related('devlog_video_entries')
+    try:
+        featured_games = Game.objects.filter(is_featured=True).prefetch_related('devlog_video_entries')
+    except Exception as e:
+        # Handle case where tables don't exist yet
+        print(f"Database error in home view: {e}")
+        featured_games = []
     return render(request, 'studio/home.html', {'featured_games': featured_games})
 
 def games(request):
@@ -55,23 +60,31 @@ def games(request):
     from django.core.paginator import Paginator
     from django.db.models import Q
     
-    # Get all games with related data
-    games_list = Game.objects.all().prefetch_related('photos', 'videos', 'devlog_video_entries')
-    
-    # Search functionality
-    search_query = request.GET.get('search', '').strip()
-    if search_query:
-        games_list = games_list.filter(
-            Q(title__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(platform__icontains=search_query) |
-            Q(tags__icontains=search_query)
-        )
-    
-    # Filter by genre
-    genre_filter = request.GET.get('genre', '').strip()
-    if genre_filter:
-        games_list = games_list.filter(genre=genre_filter)
+    try:
+        # Get all games with related data
+        games_list = Game.objects.all().prefetch_related('photos', 'videos', 'devlog_video_entries')
+        
+        # Search functionality
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            games_list = games_list.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(platform__icontains=search_query) |
+                Q(tags__icontains=search_query)
+            )
+        
+        # Filter by genre
+        genre_filter = request.GET.get('genre', '').strip()
+        if genre_filter:
+            games_list = games_list.filter(genre=genre_filter)
+            
+    except Exception as e:
+        # Handle case where tables don't exist yet
+        print(f"Database error in games view: {e}")
+        games_list = []
+        search_query = ''
+        genre_filter = ''
     
     # Filter by platform
     platform_filter = request.GET.get('platform', '').strip()
