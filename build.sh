@@ -3,45 +3,54 @@
 
 set -o errexit  # Exit on error
 
+echo "==> Forcing complete database recreation..."
+
+# Remove any existing database
+if [ -f "db.sqlite3" ]; then
+    echo "Removing existing database..."
+    rm -f db.sqlite3
+fi
+
 echo "==> Installing dependencies..."
 pip install -r requirements.txt
 
 echo "==> Checking Django configuration..."
 python manage.py check
 
-echo "==> Running database migrations..."
-echo "Checking for existing database..."
-if [ -f "db.sqlite3" ]; then
-    echo "Database exists, checking tables..."
-    python manage.py shell -c "
-from django.db import connection
-try:
-    cursor = connection.cursor()
-    cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\" AND name=\"studio_game\";')
-    result = cursor.fetchone()
-    if result:
-        print('studio_game table exists')
-    else:
-        print('studio_game table missing - will recreate database')
-        import os
-        os.remove('db.sqlite3')
-        print('Database removed')
-except Exception as e:
-    print(f'Database check failed: {e}')
-    import os
-    if os.path.exists('db.sqlite3'):
-        os.remove('db.sqlite3')
-        print('Corrupted database removed')
-"
-fi
+echo "==> Creating fresh migrations..."
+# Remove migration cache
+find . -path "*/migrations/__pycache__" -exec rm -rf {} +
 
-echo "Making fresh migrations..."
+# Create migrations for studio app specifically
 python manage.py makemigrations studio --noinput
-echo "Applying all migrations..."
+python manage.py makemigrations --noinput
+
+echo "==> Applying migrations in order..."
+# Apply core Django migrations first
+python manage.py migrate contenttypes --noinput
+python manage.py migrate auth --noinput
+python manage.py migrate admin --noinput
+python manage.py migrate sessions --noinput
+python manage.py migrate sites --noinput
+
+# Apply third-party migrations
+python manage.py migrate account --noinput
+python manage.py migrate socialaccount --noinput
+
+# Apply studio migrations
+echo "Applying studio migrations..."
+python manage.py migrate studio --noinput
+
+# Apply any remaining migrations
 python manage.py migrate --noinput
 
 echo "==> Verifying database setup..."
 python manage.py shell -c "
+import os
+print(f'Database file exists: {os.path.exists(\"db.sqlite3\")}')
+if os.path.exists('db.sqlite3'):
+    print(f'Database size: {os.path.getsize(\"db.sqlite3\")} bytes')
+
 from django.db import connection
 from studio.models import Game
 try:
@@ -49,6 +58,10 @@ try:
     cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\";')
     tables = [table[0] for table in cursor.fetchall()]
     print(f'Total tables: {len(tables)}')
+    
+    studio_tables = [t for t in tables if t.startswith('studio_')]
+    print(f'Studio tables: {studio_tables}')
+    
     if 'studio_game' in tables:
         print('✓ studio_game table exists')
         game_count = Game.objects.count()
@@ -56,10 +69,15 @@ try:
         print('✓ Database setup successful!')
     else:
         print('✗ studio_game table still missing!')
-        print('Available tables:', ', '.join(tables))
+        print('All available tables:', ', '.join(tables))
+        # Try to create the table manually
+        from django.core.management import execute_from_command_line
+        execute_from_command_line(['manage.py', 'migrate', 'studio', '--verbosity=2'])
         exit(1)
 except Exception as e:
     print(f'✗ Database verification failed: {e}')
+    import traceback
+    traceback.print_exc()
     exit(1)
 "
 
