@@ -12,7 +12,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gaming_studio.settings')
 django.setup()
 
 from django.db import connection, transaction
-from django.core.management.sql import sql_create_index
 from django.apps import apps
 
 def create_essential_tables():
@@ -62,7 +61,7 @@ def create_essential_tables():
             """
             
             cursor.execute(create_game_table_sql)
-            print("✓ studio_game table created successfully")
+            print("studio_game table created successfully")
             
             # Create other essential tables if needed
             essential_tables = [
@@ -97,9 +96,9 @@ def create_essential_tables():
                 cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';")
                 if not cursor.fetchone():
                     cursor.execute(create_sql)
-                    print(f"✓ {table_name} table created")
+                    print(f"{table_name} table created")
                 else:
-                    print(f"✓ {table_name} table already exists")
+                    print(f"{table_name} table already exists")
             
             return True
             

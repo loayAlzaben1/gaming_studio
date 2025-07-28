@@ -66,7 +66,7 @@ if [[ "$MIGRATION_CHECK" == *"FAILED"* ]]; then
         exit 1
     fi
 else
-    echo "✓ Migrations successful - studio_game table exists"
+    echo "Migrations successful - studio_game table exists"
 fi
 
 echo "==> Verifying database setup..."
