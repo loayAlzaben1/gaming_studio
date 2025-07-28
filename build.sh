@@ -56,13 +56,16 @@ else:
 ")
 
 if [[ "$MIGRATION_CHECK" == *"FAILED"* ]]; then
-    echo "✗ Migrations failed - studio_game table missing"
-    echo "==> Running emergency database setup..."
-    python emergency_db_setup.py
+    echo "Migrations failed - studio_game table missing"
+    echo "==> Running direct database setup..."
+    python direct_db_setup.py
     if [ $? -eq 0 ]; then
-        echo "✓ Emergency database setup successful"
+        echo "Direct database setup successful"
+        # Try migrations again after manual table creation
+        echo "Retrying migrations..."
+        python manage.py migrate --noinput
     else
-        echo "✗ Emergency database setup failed"
+        echo "Direct database setup failed"
         exit 1
     fi
 else
