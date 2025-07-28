@@ -1,9 +1,30 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 from .models import (Donation, Game, Photo, Video, DevlogVideo, TeamMember, SponsorTier, 
                      DonationGoal, ContactMessage, UserProfile, Achievement, UserAchievement, UserActivity,
                      GameWishlist, GameCollection, GameAnalytics, GameCategory, GameTag, GameDownload,
                      UserGeneratedContent, CommunityGameReview, AdvancedGameRating, GameForum, ForumTopic, ForumPost)
 from django.utils.html import format_html
+from django.db.models import Count, Sum
+
+# Enhanced User Admin to show email information clearly
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined', 'last_login')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    ordering = ('-date_joined',)
+    
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.select_related('profile').annotate(
+            donation_count=Count('donations'),
+            total_donated=Sum('donations__amount')
+        )
+
+# Unregister the default User admin and register our custom one
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)
 
 class PhotoInline(admin.TabularInline):
     model = Photo
@@ -213,10 +234,26 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'account_level', 'total_donated', 'current_tier', 'experience_points', 'login_streak')
+    list_display = ('get_username', 'get_email', 'get_full_name', 'account_level', 'total_donated', 'current_tier', 'experience_points', 'join_date')
     list_filter = ('current_tier', 'account_level', 'is_premium', 'join_date')
     search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
     readonly_fields = ('join_date', 'total_donated', 'account_level', 'experience_points')
+    
+    def get_username(self, obj):
+        return obj.user.username
+    get_username.short_description = 'Username'
+    get_username.admin_order_field = 'user__username'
+    
+    def get_email(self, obj):
+        return format_html('<a href="mailto:{}">{}</a>', obj.user.email, obj.user.email)
+    get_email.short_description = 'Email'
+    get_email.admin_order_field = 'user__email'
+    
+    def get_full_name(self, obj):
+        full_name = obj.user.get_full_name()
+        return full_name if full_name else '-'
+    get_full_name.short_description = 'Full Name'
+    get_full_name.admin_order_field = 'user__first_name'
     
     fieldsets = (
         ('User Information', {
