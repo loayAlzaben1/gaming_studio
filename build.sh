@@ -10,21 +10,50 @@ echo "==> Checking Django configuration..."
 python manage.py check
 
 echo "==> Running database migrations..."
+echo "Checking for existing database..."
+if [ -f "db.sqlite3" ]; then
+    echo "Database exists, checking tables..."
+    python manage.py shell -c "
+from django.db import connection
+try:
+    cursor = connection.cursor()
+    cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\" AND name=\"studio_game\";')
+    result = cursor.fetchone()
+    if result:
+        print('studio_game table exists')
+    else:
+        print('studio_game table missing - will recreate database')
+        import os
+        os.remove('db.sqlite3')
+except Exception as e:
+    print(f'Database check failed: {e}')
+    import os
+    if os.path.exists('db.sqlite3'):
+        os.remove('db.sqlite3')
+"
+fi
+
 echo "Making migrations..."
 python manage.py makemigrations --noinput
 echo "Applying migrations..."
 python manage.py migrate --noinput
 echo "Migrations completed successfully!"
 
-echo "==> Checking database tables..."
+echo "==> Verifying database setup..."
 python manage.py shell -c "
 from django.db import connection
+from studio.models import Game
 cursor = connection.cursor()
-cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table';\")
-tables = cursor.fetchall()
-print('Available tables:')
-for table in tables:
-    print(f'  - {table[0]}')
+cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\";')
+tables = [table[0] for table in cursor.fetchall()]
+print(f'Total tables: {len(tables)}')
+if 'studio_game' in tables:
+    print('✓ studio_game table exists')
+    game_count = Game.objects.count()
+    print(f'✓ Games in database: {game_count}')
+else:
+    print('✗ studio_game table missing!')
+    exit(1)
 "
 
 echo "==> Creating superuser if needed..."
