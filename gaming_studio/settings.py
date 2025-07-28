@@ -190,9 +190,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Import auto-setup to ensure tables exist
+# Import auto-setup to ensure tables exist in production
 try:
     from . import auto_setup
-    print("Auto-setup module loaded successfully")
-except Exception as e:
-    print(f"Error loading auto-setup: {e}")
+except Exception:
+    pass  # Ignore errors in development

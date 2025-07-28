@@ -48,12 +48,18 @@ def news(request):
 
 def home(request):
     try:
-        featured_games = Game.objects.filter(is_featured=True).prefetch_related('devlog_video_entries')
+        # Simplified query without complex relationships for now
+        featured_games = Game.objects.filter(is_featured=True)[:6]  # Limit to 6
     except Exception as e:
         # Handle case where tables don't exist yet
         print(f"Database error in home view: {e}")
         featured_games = []
-    return render(request, 'studio/home.html', {'featured_games': featured_games})
+    
+    # Ensure we have a safe context
+    context = {
+        'featured_games': featured_games,
+    }
+    return render(request, 'studio/home.html', context)
 
 def games(request):
     """Enhanced games showcase with filtering, search, and pagination."""
