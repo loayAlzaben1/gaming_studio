@@ -147,21 +147,28 @@ else:
 echo "==> Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "==> Running comprehensive production deployment..."
-python deploy_production.py
+echo "==> Running emergency database fix..."
+python manage.py emergency_fix
 if [ $? -eq 0 ]; then
-    echo "✅ Production deployment completed successfully"
+    echo "✅ Emergency fix completed"
 else
-    echo "⚠️ Production deployment had issues, trying fallback setup..."
-    # Fallback to individual commands
-    echo "==> Setting up Google OAuth for production..."
-    python manage.py setup_google_oauth --production || echo "Google OAuth setup failed, continuing..."
-    
-    echo "==> Setting up achievements..."
-    python manage.py setup_achievements || echo "Achievements setup failed, continuing..."
-    
-    echo "==> Setting up user profiles..."
-    python manage.py setup_user_profiles || echo "User profiles setup failed, continuing..."
+    echo "⚠️ Emergency fix failed, trying comprehensive deployment..."
+    python deploy_production.py || echo "Deployment script also failed, continuing..."
 fi
+
+echo "==> Final verification..."
+python manage.py shell -c "
+try:
+    from studio.models import Game
+    from django.contrib.sites.models import Site
+    from allauth.socialaccount.models import SocialApp
+    
+    print(f'Games: {Game.objects.count()}')
+    print(f'Sites: {Site.objects.count()}')  
+    print(f'OAuth apps: {SocialApp.objects.count()}')
+    print('✅ All models accessible')
+except Exception as e:
+    print(f'❌ Model error: {e}')
+"
 
 echo "==> Build completed successfully!"
