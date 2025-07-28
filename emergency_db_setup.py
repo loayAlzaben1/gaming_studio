@@ -18,6 +18,9 @@ from django.apps import apps
 def create_essential_tables():
     """Create essential tables manually if migrations fail"""
     try:
+        print("==> Starting emergency database setup...")
+        print(f"Database file exists: {os.path.exists('db.sqlite3')}")
+        
         with connection.cursor() as cursor:
             # Check if studio_game table exists
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='studio_game';")
@@ -26,6 +29,7 @@ def create_essential_tables():
                 return True
             
             print("Creating studio_game table manually...")
+            print("Executing CREATE TABLE statement...")
             
             # Create studio_game table with essential fields
             create_game_table_sql = """
