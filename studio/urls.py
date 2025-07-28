@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .health_check import health_check
 from django.shortcuts import redirect
 
 urlpatterns = [
@@ -48,6 +49,9 @@ urlpatterns = [
     path('review/<int:review_id>/like/', views.like_review, name='like_review'),
     path('ugc/<int:content_id>/like/', views.like_ugc, name='like_ugc'),
     path('comment/<int:comment_id>/like/', views.like_comment, name='like_comment'),
+    
+    # Health check endpoint for debugging
+    path('health/', health_check, name='health_check'),
     
     # Guide Pages
     path('guides/review/', views.review_guide, name='review_guide'),
