@@ -25,34 +25,41 @@ try:
         print('studio_game table missing - will recreate database')
         import os
         os.remove('db.sqlite3')
+        print('Database removed')
 except Exception as e:
     print(f'Database check failed: {e}')
     import os
     if os.path.exists('db.sqlite3'):
         os.remove('db.sqlite3')
+        print('Corrupted database removed')
 "
 fi
 
-echo "Making migrations..."
-python manage.py makemigrations --noinput
-echo "Applying migrations..."
+echo "Making fresh migrations..."
+python manage.py makemigrations studio --noinput
+echo "Applying all migrations..."
 python manage.py migrate --noinput
-echo "Migrations completed successfully!"
 
 echo "==> Verifying database setup..."
 python manage.py shell -c "
 from django.db import connection
 from studio.models import Game
-cursor = connection.cursor()
-cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\";')
-tables = [table[0] for table in cursor.fetchall()]
-print(f'Total tables: {len(tables)}')
-if 'studio_game' in tables:
-    print('✓ studio_game table exists')
-    game_count = Game.objects.count()
-    print(f'✓ Games in database: {game_count}')
-else:
-    print('✗ studio_game table missing!')
+try:
+    cursor = connection.cursor()
+    cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\";')
+    tables = [table[0] for table in cursor.fetchall()]
+    print(f'Total tables: {len(tables)}')
+    if 'studio_game' in tables:
+        print('✓ studio_game table exists')
+        game_count = Game.objects.count()
+        print(f'✓ Games in database: {game_count}')
+        print('✓ Database setup successful!')
+    else:
+        print('✗ studio_game table still missing!')
+        print('Available tables:', ', '.join(tables))
+        exit(1)
+except Exception as e:
+    print(f'✗ Database verification failed: {e}')
     exit(1)
 "
 
