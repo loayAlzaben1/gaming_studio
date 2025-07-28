@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    /* Mobile-Responsive Game Detail Page */
+    /* Enhanced Mobile-Responsive Game Detail Page */
     @media (max-width: 768px) {
         .game-hero {
             height: 40vh !important;
@@ -24,22 +24,28 @@
         .game-stats {
             flex-direction: column !important;
             gap: 0.5rem !important;
+            align-items: flex-start !important;
         }
         
         .game-stats > div {
             font-size: 0.875rem !important;
+            width: 100% !important;
         }
         
         .action-buttons {
             flex-direction: column !important;
-            gap: 0.5rem !important;
+            gap: 0.75rem !important;
+            width: 100% !important;
         }
         
         .action-buttons a, .action-buttons button {
             width: 100% !important;
             justify-content: center !important;
-            padding: 0.75rem 1rem !important;
-            font-size: 0.9rem !important;
+            padding: 1rem !important;
+            font-size: 1rem !important;
+            min-height: 48px !important;
+            display: flex !important;
+            align-items: center !important;
         }
         
         .game-content-grid {
@@ -98,6 +104,62 @@
             margin-bottom: 1rem !important;
         }
         
+        /* Improved mobile hero layout */
+        .hero-content {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+        }
+        
+        .hero-info {
+            width: 100% !important;
+        }
+        
+        /* Better mobile badges */
+        .game-badges {
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .game-badges span {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+        
+        /* Enhanced sidebar on mobile */
+        .sidebar-card {
+            margin-bottom: 1rem !important;
+            padding: 1rem !important;
+        }
+        
+        .sidebar-card h3 {
+            font-size: 1.125rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        /* Better review cards */
+        .review-item {
+            padding: 1rem !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        .review-author {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+        }
+        
+        .review-rating {
+            align-self: flex-start !important;
+        }
+        
+        /* Mobile-friendly video grid */
+        .video-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        
+        /* Better mobile typography */
         h1 {
             font-size: 1.5rem !important;
             line-height: 1.3 !important;
@@ -111,6 +173,24 @@
         h3 {
             font-size: 1.125rem !important;
             line-height: 1.4 !important;
+        }
+        
+        /* Mobile-specific improvements */
+        .text-3xl {
+            font-size: 1.5rem !important;
+        }
+        
+        .text-lg {
+            font-size: 1rem !important;
+        }
+        
+        /* Better mobile spacing */
+        .space-y-6 > * + * {
+            margin-top: 1rem !important;
+        }
+        
+        .space-y-8 > * + * {
+            margin-top: 1.5rem !important;
         }
     }
     
@@ -158,6 +238,22 @@
             padding-top: 1rem !important;
             padding-bottom: 1rem !important;
         }
+        
+        /* Ultra-small screen optimizations */
+        .container {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .game-badges span {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .action-buttons a, .action-buttons button {
+            font-size: 0.9rem !important;
+            padding: 0.875rem !important;
+        }
     }
     
     /* Touch-friendly improvements */
@@ -175,6 +271,59 @@
         input, textarea, select {
             font-size: 16px !important; /* Prevents zoom on iOS */
         }
+        
+        /* Prevent horizontal scrolling */
+        * {
+            box-sizing: border-box !important;
+        }
+        
+        img {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+        
+        /* Better touch targets */
+        .bg-gray-800 {
+            padding: 1rem !important;
+        }
+        
+        .bg-gray-700 {
+            padding: 1rem !important;
+        }
+        
+        /* Improved modal and image viewing on mobile */
+        .cursor-pointer {
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Better mobile navigation within game page */
+        .sticky-nav {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+            background: rgba(17, 24, 39, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            padding: 0.5rem 1rem !important;
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3) !important;
+        }
+    }
+    
+    /* Landscape phone optimizations */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .game-hero {
+            height: 60vh !important;
+            min-height: 300px !important;
+        }
+        
+        .hero-content {
+            flex-direction: row !important;
+            align-items: center !important;
+        }
+        
+        .game-cover-mobile {
+            width: 150px !important;
+            height: 225px !important;
+        }
     }
 </style>
 
@@ -184,8 +333,8 @@
     <!-- Game Hero Section -->
     <div class="game-hero relative bg-cover bg-center h-64 sm:h-80 lg:h-96" style="background-image: url('{% if game.cover_image %}{{ game.cover_image.url }}{% else %}https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop{% endif %}');">
         <div class="absolute inset-0 bg-black bg-opacity-70 flex items-end">
-            <div class="container mx-auto px-4 py-8">
-                <div class="flex flex-col lg:flex-row items-start lg:items-end gap-6">
+            <div class="container mx-auto px-4 py-4 sm:py-8">
+                <div class="hero-content flex flex-col lg:flex-row items-start lg:items-end gap-4 lg:gap-6">
                     <!-- Game Cover -->
                     {% if game.cover_image %}
                     <div class="flex-shrink-0">
@@ -194,8 +343,8 @@
                     {% endif %}
                     
                     <!-- Game Info -->
-                    <div class="flex-1">
-                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <div class="hero-info flex-1 w-full">
+                        <div class="game-badges flex flex-wrap items-center gap-2 mb-3">
                             {% if game.is_featured %}
                             <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
                                 <i class="fas fa-star mr-1"></i>FEATURED
@@ -242,9 +391,9 @@
                         </div>
                         
                         <!-- Action Buttons -->
-                        <div class="action-buttons flex flex-wrap gap-3 mt-6">
+                        <div class="action-buttons flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
                             {% if game.trailer_link %}
-                            <a href="{{ game.trailer_link }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                            <a href="{{ game.trailer_link }}" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none touch-action-manipulation">
                                 <i class="fab fa-youtube mr-2"></i>
                                 <span class="hidden sm:inline">Watch </span>Trailer
                             </a>
@@ -252,32 +401,32 @@
                             
                             {% if user.is_authenticated %}
                             <!-- Review & Rating Buttons -->
-                            <a href="{% url 'write_review' game.pk %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                            <a href="{% url 'write_review' game.pk %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none touch-action-manipulation">
                                 <i class="fas fa-star mr-2"></i>
                                 <span class="hidden sm:inline">Write </span>Review
                             </a>
                             
-                            <a href="{% url 'rate_game' game.pk %}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                            <a href="{% url 'rate_game' game.pk %}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none touch-action-manipulation">
                                 <i class="fas fa-chart-bar mr-2"></i>
                                 <span class="hidden sm:inline">Rate </span>Game
                             </a>
                             
-                            <a href="{% url 'game_forum' game.pk %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                            <a href="{% url 'game_forum' game.pk %}" class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none touch-action-manipulation">
                                 <i class="fas fa-comments mr-2"></i>Forum
                             </a>
                             
-                            <button onclick="toggleWishlist({{ game.pk }})" id="wishlist-btn" class="wishlist-btn bg-gray-700 hover:bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none">
+                            <button onclick="toggleWishlist({{ game.pk }})" id="wishlist-btn" class="wishlist-btn bg-gray-700 hover:bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center min-w-0 flex-1 sm:flex-none touch-action-manipulation">
                                 <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart mr-2"></i>
                                 <span class="hidden sm:inline">{% if in_wishlist %}Remove from {% else %}Add to {% endif %}</span>Wishlist
                             </button>
                             {% else %}
                             <!-- Login prompt for review features -->
-                            <a href="{% url 'account_login' %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center">
+                            <a href="{% url 'account_login' %}" class="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center touch-action-manipulation">
                                 <i class="fas fa-star mr-2"></i>Login to Review
                             </a>
                             {% endif %}
                             
-                            <button onclick="shareGame()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                            <button onclick="shareGame()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center touch-action-manipulation">
                                 <i class="fas fa-share mr-2"></i>Share
                             </button>
                         </div>
