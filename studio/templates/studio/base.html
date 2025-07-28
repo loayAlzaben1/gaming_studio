@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google-site-verification" content="bsUCyfYYhdNcBqq2-39-T7E2hTtyuTYfdFBAdTFwUrA" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a202c">
     <title>{% block title %}Gaming Studio{% endblock %}</title>
     
     <!-- Favicon and App Icons -->
@@ -189,95 +191,53 @@
         /* Gaming Logo Styles */
         .gaming-logo {
             position: relative;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             border-radius: 12px;
             padding: 0.5rem;
         }
         .gaming-logo:hover {
-            transform: translateY(-2px) scale(1.02);
-            filter: drop-shadow(0 10px 20px rgba(59, 130, 246, 0.3));
-        }
-        .gaming-logo::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, 
-                rgba(59, 130, 246, 0.1), 
-                rgba(139, 92, 246, 0.1), 
-                rgba(6, 182, 212, 0.1), 
-                rgba(59, 130, 246, 0.1)
-            );
-            border-radius: 12px;
-            opacity: 0;
-            transition: all 0.4s ease;
-            z-index: -1;
-        }
-        .gaming-logo:hover::before {
-            opacity: 1;
-            animation: none;
-        }
-        .gaming-logo::after {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6);
-            border-radius: 13px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -2;
-            animation: rotate 3s linear infinite;
-        }
-        .gaming-logo:hover::after {
-            opacity: 0.4;
+            transform: translateY(-2px);
         }
         
         /* Enhanced gamepad icon hover effects */
         .gaming-logo:hover .fas.fa-gamepad {
-            animation: spin 2s linear infinite, pulse 1.5s ease-in-out infinite alternate;
             transform: scale(1.1);
-            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8));
+            color: #06b6d4;
         }
         
-        /* Text gradient animation on hover */
+        /* Text gradient simple hover */
         .gaming-logo:hover .bg-gradient-to-r {
-            animation: gradient-shift 2s ease-in-out infinite;
-        }
-        
-        @keyframes gradient-shift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.05); }
-        }
-        
-        /* Background size utilities for gradient animation */
-        .bg-size-200 {
-            background-size: 200% 200%;
-        }
-        .bg-pos-0 {
-            background-position: 0% 50%;
-        }
-        .bg-pos-100 {
-            background-position: 100% 50%;
+            color: #06b6d4;
         }
         
         /* Icon container hover effects */
         .icon-container:hover {
-            transform: rotate(10deg);
+            transform: rotate(5deg);
         }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        /* General responsive improvements */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Touch-friendly interactive elements */
+        a, button, .clickable {
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+            touch-action: manipulation;
+        }
+        
+        /* Prevent horizontal scroll on mobile */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        /* Mobile-friendly focus states */
+        @media (max-width: 768px) {
+            input:focus, textarea:focus, select:focus {
+                outline: 2px solid #60a5fa;
+                outline-offset: 2px;
+            }
         }
         
         /* Mobile Gaming Logo */
@@ -287,6 +247,147 @@
             border-radius: 12px;
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Footer Styles */
+        .social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .footer-link {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .footer-link:hover {
+            color: #60a5fa;
+            padding-left: 0.25rem;
+        }
+        
+        /* Mobile Navigation Improvements */
+        @media (max-width: 1024px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.5rem;
+            }
+            
+            /* Hide desktop navigation elements on mobile */
+            .navbar .space-x-4 {
+                display: none;
+            }
+            
+            /* Improve mobile menu */
+            .mobile-menu {
+                max-height: 100vh;
+                overflow-y: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            
+            .mobile-menu::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .mobile-menu-link {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .mobile-menu-header {
+                padding: 1.5rem 1rem 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .footer-link {
+                font-size: 0.8rem;
+            }
+            
+            .social-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            /* Better mobile typography */
+            h1 {
+                font-size: 1.75rem !important;
+                line-height: 1.2;
+            }
+            
+            h2 {
+                font-size: 1.5rem !important;
+                line-height: 1.3;
+            }
+            
+            h3 {
+                font-size: 1.25rem !important;
+                line-height: 1.4;
+            }
+            
+            /* Mobile-friendly buttons */
+            .btn, button, a.button {
+                min-height: 44px;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Mobile cards and content */
+            .card, .game-card {
+                margin-bottom: 1rem;
+                padding: 1rem;
+            }
+            
+            /* Mobile text readability */
+            p, .text-base {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+        }
+        
+        /* Ultra-small screens (very old phones) */
+        @media (max-width: 360px) {
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            .mobile-menu-link {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -302,10 +403,10 @@
                     <div class="absolute inset-0 rounded-full bg-cyan-300 opacity-0 group-hover:opacity-10 animate-ping"></div>
                 </div>
                 <div class="ml-3 flex flex-col text-container">
-                    <span class="hidden sm:inline text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent group-hover:from-cyan-300 group-hover:via-blue-400 group-hover:to-purple-400 transition-all duration-500 bg-size-200 bg-pos-0 group-hover:bg-pos-100">
+                    <span class="hidden sm:inline text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent transition-all duration-500">
                         Gaming Studio
                     </span>
-                    <span class="sm:hidden text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent group-hover:from-cyan-300 group-hover:to-blue-400 transition-all duration-500">
+                    <span class="sm:hidden text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent transition-all duration-500">
                         GS
                     </span>
                     <span class="hidden sm:inline text-xs text-gray-400 group-hover:text-cyan-200 transition-all duration-300 font-light tracking-wide opacity-80 group-hover:opacity-100">
@@ -475,54 +576,18 @@
                         <i class="fas fa-chevron-right"></i>
                     </a>
                     
-                    <!-- Community Section with Review Features -->
+                    <!-- Community Section (Simplified) -->
                     <div class="border-t border-gray-600 my-2 pt-2">
-                        <div class="px-4 py-2 text-xs text-gray-400 font-semibold flex items-center">
-                            <i class="fas fa-users mr-2 text-blue-400"></i>
-                            COMMUNITY FEATURES
-                            {% if user.is_authenticated %}
-                                <span class="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
-                                    NEW
-                                </span>
-                            {% endif %}
-                        </div>
-                        <a href="{% url 'community_showcase' %}" class="mobile-menu-link">
-                            <i class="fas fa-users text-blue-400"></i>
-                            <span>Community Hub</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                        
                         {% if user.is_authenticated %}
-                            <!-- Review Features for Mobile -->
                             <a href="{% url 'review_hub' %}" class="mobile-menu-link">
                                 <i class="fas fa-star text-yellow-400"></i>
-                                <span>Write Reviews</span>
-                                <span class="ml-auto bg-yellow-500 text-black text-xs px-2 py-1 rounded-full">HOT</span>
-                            </a>
-                            <a href="{% url 'rating_hub' %}" class="mobile-menu-link">
-                                <i class="fas fa-chart-bar text-purple-400"></i>
-                                <span>Rate Games</span>
-                                <span class="ml-auto bg-purple-500 text-white text-xs px-2 py-1 rounded-full">NEW</span>
-                            </a>
-                            <a href="{% url 'forum_hub' %}" class="mobile-menu-link">
-                                <i class="fas fa-comments text-green-400"></i>
-                                <span>Game Forums</span>
+                                <span>Reviews</span>
                                 <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="{% url 'games' %}" class="mobile-menu-link" onclick="showReviewToast('upload')">
-                                <i class="fas fa-upload text-red-400"></i>
-                                <span>Upload Content</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                            <a href="{% url 'review_guide' %}" class="mobile-menu-link special">
-                                <i class="fas fa-question-circle text-blue-400"></i>
-                                <span>Review Guide</span>
-                                <i class="fas fa-external-link-alt"></i>
                             </a>
                         {% else %}
-                            <a href="{% url 'account_login' %}" class="mobile-menu-link special">
-                                <i class="fas fa-sign-in-alt text-yellow-400"></i>
-                                <span>Login to Review</span>
+                            <a href="{% url 'account_login' %}" class="mobile-menu-link">
+                                <i class="fas fa-sign-in-alt text-blue-400"></i>
+                                <span>Login</span>
                                 <i class="fas fa-chevron-right"></i>
                             </a>
                         {% endif %}
@@ -538,15 +603,6 @@
                         <span>Contact</span>
                         <i class="fas fa-chevron-right"></i>
                     </a>
-                    
-                    <!-- Review Badge for Mobile -->
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'review_guide' %}" class="mobile-menu-link special bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-400/30">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <span class="text-yellow-300 font-semibold">Review Guide</span>
-                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-bounce">!</span>
-                        </a>
-                    {% endif %}
                     
                     <a href="{% url 'donate' %}" class="mobile-menu-link special bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/30">
                         <i class="fas fa-heart text-red-300"></i>
@@ -571,11 +627,6 @@
                             <span>Dashboard</span>
                             <i class="fas fa-chevron-right"></i>
                         </a>
-                        <a href="#" class="mobile-menu-link">
-                            <i class="fas fa-history"></i>
-                            <span>My Donations</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
                         <a href="{% url 'account_logout' %}" class="mobile-menu-link">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
@@ -583,11 +634,6 @@
                         </a>
                     {% else %}
                         <div class="border-t border-gray-600 my-4 pt-4">
-                            <a href="{% url 'account_login' %}" class="mobile-menu-link">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span>Login</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
                             <a href="{% url 'account_signup' %}" class="mobile-menu-link special">
                                 <i class="fas fa-user-plus"></i>
                                 <span>Sign Up</span>
@@ -603,30 +649,94 @@
         {% block content %}
         {% endblock %}
     </main>
-    <footer class="bg-gray-800 bg-opacity-80 p-6 text-center relative z-10">
-        <div class="mb-4 flex justify-center space-x-6">
-            <i class="fas fa-skull-crossbones text-4xl text-red-400 animate-pulse"></i>
-            <i class="fas fa-shield-alt text-4xl text-yellow-400 animate-pulse"></i>
-            <i class="fas fa-gem text-4xl text-green-400 animate-pulse"></i>
-        </div>
-        <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2 text-neon">Follow Us</h3>
-            <div class="flex justify-center space-x-4">
-                <a href="https://twitter.com" target="_blank" class="text-blue-400 hover:text-neon">Twitter</a>
-                <a href="https://instagram.com" target="_blank" class="text-blue-400 hover:text-neon">Instagram</a>
-                <a href="https://youtube.com" target="_blank" class="text-blue-400 hover:text-neon">YouTube</a>
-                <a href="https://discord.gg/your-server-link" target="_blank" class="text-blue-400 hover:text-neon">Discord</a>
+    <footer class="relative mt-20">
+        <!-- Footer Background -->
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-800 to-transparent opacity-95"></div>
+        
+        <!-- Footer Content -->
+        <div class="relative z-10 container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                
+                <!-- Brand Section -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-gamepad text-2xl text-blue-400 mr-3"></i>
+                        <h3 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                            Gaming Studio
+                        </h3>
+                    </div>
+                    <p class="text-gray-400 mb-4 max-w-md leading-relaxed">
+                        Creating epic gaming experiences since 2023. Join our community of passionate gamers and developers.
+                    </p>
+                    <!-- Social Media Icons -->
+                    <div class="flex space-x-4">
+                        <a href="https://twitter.com" target="_blank" class="social-icon group">
+                            <i class="fab fa-twitter text-lg group-hover:text-blue-400 transition-colors duration-300"></i>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" class="social-icon group">
+                            <i class="fab fa-instagram text-lg group-hover:text-pink-400 transition-colors duration-300"></i>
+                        </a>
+                        <a href="https://youtube.com" target="_blank" class="social-icon group">
+                            <i class="fab fa-youtube text-lg group-hover:text-red-400 transition-colors duration-300"></i>
+                        </a>
+                        <a href="https://discord.gg/your-server-link" target="_blank" class="social-icon group">
+                            <i class="fab fa-discord text-lg group-hover:text-indigo-400 transition-colors duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'home' %}" class="footer-link">Home</a></li>
+                        <li><a href="{% url 'games' %}" class="footer-link">Games</a></li>
+                        <li><a href="{% url 'team' %}" class="footer-link">Team</a></li>
+                        <li><a href="{% url 'contact' %}" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Community -->
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Community</h4>
+                    <ul class="space-y-2">
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'review_hub' %}" class="footer-link">Reviews</a></li>
+                            <li><a href="{% url 'forum_hub' %}" class="footer-link">Forums</a></li>
+                            <li><a href="{% url 'donate' %}" class="footer-link">Support Us</a></li>
+                        {% else %}
+                            <li><a href="{% url 'account_login' %}" class="footer-link">Join Community</a></li>
+                            <li><a href="{% url 'account_login' %}" class="footer-link">Reviews</a></li>
+                            <li><a href="{% url 'donate' %}" class="footer-link">Support Us</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Newsletter Section -->
+            <div class="border-t border-gray-700 pt-8 mb-8">
+                <div class="max-w-md mx-auto text-center">
+                    <h4 class="text-lg font-semibold text-white mb-2">Stay Updated</h4>
+                    <p class="text-gray-400 text-sm mb-4">Get the latest news about our games and updates</p>
+                    <form method="POST" action="{% url 'newsletter_subscribe' %}" class="flex flex-col sm:flex-row gap-2">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="Enter your email" 
+                               class="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300" required>
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="border-t border-gray-700 pt-6 text-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 Gaming Studio. All rights reserved. Made with 
+                    <i class="fas fa-heart text-red-400 mx-1"></i> for gamers.
+                </p>
             </div>
         </div>
-        <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2 text-neon">Subscribe to Our Newsletter</h3>
-            <form method="POST" action="{% url 'newsletter_subscribe' %}" class="flex justify-center">
-                {% csrf_token %}
-                <input type="email" name="email" placeholder="Enter your email" class="p-2 rounded-l bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-neon" required>
-                <button type="submit" class="btn-neon p-2 rounded-r">Subscribe</button>
-            </form>
-        </div>
-        <p>© 2025 Gaming Studio. All rights reserved.</p>
     </footer>
     <script>
         // Particle System
