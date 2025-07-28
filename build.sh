@@ -44,6 +44,31 @@ python manage.py migrate studio --noinput
 # Apply any remaining migrations
 python manage.py migrate --noinput
 
+echo "==> Checking if migration worked..."
+python manage.py shell -c "
+from django.db import connection
+cursor = connection.cursor()
+cursor.execute('SELECT name FROM sqlite_master WHERE type=\"table\" AND name=\"studio_game\";')
+if cursor.fetchone():
+    print('✓ Migrations successful - studio_game table exists')
+else:
+    print('✗ Migrations failed - studio_game table missing')
+    print('Running emergency database setup...')
+    exit(42)  # Special exit code to trigger emergency setup
+"
+
+# If migrations failed, run emergency setup
+if [ $? -eq 42 ]; then
+    echo "==> Running emergency database setup..."
+    python emergency_db_setup.py
+    if [ $? -eq 0 ]; then
+        echo "✓ Emergency database setup successful"
+    else
+        echo "✗ Emergency database setup failed"
+        exit 1
+    fi
+fi
+
 echo "==> Verifying database setup..."
 python manage.py shell -c "
 import os
