@@ -19,13 +19,17 @@ urlpatterns = [
     path('test/', simple_test, name='simple_test'),
     path('urls/', url_test, name='url_test'),
     
-    # IMPORTANT: allauth URLs MUST come BEFORE our custom overrides
-    # This allows OAuth callbacks to work properly
-    path('accounts/', include('allauth.urls')),  # This handles /accounts/google/login/callback/
+    # CRITICAL: OAuth callbacks MUST be accessible for Google sign-in
+    path('accounts/google/', include('allauth.socialaccount.providers.google.urls')),
     
-    # Our custom pages - only override the main login/signup, not the OAuth callbacks
+    # Our working custom pages - replace the broken allauth login/signup
+    path('accounts/login/', instant_login, name='account_login'),
+    path('accounts/signup/', instant_signup, name='account_signup'), 
     path('login/', instant_login, name='custom_login'),
     path('signup/', instant_signup, name='custom_signup'),
+    
+    # Include remaining allauth URLs (but our overrides above take precedence)
+    path('accounts/', include('allauth.urls')),
     
     # Keep studio URLs
     path('', include('studio.urls')),
