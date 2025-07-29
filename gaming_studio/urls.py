@@ -7,6 +7,7 @@ from studio.health_check import health_check
 from studio.media_views import serve_media
 from instant_auth import instant_login, instant_signup
 from test_simple import simple_test
+from url_test import url_test
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,6 +17,7 @@ urlpatterns = [
     path('contact/', contact, name='contact'),
     path('health/', health_check, name='health_check'),
     path('test/', simple_test, name='simple_test'),
+    path('urls/', url_test, name='url_test'),
     
     # IMPORTANT: allauth URLs MUST come BEFORE our custom overrides
     # This allows OAuth callbacks to work properly
