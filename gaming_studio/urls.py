@@ -2,16 +2,9 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from studio.media_views import serve_media
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
 from studio.views import home, games, team, contact
 from studio.health_check import health_check
+from studio.media_views import serve_media
 from instant_auth import instant_login, instant_signup
 
 urlpatterns = [
@@ -28,7 +21,6 @@ urlpatterns = [
     
     # Keep studio URLs
     path('', include('studio.urls')),
-]
     path('accounts/', include('allauth.urls')),  # Restored full allauth functionality
 ]
 
