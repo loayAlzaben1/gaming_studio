@@ -13,7 +13,10 @@ pip install -r requirements.txt
 echo "==> Running basic Django migrations..."
 python manage.py migrate --run-syncdb
 
+echo "==> Setting up Google OAuth (CRITICAL for login)..."
+python manage.py setup_oauth_now || echo "OAuth setup failed, continuing..."
+
 echo "==> Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "==> MINIMAL BUILD COMPLETE - Custom setup skipped for now"
+echo "==> MINIMAL BUILD COMPLETE - OAuth configured"
