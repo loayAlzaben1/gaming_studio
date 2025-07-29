@@ -19,17 +19,17 @@ urlpatterns = [
     path('test/', simple_test, name='simple_test'),
     path('urls/', url_test, name='url_test'),
     
-    # CRITICAL: OAuth callbacks MUST be accessible for Google sign-in
-    path('accounts/google/', include('allauth.socialaccount.providers.google.urls')),
+    # CRITICAL: Include socialaccount URLs for OAuth callbacks BEFORE our overrides
+    path('accounts/', include('allauth.socialaccount.urls')),
     
-    # Our working custom pages - replace the broken allauth login/signup
+    # Our working custom pages - override the broken allauth login/signup
     path('accounts/login/', instant_login, name='account_login'),
     path('accounts/signup/', instant_signup, name='account_signup'), 
     path('login/', instant_login, name='custom_login'),
     path('signup/', instant_signup, name='custom_signup'),
     
-    # Include remaining allauth URLs (but our overrides above take precedence)
-    path('accounts/', include('allauth.urls')),
+    # Include remaining allauth account URLs (but our overrides above take precedence)
+    path('accounts/', include('allauth.account.urls')),
     
     # Keep studio URLs
     path('', include('studio.urls')),
