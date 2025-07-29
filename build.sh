@@ -7,6 +7,18 @@ echo "==> Build script starting..."
 echo "Current directory: $(pwd)"
 echo "Files in directory: $(ls -la)"
 
+echo "==> INSTALLING DEPENDENCIES FIRST..."
+pip install -r requirements.txt
+
+echo "==> ULTRA MINIMAL FIX - ONLY CREATE STUDIO_GAME TABLE..."
+python manage.py ultra_minimal
+if [ $? -eq 0 ]; then
+    echo "✅ Ultra minimal fix SUCCESS"
+else
+    echo "⚠️ Ultra minimal command failed, trying script..."
+    python ultra_minimal.py || echo "Script also failed"
+fi
+
 echo "==> RUNNING SUPER SIMPLE FIX FIRST..."
 python simple_fix.py
 if [ $? -eq 0 ]; then
@@ -160,6 +172,14 @@ if not User.objects.filter(is_superuser=True).exists():
 else:
     print('Superuser already exists')
 "
+
+echo "==> FINAL FIX - ADD MISSING DATA AND OAUTH..."
+python manage.py final_fix
+if [ $? -eq 0 ]; then
+    echo "✅ Final fix SUCCESS - OAuth and games configured"
+else
+    echo "⚠️ Final fix failed"
+fi
 
 echo "==> Collecting static files..."
 python manage.py collectstatic --noinput
