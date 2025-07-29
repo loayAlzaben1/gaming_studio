@@ -8,6 +8,7 @@ from studio.media_views import serve_media
 from instant_auth import instant_login, instant_signup
 from test_simple import simple_test
 from url_test import url_test
+from oauth_debug import oauth_debug
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -18,6 +19,7 @@ urlpatterns = [
     path('health/', health_check, name='health_check'),
     path('test/', simple_test, name='simple_test'),
     path('urls/', url_test, name='url_test'),
+    path('oauth-debug/', oauth_debug, name='oauth_debug'),
     
     # WORKING APPROACH: Include allauth URLs but override specific login/signup
     path('accounts/', include('allauth.urls')),  # This includes ALL OAuth functionality

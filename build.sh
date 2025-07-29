@@ -14,6 +14,7 @@ echo "==> Running basic Django migrations..."
 python manage.py migrate --run-syncdb
 
 echo "==> Setting up Google OAuth (CRITICAL for login)..."
+python manage.py setup_oauth_enhanced || echo "Enhanced OAuth setup failed, trying basic..."
 python manage.py setup_oauth_now || echo "OAuth setup failed, continuing..."
 
 echo "==> Collecting static files..."
