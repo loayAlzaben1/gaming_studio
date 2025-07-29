@@ -7,6 +7,14 @@ echo "==> Build script starting..."
 echo "Current directory: $(pwd)"
 echo "Files in directory: $(ls -la)"
 
+echo "==> RUNNING SUPER SIMPLE FIX FIRST..."
+python simple_fix.py
+if [ $? -eq 0 ]; then
+    echo "✅ Simple fix completed successfully"
+else
+    echo "⚠️ Simple fix failed, continuing with normal process..."
+fi
+
 echo "==> Ensuring database exists first..."
 # Create a basic database file if it doesn't exist
 if [ ! -f "db.sqlite3" ]; then
@@ -38,6 +46,15 @@ fi
 
 echo "==> Installing dependencies..."
 pip install -r requirements.txt
+
+echo "==> RUNNING SIMPLE FIX AS MANAGEMENT COMMAND..."
+python manage.py simple_fix
+if [ $? -eq 0 ]; then
+    echo "✅ Management command simple fix completed"
+else
+    echo "⚠️ Management command failed, trying script version..."
+    python simple_fix.py || echo "Both fixes failed, continuing..."
+fi
 
 echo "==> Checking Django configuration..."
 python manage.py check
