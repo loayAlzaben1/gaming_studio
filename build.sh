@@ -173,6 +173,14 @@ else:
     print('Superuser already exists')
 "
 
+echo "==> SETTING UP GOOGLE OAUTH IMMEDIATELY..."
+python manage.py setup_oauth_now
+if [ $? -eq 0 ]; then
+    echo "✅ Google OAuth configured - Gmail sign-in ready!"
+else
+    echo "⚠️ OAuth setup failed"
+fi
+
 echo "==> IMMEDIATE GAMES FIX..."
 python manage.py add_games
 if [ $? -eq 0 ]; then

@@ -82,7 +82,7 @@ def instant_login(request):
             <button type="submit" class="button">Sign In</button>
         </form>
         
-        <a href="/accounts/google/login/" class="button google-btn">
+        <a href="https://accounts.google.com/oauth/authorize?client_id=1035193411026-ti6ub7vrs3kdkg7n8e87nfcjgh1f6llh.apps.googleusercontent.com&redirect_uri=https://gaming-studio.onrender.com/accounts/google/login/callback/&scope=openid%20email%20profile&response_type=code&state=gaming_studio" class="button google-btn">
             🔍 Continue with Google
         </a>
         
@@ -167,7 +167,7 @@ def instant_signup(request):
             Create your account and start gaming with us.
         </div>
         
-        <a href="/accounts/google/login/" class="button google-btn">
+        <a href="https://accounts.google.com/oauth/authorize?client_id=1035193411026-ti6ub7vrs3kdkg7n8e87nfcjgh1f6llh.apps.googleusercontent.com&redirect_uri=https://gaming-studio.onrender.com/accounts/google/login/callback/&scope=openid%20email%20profile&response_type=code&state=gaming_studio_signup" class="button google-btn">
             🔍 Sign up with Google
         </a>
         
