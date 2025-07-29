@@ -17,13 +17,16 @@ urlpatterns = [
     path('health/', health_check, name='health_check'),
     path('test/', simple_test, name='simple_test'),
     
-    # IMMEDIATE FIX - Replace broken auth URLs
-    path('accounts/login/', instant_login, name='account_login'),
-    path('accounts/signup/', instant_signup, name='account_signup'),
+    # IMPORTANT: allauth URLs MUST come BEFORE our custom overrides
+    # This allows OAuth callbacks to work properly
+    path('accounts/', include('allauth.urls')),  # This handles /accounts/google/login/callback/
+    
+    # Our custom pages - only override the main login/signup, not the OAuth callbacks
+    path('login/', instant_login, name='custom_login'),
+    path('signup/', instant_signup, name='custom_signup'),
     
     # Keep studio URLs
     path('', include('studio.urls')),
-    path('accounts/', include('allauth.urls')),  # Restored full allauth functionality
 ]
 
 # Serve media files
