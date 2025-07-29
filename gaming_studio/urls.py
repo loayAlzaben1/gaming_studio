@@ -6,6 +6,7 @@ from studio.views import home, games, team, contact
 from studio.health_check import health_check
 from studio.media_views import serve_media
 from instant_auth import instant_login, instant_signup
+from test_simple import simple_test
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,6 +15,7 @@ urlpatterns = [
     path('team/', team, name='team'),
     path('contact/', contact, name='contact'),
     path('health/', health_check, name='health_check'),
+    path('test/', simple_test, name='simple_test'),
     
     # IMMEDIATE FIX - Replace broken auth URLs
     path('accounts/login/', instant_login, name='account_login'),
