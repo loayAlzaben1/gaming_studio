@@ -173,6 +173,14 @@ else:
     print('Superuser already exists')
 "
 
+echo "==> IMMEDIATE GAMES FIX..."
+python manage.py add_games
+if [ $? -eq 0 ]; then
+    echo "✅ Sample games added immediately"
+else
+    echo "⚠️ Games fix failed"
+fi
+
 echo "==> FINAL FIX - ADD MISSING DATA AND OAUTH..."
 python manage.py final_fix
 if [ $? -eq 0 ]; then
