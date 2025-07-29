@@ -19,17 +19,13 @@ urlpatterns = [
     path('test/', simple_test, name='simple_test'),
     path('urls/', url_test, name='url_test'),
     
-    # CRITICAL: Include socialaccount URLs for OAuth callbacks BEFORE our overrides
-    path('accounts/', include('allauth.socialaccount.urls')),
+    # WORKING APPROACH: Include allauth URLs but override specific login/signup
+    path('accounts/', include('allauth.urls')),  # This includes ALL OAuth functionality
     
-    # Our working custom pages - override the broken allauth login/signup
-    path('accounts/login/', instant_login, name='account_login'),
-    path('accounts/signup/', instant_signup, name='account_signup'), 
-    path('login/', instant_login, name='custom_login'),
-    path('signup/', instant_signup, name='custom_signup'),
-    
-    # Include remaining allauth account URLs (but our overrides above take precedence)
-    path('accounts/', include('allauth.account.urls')),
+    # Override the specific broken pages AFTER allauth URLs
+    # Note: This won't actually override due to URL ordering, so let's use different paths
+    path('signin/', instant_login, name='custom_login'),
+    path('register/', instant_signup, name='custom_signup'),
     
     # Keep studio URLs
     path('', include('studio.urls')),
