@@ -9,6 +9,7 @@ from instant_auth import instant_login, instant_signup
 from test_simple import simple_test
 from url_test import url_test
 from oauth_debug import oauth_debug
+from clean_oauth import clean_login, clean_signup, google_auth_start, google_auth_callback
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,10 +22,16 @@ urlpatterns = [
     path('urls/', url_test, name='url_test'),
     path('oauth-debug/', oauth_debug, name='oauth_debug'),
     
-    # Include ALL allauth URLs for full OAuth functionality
+    # CLEAN OAUTH SOLUTION - Working from scratch
+    path('clean-login/', clean_login, name='clean_login'),
+    path('clean-signup/', clean_signup, name='clean_signup'),
+    path('auth/google/', google_auth_start, name='google_auth_start'),
+    path('auth/google/callback/', google_auth_callback, name='google_auth_callback'),
+    
+    # Include allauth URLs for any remaining functionality (but we don't use broken login/signup)
     path('accounts/', include('allauth.urls')),
     
-    # Our beautiful custom login/signup pages on different URLs
+    # Our custom pages on alternative URLs  
     path('signin/', instant_login, name='custom_login'),
     path('register/', instant_signup, name='custom_signup'),
     
