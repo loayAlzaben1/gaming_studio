@@ -13,7 +13,7 @@ from oauth_debug import oauth_debug
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
-    path('games/', games, name='games'),
+    path('games/', games, name='games'),  
     path('team/', team, name='team'),
     path('contact/', contact, name='contact'),
     path('health/', health_check, name='health_check'),
@@ -21,13 +21,19 @@ urlpatterns = [
     path('urls/', url_test, name='url_test'),
     path('oauth-debug/', oauth_debug, name='oauth_debug'),
     
-    # WORKING APPROACH: Include allauth URLs but override specific login/signup
-    path('accounts/', include('allauth.urls')),  # This includes ALL OAuth functionality
+    # CRITICAL: Include socialaccount URLs first for OAuth callbacks
+    path('accounts/', include('allauth.socialaccount.urls')),
     
-    # Override the specific broken pages AFTER allauth URLs
-    # Note: This won't actually override due to URL ordering, so let's use different paths
+    # Override broken allauth login/signup with our working custom pages
+    path('accounts/login/', instant_login, name='account_login'),
+    path('accounts/signup/', instant_signup, name='account_signup'),
+    
+    # Additional custom paths
     path('signin/', instant_login, name='custom_login'),
     path('register/', instant_signup, name='custom_signup'),
+    
+    # Include remaining allauth account URLs (for other functionality)
+    path('accounts/', include('allauth.account.urls')),
     
     # Keep studio URLs
     path('', include('studio.urls')),
