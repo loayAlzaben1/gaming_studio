@@ -270,7 +270,7 @@ def google_auth_callback(request):
         token_url = "https://oauth2.googleapis.com/token"
         token_data = {
             'client_id': "1035193411026-ti6ub7vrs3kdkg7n8e87nfcjgh1f6llh.apps.googleusercontent.com",
-            'client_secret': "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",
+            'client_secret': "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",  # Updated July 30, 2025
             'code': code,
             'grant_type': 'authorization_code',
             'redirect_uri': "https://gaming-studio.onrender.com/auth/google/callback/",

@@ -20,8 +20,8 @@ class Command(BaseCommand):
         self.stdout.write(f"✅ Site: {site.domain}")
         
         # 2. Setup Google OAuth app with your existing credentials
-        # Use the new client secret from July 29, 2025
-        client_secret = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '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')
+        # Use the new client secret from July 30, 2025
+        client_secret = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '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')
         
         google_app, created = SocialApp.objects.get_or_create(
             provider='google',

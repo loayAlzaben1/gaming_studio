@@ -23,7 +23,7 @@ class Command(BaseCommand):
         self.stdout.write(f"✅ Primary Site: {site.domain}")
         
         # 2. Setup Google OAuth app with enhanced configuration
-        client_secret = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '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')
+        client_secret = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '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')
         
         # Delete any existing Google apps to start fresh
         SocialApp.objects.filter(provider='google').delete()
