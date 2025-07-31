@@ -193,87 +193,86 @@ def donate(request):
     total_donations = Decimal('0.00')
     general_progress = 0
     donations = []
-    
-    # Try to get donation data if database is available
-    if MODELS_AVAILABLE:
-        try:
-            if SponsorTier:
-                sponsor_tiers = list(SponsorTier.objects.all().order_by('min_amount'))
-        except:
-            pass
-            
-        try:
-            if DonationGoal:
-                active_goals = list(DonationGoal.objects.filter(status='active').order_by('-start_date'))
-        except:
-            pass
-            
-        try:
-            if Donation:
-                total_donations = Donation.objects.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-                general_goal = Decimal('1000.00')
-                general_progress = min((total_donations / general_goal) * 100, 100)
-                donations = list(Donation.objects.select_related('sponsor_tier').order_by('-donated_at')[:10])
-        except:
-            pass
 
-    if request.method == "POST":
-        form = DonationForm(request.POST)
-        if form.is_valid():
-            amount = form.cleaned_data['amount']
-            donor_name = form.cleaned_data['donor_name'] or "Anonymous"
-            donor_email = form.cleaned_data['donor_email']
-            donation_type = form.cleaned_data['donation_type']
-            
-            # Store form data in session for later use
-            request.session['donation_data'] = {
-                'donor_name': donor_name,
-                'donor_email': donor_email,
-                'donation_type': donation_type,
-                'amount': str(amount),
-            }
-            
-            try:
-                # Create payment description
-                description = f"{'Recurring' if donation_type != 'one_time' else 'One-time'} donation of ${amount:.2f} to Gaming Studio by {donor_name}"
-                
-                payment = paypalrestsdk.Payment({
-                    "intent": "sale",
-                    "payer": {"payment_method": "paypal"},
-                    "transactions": [{
-                        "amount": {"total": f"{amount:.2f}", "currency": "USD"},
-                        "description": description
-                    }],
-                    "redirect_urls": {
-                        "return_url": request.build_absolute_uri("/donate/success/"),
-                        "cancel_url": request.build_absolute_uri("/cancel/")
-                    }
-                })
-                
-                if payment.create():
-                    for link in payment.links:
-                        if link.method == "REDIRECT":
-                            return HttpResponseRedirect(link.href)
-                else:
-                    print(f"Payment creation failed: {payment.error}")
-                    messages.error(request, f"Payment creation failed. Please try again.")
-                    
-            except Exception as e:
-                print(f"PayPal error: {e}")
-                messages.error(request, "Payment system error. Please try again later.")
-                
-    else:
+    # Try to get donation data if database is available
+    try:
+        if MODELS_AVAILABLE and SponsorTier:
+            sponsor_tiers = list(SponsorTier.objects.all().order_by('min_amount'))
+    except Exception as e:
+        print(f"SponsorTier error: {e}")
+        sponsor_tiers = []
+    try:
+        if MODELS_AVAILABLE and DonationGoal:
+            active_goals = list(DonationGoal.objects.filter(status='active').order_by('-start_date'))
+    except Exception as e:
+        print(f"DonationGoal error: {e}")
+        active_goals = []
+    try:
+        if MODELS_AVAILABLE and Donation:
+            total_donations = Donation.objects.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+            general_goal = Decimal('1000.00')
+            general_progress = min((total_donations / general_goal) * 100, 100)
+            donations = list(Donation.objects.select_related('sponsor_tier').order_by('-donated_at')[:10])
+    except Exception as e:
+        print(f"Donation error: {e}")
+        total_donations = Decimal('0.00')
+        general_progress = 0
+        donations = []
+
+    try:
+        if request.method == "POST":
+            form = DonationForm(request.POST)
+            if form.is_valid():
+                amount = form.cleaned_data['amount']
+                donor_name = form.cleaned_data['donor_name'] or "Anonymous"
+                donor_email = form.cleaned_data['donor_email']
+                donation_type = form.cleaned_data['donation_type']
+                # Store form data in session for later use
+                request.session['donation_data'] = {
+                    'donor_name': donor_name,
+                    'donor_email': donor_email,
+                    'donation_type': donation_type,
+                    'amount': str(amount),
+                }
+                try:
+                    # Create payment description
+                    description = f"{'Recurring' if donation_type != 'one_time' else 'One-time'} donation of ${amount:.2f} to Gaming Studio by {donor_name}"
+                    payment = paypalrestsdk.Payment({
+                        "intent": "sale",
+                        "payer": {"payment_method": "paypal"},
+                        "transactions": [{
+                            "amount": {"total": f"{amount:.2f}", "currency": "USD"},
+                            "description": description
+                        }],
+                        "redirect_urls": {
+                            "return_url": request.build_absolute_uri("/donate/success/"),
+                            "cancel_url": request.build_absolute_uri("/cancel/")
+                        }
+                    })
+                    if payment.create():
+                        for link in payment.links:
+                            if link.method == "REDIRECT":
+                                return HttpResponseRedirect(link.href)
+                    else:
+                        print(f"Payment creation failed: {payment.error}")
+                        messages.error(request, f"Payment creation failed. Please try again.")
+                except Exception as e:
+                    print(f"PayPal error: {e}")
+                    messages.error(request, "Payment system error. Please try again later.")
+        else:
+            form = DonationForm()
+    except Exception as e:
+        print(f"Donation page error: {e}")
         form = DonationForm()
-    
+
     context = {
-        'form': form, 
-        'total_donations': total_donations, 
-        'general_progress': general_progress, 
+        'form': form,
+        'total_donations': total_donations,
+        'general_progress': general_progress,
         'donations': donations,
         'sponsor_tiers': sponsor_tiers,
         'active_goals': active_goals,
     }
-    
     return render(request, 'studio/donate.html', context)
 
 def donate_success(request):

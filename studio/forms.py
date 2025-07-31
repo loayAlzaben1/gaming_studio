@@ -50,8 +50,9 @@ class DonationForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Try to add donation goals if available
+        # Try to add donation goals if available, else fallback to a simple choice
         try:
+            from .models import DonationGoal
             self.fields['donation_goal'] = forms.ModelChoiceField(
                 queryset=DonationGoal.objects.filter(status='active'),
                 required=False,
@@ -61,9 +62,15 @@ class DonationForm(forms.Form):
                     'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors'
                 })
             )
-        except:
-            # If DonationGoal model not available, don't add the field
-            pass
+        except Exception as e:
+            self.fields['donation_goal'] = forms.ChoiceField(
+                choices=[('', '💝 General Support')],
+                required=False,
+                label="Support a specific goal (Optional)",
+                widget=forms.Select(attrs={
+                    'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors'
+                })
+            )
     
     def clean(self):
         cleaned_data = super().clean()
