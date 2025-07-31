@@ -15,6 +15,32 @@ from django.db import connection, transaction
 from django.apps import apps
 
 def create_essential_tables():
+            # Create other essential tables if needed
+            essential_tables = [
+                ("studio_donation", """
+                CREATE TABLE "studio_donation" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "user_id" bigint,
+                    "donor_name" varchar(100) NOT NULL,
+                    "donor_email" varchar(254),
+                    "amount" decimal NOT NULL,
+                    "donated_at" datetime NOT NULL,
+                    "donation_type" varchar(20) NOT NULL,
+                    "is_recurring" bool NOT NULL,
+                    "thank_you_sent" bool NOT NULL,
+                    "next_payment_date" datetime,
+                    "paypal_subscription_id" varchar(100),
+                    "sponsor_tier_id" integer,
+                    "donation_goal_id" integer
+                );
+                """),
+                ("django_session", """
+                CREATE TABLE "django_session" (
+                    "session_key" varchar(40) NOT NULL PRIMARY KEY,
+                    "session_data" text NOT NULL,
+                    "expire_date" datetime NOT NULL
+                );
+                """),
                 ("django_site", """
                 CREATE TABLE "django_site" (
                     "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -22,6 +48,59 @@ def create_essential_tables():
                     "name" varchar(50) NOT NULL
                 );
                 """),
+                ("studio_userprofile", """
+                CREATE TABLE "studio_userprofile" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "user_id" bigint NOT NULL UNIQUE,
+                    "bio" text NOT NULL,
+                    "avatar" varchar(100),
+                    "join_date" datetime NOT NULL,
+                    "account_level" integer NOT NULL,
+                    "experience_points" integer NOT NULL,
+                    "total_donated" decimal NOT NULL,
+                    "is_premium" bool NOT NULL
+                );
+                """),
+                ("studio_donationgoal", """
+                CREATE TABLE "studio_donationgoal" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "title" varchar(200) NOT NULL,
+                    "description" text NOT NULL,
+                    "target_amount" decimal NOT NULL,
+                    "current_amount" decimal NOT NULL,
+                    "is_active" bool NOT NULL,
+                    "status" varchar(20) NOT NULL,
+                    "image" varchar(100),
+                    "start_date" datetime,
+                    "end_date" datetime,
+                    "created_at" datetime NOT NULL,
+                    "updated_at" datetime NOT NULL
+                );
+                """),
+                ("studio_teammember", """
+                CREATE TABLE "studio_teammember" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" varchar(100) NOT NULL,
+                    "role" varchar(100) NOT NULL,
+                    "bio" text NOT NULL,
+                    "photo" varchar(100),
+                    "social_link" varchar(200),
+                    "join_date" datetime NOT NULL
+                );
+                """),
+                ("studio_sponsortier", """
+                CREATE TABLE "studio_sponsortier" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" varchar(50) NOT NULL,
+                    "icon" varchar(50),
+                    "color" varchar(20),
+                    "min_amount" decimal NOT NULL,
+                    "perks" text,
+                    "created_at" datetime NOT NULL,
+                    "updated_at" datetime NOT NULL
+                );
+                """),
+            ]
     """Create essential tables manually if migrations fail"""
     try:
         print("==> Starting emergency database setup...")
