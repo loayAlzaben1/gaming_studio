@@ -454,31 +454,7 @@
                 </a>
                 
                 <!-- Authentication Links -->
-                <!-- User authentication removed -->
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="{% url 'dashboard' %}">Dashboard</a>
-                            <a href="{% url 'my_donations' %}">My Donations</a>
-                            <a href="{% url 'profile_edit' %}">Profile</a>
-                            <hr class="border-gray-600 my-1">
-                            <a href="{% url 'user_wishlist' %}">
-                                <i class="fas fa-heart mr-2 text-red-400"></i>Wishlist
-                            </a>
-                            <a href="{% url 'game_collection_list' %}">
-                                <i class="fas fa-folder mr-2 text-blue-400"></i>Collections
-                            </a>
-                            <hr class="border-gray-600 my-1">
-                            <a href="{% url 'account_logout' %}">Logout</a>
-                        </div>
-                    </div>
-                {% else %}
-                    <a href="{% url 'account_login' %}" class="hover:text-neon transition-colors duration-200">
-                        <i class="fas fa-sign-in-alt mr-1"></i>Login
-                    </a>
-                    <a href="{% url 'account_signup' %}" class="btn-neon-outline">
-                        <i class="fas fa-user-plus mr-1"></i>Sign Up
-                    </a>
-                {% endif %}
+                <!-- Authentication system completely removed -->
             </div>
             
             <!-- Mobile Menu Button (improved design) -->
@@ -554,20 +530,7 @@
                             <span>Dashboard</span>
                             <i class="fas fa-chevron-right"></i>
                         </a>
-                        <a href="{% url 'account_logout' %}" class="mobile-menu-link">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    {% else %}
-                        <div class="border-t border-gray-600 my-4 pt-4">
-                            <a href="{% url 'account_signup' %}" class="mobile-menu-link special">
-                                <i class="fas fa-user-plus"></i>
-                                <span>Sign Up</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </div>
-                    {% endif %}
+                        <!-- Authentication removed -->
                 </nav>
             </div>
         </div>
