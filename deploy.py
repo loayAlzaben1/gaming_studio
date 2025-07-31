@@ -57,14 +57,33 @@ def create_superuser():
 
 def deploy():
     """Run deployment steps"""
-    print("Starting deployment process...")
+    print("🚀 Starting deployment process...")
     
     # Setup Django
     django.setup()
     
-    # Run migrations
-    if not run_command("python manage.py migrate --noinput", "Database migrations"):
-        print("Migration failed, but continuing...")
+    # Run migrations with syncdb to create missing tables
+    print("📊 Running database migrations with syncdb...")
+    if not run_command("python manage.py migrate --run-syncdb --noinput", "Database migrations with syncdb"):
+        print("Migration with syncdb failed, trying regular migration...")
+        if not run_command("python manage.py migrate --noinput", "Regular database migrations"):
+            print("❌ Both migration attempts failed, but continuing...")
+    
+    # Verify database tables
+    print("✅ Verifying database setup...")
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = [row[0] for row in cursor.fetchall()]
+            studio_tables = [t for t in tables if 'studio_' in t]
+            print(f"📋 Found {len(tables)} total tables, {len(studio_tables)} studio tables")
+            if 'studio_game' in tables:
+                print("✅ studio_game table exists!")
+            else:
+                print("❌ studio_game table missing!")
+    except Exception as e:
+        print(f"❌ Database verification error: {e}")
     
     # Collect static files
     if not run_command("python manage.py collectstatic --noinput --clear", "Static files collection"):
@@ -73,7 +92,7 @@ def deploy():
     # Create superuser
     create_superuser()
     
-    print("Deployment process completed!")
+    print("🎯 Deployment process completed!")
 
 if __name__ == "__main__":
     deploy()
