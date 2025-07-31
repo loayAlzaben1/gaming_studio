@@ -48,15 +48,22 @@ class DonationForm(forms.Form):
         })
     )
     
-    donation_goal = forms.ModelChoiceField(
-        queryset=DonationGoal.objects.filter(status='active'),
-        required=False,
-        empty_label="💝 General Support",
-        label="Support a specific goal (Optional)",
-        widget=forms.Select(attrs={
-            'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors'
-        })
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Try to add donation goals if available
+        try:
+            self.fields['donation_goal'] = forms.ModelChoiceField(
+                queryset=DonationGoal.objects.filter(status='active'),
+                required=False,
+                empty_label="💝 General Support",
+                label="Support a specific goal (Optional)",
+                widget=forms.Select(attrs={
+                    'class': 'w-full p-3 rounded-lg bg-gray-600 text-white border border-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition-colors'
+                })
+            )
+        except:
+            # If DonationGoal model not available, don't add the field
+            pass
     
     def clean(self):
         cleaned_data = super().clean()
