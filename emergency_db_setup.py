@@ -131,11 +131,11 @@ def create_essential_tables():
             
             for table_name, create_sql in essential_tables:
                 cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';")
-                if not cursor.fetchone():
-                    cursor.execute(create_sql)
-                    print(f"{table_name} table created")
-                else:
-                    print(f"{table_name} table already exists")
+                if cursor.fetchone():
+                    print(f"{table_name} table exists, dropping...")
+                    cursor.execute(f"DROP TABLE {table_name};")
+                cursor.execute(create_sql)
+                print(f"{table_name} table created")
             
             return True
             
