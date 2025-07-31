@@ -7,6 +7,8 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 """
 
+import os
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gaming_studio.settings')
 
 # Emergency DB setup (guarantee tables before app loads)
