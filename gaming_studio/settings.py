@@ -153,10 +153,9 @@ EMAIL_HOST_USER = 'Gaming Studio'
 # Authentication Settings
 SITE_ID = 1
 
-# Authentication backends
+# Authentication backends - ALLAUTH REMOVED!
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 # ALL AUTHENTICATION CONFIGURATION REMOVED!
