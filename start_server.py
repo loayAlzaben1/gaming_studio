@@ -1,7 +1,17 @@
+
 import os
 import subprocess
 import time
 import webbrowser
+
+# Emergency DB setup (auto-create essential tables if missing)
+try:
+    import emergency_db_setup
+    emergency_db_setup.create_essential_tables()
+    print("✅ Emergency DB setup completed!")
+except Exception as e:
+    print(f"⚠️ Emergency DB setup error: {e}")
+
 
 # Run migrations first
 print("🔧 Running database migrations...")
