@@ -101,6 +101,13 @@ def create_essential_tables():
                 );
                 """),
             ]
+                    "min_amount" decimal NOT NULL,
+                    "perks" text,
+                    "created_at" datetime NOT NULL,
+                    "updated_at" datetime NOT NULL
+                );
+                """),
+            ]
     """Create essential tables manually if migrations fail"""
     try:
         print("==> Starting emergency database setup...")
