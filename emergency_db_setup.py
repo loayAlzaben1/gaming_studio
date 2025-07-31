@@ -76,7 +76,8 @@ def create_essential_tables():
                     "donation_type" varchar(20) NOT NULL,
                     "is_recurring" bool NOT NULL,
                     "thank_you_sent" bool NOT NULL,
-                    "next_payment_date" datetime
+                    "next_payment_date" datetime,
+                    "paypal_subscription_id" varchar(100)
                 );
                 """),
                 ("studio_userprofile", """
@@ -100,6 +101,7 @@ def create_essential_tables():
                     "target_amount" decimal NOT NULL,
                     "current_amount" decimal NOT NULL,
                     "is_active" bool NOT NULL,
+                    "status" varchar(20) NOT NULL,
                     "start_date" datetime,
                     "end_date" datetime,
                     "created_at" datetime NOT NULL,
