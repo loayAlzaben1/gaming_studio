@@ -80,7 +80,7 @@ def create_essential_tables():
                 ("studio_userprofile", """
                 CREATE TABLE "studio_userprofile" (
                     "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-                    "user_id" bigint NOT NULL UNIQUE REFERENCES "auth_user" ("id"),
+                    "user_id" bigint NOT NULL UNIQUE,
                     "bio" text NOT NULL,
                     "avatar" varchar(100),
                     "join_date" datetime NOT NULL,
@@ -88,6 +88,40 @@ def create_essential_tables():
                     "experience_points" integer NOT NULL,
                     "total_donated" decimal NOT NULL,
                     "is_premium" bool NOT NULL
+                );
+                """),
+                ("studio_donationgoal", """
+                CREATE TABLE "studio_donationgoal" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "title" varchar(200) NOT NULL,
+                    "description" text NOT NULL,
+                    "target_amount" decimal NOT NULL,
+                    "current_amount" decimal NOT NULL,
+                    "is_active" bool NOT NULL,
+                    "created_at" datetime NOT NULL,
+                    "updated_at" datetime NOT NULL
+                );
+                """),
+                ("studio_teammember", """
+                CREATE TABLE "studio_teammember" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" varchar(100) NOT NULL,
+                    "role" varchar(100) NOT NULL,
+                    "bio" text NOT NULL,
+                    "photo" varchar(100),
+                    "social_link" varchar(200),
+                    "join_date" datetime NOT NULL
+                );
+                """),
+                ("studio_sponsortier", """
+                CREATE TABLE "studio_sponsortier" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" varchar(50) NOT NULL,
+                    "icon" varchar(50),
+                    "color" varchar(20),
+                    "min_amount" decimal NOT NULL,
+                    "created_at" datetime NOT NULL,
+                    "updated_at" datetime NOT NULL
                 );
                 """)
             ]
