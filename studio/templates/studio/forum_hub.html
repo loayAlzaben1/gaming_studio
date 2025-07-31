@@ -179,7 +179,7 @@
                 <a href="{% url 'forum_rules' %}" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition">
                     <i class="fas fa-book mr-2"></i>Forum Rules
                 </a>
-                {% if not user.is_authenticated %}
+                {% if not none.is_authenticated %}
                     <a href="{% url 'login' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold transition">
                         <i class="fas fa-sign-in-alt mr-2"></i>Join Discussion
                     </a>

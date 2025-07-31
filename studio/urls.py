@@ -25,7 +25,6 @@ urlpatterns = [
     path('follow/<str:username>/', views.follow_user, name='follow_user'),
     path('my-donations/', views.my_donations, name='my_donations'),
     path('settings/', views.settings, name='settings'),
-    path('account-settings/', lambda request: redirect('/accounts/email/'), name='account_settings'),
     # Admin analytics (staff only)
     path('admin/analytics/games/', views.game_analytics_summary, name='game_analytics_summary'),
     

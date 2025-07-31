@@ -1,5 +1,5 @@
 {% extends 'studio/base.html' %}
-{% block title %}{{ profile_user.username }}'s Gaming Profile{% endblock %}
+{% block title %}{{ profile_none.username }}'s Gaming Profile{% endblock %}
 
 {% block content %}
 <!-- Enhanced Gaming Profile Page -->
@@ -25,7 +25,7 @@
                     <!-- Avatar -->
                     <div class="relative">
                         {% if profile.avatar %}
-                            <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" 
+                            <img src="{{ profile.avatar.url }}" alt="{{ profile_none.username }}" 
                                  class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-yellow-400 shadow-lg object-cover">
                         {% else %}
                             <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-yellow-400 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
@@ -44,7 +44,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between">
                             <div>
                                 <h1 class="text-2xl sm:text-4xl font-bold text-white">
-                                    {{ profile_user.get_full_name|default:profile_user.username }}
+                                    {{ profile_none.get_full_name|default:profile_none.username }}
                                 </h1>
                                 {% if profile.custom_title %}
                                     <p class="text-lg text-yellow-400 font-semibold mt-1">{{ profile.custom_title }}</p>

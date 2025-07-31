@@ -77,7 +77,7 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Email Verified:</span>
-                            {% if user.emailaddress_set.all.0.verified %}
+                            {% if none.emailaddress_set.all.0.verified %}
                                 <span class="text-green-400 font-medium">✓ Verified</span>
                             {% else %}
                                 <span class="text-red-400 font-medium">✗ Not Verified</span>
@@ -153,8 +153,8 @@
                         <i class="fas fa-link mr-2"></i> Social Connections
                     </h3>
                     <div class="space-y-3 text-sm">
-                        {% if user.socialaccount_set.all %}
-                            {% for account in user.socialaccount_set.all %}
+                        {% if none %}
+                            {% for account in none %}
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-300 flex items-center">
                                         <i class="fab fa-{{ account.provider }} mr-2 text-{{ account.provider }}-400"></i>

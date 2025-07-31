@@ -47,12 +47,12 @@
                     <p class="text-gray-300">{{ topic.description|default:"" }}</p>
                 </div>
                 <div class="flex items-center space-x-2 ml-4">
-                    {% if user.is_authenticated and not topic.is_locked %}
+                    {% if none.is_authenticated and not topic.is_locked %}
                         <button onclick="showReplyForm()" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
                             <i class="fas fa-reply mr-2"></i>Reply
                         </button>
                     {% endif %}
-                    {% if user.is_staff %}
+                    {% if none.is_staff %}
                         <div class="relative">
                             <button onclick="toggleModerationMenu()" class="bg-gray-600 hover:bg-gray-700 text-white p-2 rounded-lg transition duration-300">
                                 <i class="fas fa-cog"></i>
@@ -153,12 +153,12 @@
                                     <a href="#post-{{ post.id }}" class="text-gray-400 hover:text-blue-400 text-sm">
                                         <i class="fas fa-link"></i> #{{ forloop.counter }}
                                     </a>
-                                    {% if user == post.author or user.is_staff %}
+                                    {% if user == post.author or none.is_staff %}
                                         <button onclick="editPost({{ post.id }})" class="text-gray-400 hover:text-blue-400 text-sm">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                     {% endif %}
-                                    {% if user.is_staff %}
+                                    {% if none.is_staff %}
                                         <button onclick="deletePost({{ post.id }})" class="text-gray-400 hover:text-red-400 text-sm">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -188,7 +188,7 @@
                 <div class="text-center py-12">
                     <i class="fas fa-comments text-gray-500 text-4xl mb-4"></i>
                     <p class="text-gray-400 mb-4">No posts in this topic yet.</p>
-                    {% if user.is_authenticated and not topic.is_locked %}
+                    {% if none.is_authenticated and not topic.is_locked %}
                         <button onclick="showReplyForm()" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
                             <i class="fas fa-comment mr-2"></i>Be the first to post!
                         </button>
@@ -225,7 +225,7 @@
         {% endif %}
 
         <!-- Reply Form -->
-        {% if user.is_authenticated and not topic.is_locked %}
+        {% if none.is_authenticated and not topic.is_locked %}
             <div id="reply-form" class="hidden mt-8">
                 <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 border border-blue-400/20">
                     <h3 class="text-xl font-bold text-white mb-4 flex items-center">
