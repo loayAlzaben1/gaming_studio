@@ -9,26 +9,49 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 def home(request):
-    featured_games = Game.objects.filter(is_featured=True)[:6]
-    team_members = TeamMember.objects.all()[:4]
+    try:
+        featured_games = Game.objects.filter(is_featured=True)[:6]
+    except:
+        featured_games = []
+    
+    try:
+        team_members = TeamMember.objects.all()[:4]
+    except:
+        team_members = []
+    
     return render(request, 'studio/home.html', {
         'featured_games': featured_games,
         'team_members': team_members,
     })
 
 def games(request):
-    games_list = Game.objects.all()
-    paginator = Paginator(games_list, 9)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'studio/games.html', {'page_obj': page_obj})
+    try:
+        games_list = Game.objects.all()
+        paginator = Paginator(games_list, 9)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'studio/games.html', {'page_obj': page_obj})
+    except:
+        return render(request, 'studio/simple_message.html', {
+            'title': 'Games Coming Soon',
+            'message': 'Game database is being set up. Please check back later!'
+        })
 
 def game_detail(request, pk):
-    game = get_object_or_404(Game, pk=pk)
-    return render(request, 'studio/game_detail.html', {'game': game})
+    try:
+        game = get_object_or_404(Game, pk=pk)
+        return render(request, 'studio/game_detail.html', {'game': game})
+    except:
+        return render(request, 'studio/simple_message.html', {
+            'title': 'Game Not Found',
+            'message': 'Game database is being set up. Please check back later!'
+        })
 
 def team(request):
-    team_members = TeamMember.objects.all()
+    try:
+        team_members = TeamMember.objects.all()
+    except:
+        team_members = []
     return render(request, 'studio/team.html', {'team_members': team_members})
 
 def contact(request):

@@ -3,6 +3,14 @@ import subprocess
 import time
 import webbrowser
 
+# Run migrations first
+print("🔧 Running database migrations...")
+try:
+    subprocess.run(["python", "manage.py", "migrate"], check=True)
+    print("✅ Database migrations completed!")
+except Exception as e:
+    print(f"⚠️  Migration warning: {e}")
+
 # Start Django server
 server_process = subprocess.Popen(["python", "manage.py", "runserver"], cwd=os.getcwd())
 
