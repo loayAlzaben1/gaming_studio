@@ -5,12 +5,8 @@ from django.conf.urls.static import static
 from studio.views import home, games, team, contact
 from studio.health_check import health_check
 from studio.media_views import serve_media
-from instant_auth import instant_login, instant_signup
-from test_simple import simple_test
-from url_test import url_test
-from oauth_debug import oauth_debug
-from clean_oauth import clean_login, clean_signup, google_auth_start, google_auth_callback
 
+# NO AUTHENTICATION - COMPLETELY REMOVED!
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
@@ -18,24 +14,8 @@ urlpatterns = [
     path('team/', team, name='team'),
     path('contact/', contact, name='contact'),
     path('health/', health_check, name='health_check'),
-    path('test/', simple_test, name='simple_test'),
-    path('urls/', url_test, name='url_test'),
-    path('oauth-debug/', oauth_debug, name='oauth_debug'),
     
-    # CLEAN OAUTH SOLUTION - Working from scratch
-    path('clean-login/', clean_login, name='clean_login'),
-    path('clean-signup/', clean_signup, name='clean_signup'),
-    path('auth/google/', google_auth_start, name='google_auth_start'),
-    path('auth/google/callback/', google_auth_callback, name='google_auth_callback'),
-    
-    # Include allauth URLs for any remaining functionality (but we don't use broken login/signup)
-    path('accounts/', include('allauth.urls')),
-    
-    # Our custom pages on alternative URLs  
-    path('signin/', instant_login, name='custom_login'),
-    path('register/', instant_signup, name='custom_signup'),
-    
-    # Keep studio URLs
+    # Keep studio URLs (but remove any auth requirements)
     path('', include('studio.urls')),
 ]
 

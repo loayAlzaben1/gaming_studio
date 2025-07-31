@@ -30,10 +30,7 @@ INSTALLED_APPS = [
     'studio',
     'crispy_forms',
     'crispy_bootstrap4',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    # ALL AUTHENTICATION APPS REMOVED!
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -45,9 +42,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # ALLAUTH MIDDLEWARE REMOVED!
 ]
 
 ROOT_URLCONF = 'gaming_studio.urls'
@@ -162,36 +159,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-# Allauth settings (Updated for latest version)
-ACCOUNT_LOGIN_METHODS = ['email']
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_LOGOUT_ON_GET = True
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
-# Social account settings
-SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
-
-# Google OAuth settings (you'll need to get these from Google Cloud Console)
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    }
-}
-
-# Import auto-setup to ensure tables exist in production
-try:
-    from . import auto_setup
-except Exception:
-    pass  # Ignore errors in development
+# ALL AUTHENTICATION CONFIGURATION REMOVED!
+# NO MORE LOGIN/LOGOUT REDIRECTS
+# NO MORE ALLAUTH SETTINGS
+# SITE IS NOW COMPLETELY OPEN!
