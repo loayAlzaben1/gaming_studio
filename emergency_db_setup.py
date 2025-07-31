@@ -15,6 +15,13 @@ from django.db import connection, transaction
 from django.apps import apps
 
 def create_essential_tables():
+                ("django_site", """
+                CREATE TABLE "django_site" (
+                    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "domain" varchar(100) NOT NULL,
+                    "name" varchar(50) NOT NULL
+                );
+                """),
     """Create essential tables manually if migrations fail"""
     try:
         print("==> Starting emergency database setup...")
