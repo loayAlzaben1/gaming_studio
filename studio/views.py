@@ -1,23 +1,47 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
-from .models import Game, TeamMember, ContactMessage
-from .forms import ContactForm
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+# Safe model imports with error handling
+try:
+    from .models import Game, TeamMember, ContactMessage
+    MODELS_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: Models not available: {e}")
+    MODELS_AVAILABLE = False
+    Game = None
+    TeamMember = None
+    ContactMessage = None
+
+try:
+    from .forms import ContactForm
+    FORMS_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: Forms not available: {e}")
+    FORMS_AVAILABLE = False
+    ContactForm = None
+
 def home(request):
-    try:
-        featured_games = Game.objects.filter(is_featured=True)[:6]
-    except:
-        featured_games = []
+    featured_games = []
+    team_members = []
     
-    try:
-        team_members = TeamMember.objects.all()[:4]
-    except:
-        team_members = []
+    if MODELS_AVAILABLE and Game:
+        try:
+            featured_games = list(Game.objects.filter(is_featured=True)[:6])
+        except Exception as e:
+            print(f"Home view Game query error: {e}")
+            featured_games = []
+    
+    if MODELS_AVAILABLE and TeamMember:
+        try:
+            team_members = list(TeamMember.objects.all()[:4])
+        except Exception as e:
+            print(f"Home view TeamMember query error: {e}")
+            team_members = []
     
     return render(request, 'studio/home.html', {
         'featured_games': featured_games,
@@ -25,13 +49,20 @@ def home(request):
     })
 
 def games(request):
+    if not MODELS_AVAILABLE or not Game:
+        return render(request, 'studio/simple_message.html', {
+            'title': 'Games Coming Soon',
+            'message': 'Game database is being set up. Please check back later!'
+        })
+    
     try:
         games_list = Game.objects.all()
         paginator = Paginator(games_list, 9)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request, 'studio/games.html', {'page_obj': page_obj})
-    except:
+    except Exception as e:
+        print(f"Games view error: {e}")
         return render(request, 'studio/simple_message.html', {
             'title': 'Games Coming Soon',
             'message': 'Game database is being set up. Please check back later!'
@@ -48,24 +79,42 @@ def game_detail(request, pk):
         })
 
 def team(request):
-    try:
-        team_members = TeamMember.objects.all()
-    except:
-        team_members = []
+    team_members = []
+    
+    if MODELS_AVAILABLE and TeamMember:
+        try:
+            team_members = list(TeamMember.objects.all())
+        except Exception as e:
+            print(f"Team view error: {e}")
+            team_members = []
+    
     return render(request, 'studio/team.html', {'team_members': team_members})
 
 def contact(request):
+    if not FORMS_AVAILABLE or not ContactForm:
+        return render(request, 'studio/simple_message.html', {
+            'title': 'Contact Form Unavailable',
+            'message': 'Contact form is being set up. Please check back later!'
+        })
+    
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            contact_message = ContactMessage(
-                name=form.cleaned_data['name'],
-                email=form.cleaned_data['email'],
-                subject=form.cleaned_data['subject'],
-                message=form.cleaned_data['message']
-            )
-            contact_message.save()
-            messages.success(request, 'Your message has been sent successfully!')
+            if MODELS_AVAILABLE and ContactMessage:
+                try:
+                    contact_message = ContactMessage(
+                        name=form.cleaned_data['name'],
+                        email=form.cleaned_data['email'],
+                        subject=form.cleaned_data['subject'],
+                        message=form.cleaned_data['message']
+                    )
+                    contact_message.save()
+                    messages.success(request, 'Your message has been sent successfully!')
+                except Exception as e:
+                    print(f"Contact save error: {e}")
+                    messages.error(request, 'There was an error sending your message. Please try again later.')
+            else:
+                messages.info(request, 'Contact system is being set up. Your message cannot be saved right now.')
             return redirect('contact')
     else:
         form = ContactForm()
