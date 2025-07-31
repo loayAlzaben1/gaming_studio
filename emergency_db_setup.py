@@ -78,7 +78,15 @@ def create_essential_tables():
                     "thank_you_sent" bool NOT NULL,
                     "next_payment_date" datetime,
                     "paypal_subscription_id" varchar(100),
-                    "sponsor_tier_id" integer
+                    "sponsor_tier_id" integer,
+                    "donation_goal_id" integer
+                );
+                """),
+                ("django_session", """
+                CREATE TABLE "django_session" (
+                    "session_key" varchar(40) NOT NULL PRIMARY KEY,
+                    "session_data" text NOT NULL,
+                    "expire_date" datetime NOT NULL
                 );
                 """),
                 ("studio_userprofile", """
