@@ -68,6 +68,7 @@ def create_essential_tables():
                 ("studio_donation", """
                 CREATE TABLE "studio_donation" (
                     "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "user_id" bigint,
                     "donor_name" varchar(100) NOT NULL,
                     "donor_email" varchar(254),
                     "amount" decimal NOT NULL,
@@ -98,6 +99,7 @@ def create_essential_tables():
                     "target_amount" decimal NOT NULL,
                     "current_amount" decimal NOT NULL,
                     "is_active" bool NOT NULL,
+                    "start_date" datetime,
                     "created_at" datetime NOT NULL,
                     "updated_at" datetime NOT NULL
                 );
@@ -120,6 +122,7 @@ def create_essential_tables():
                     "icon" varchar(50),
                     "color" varchar(20),
                     "min_amount" decimal NOT NULL,
+                    "perks" text,
                     "created_at" datetime NOT NULL,
                     "updated_at" datetime NOT NULL
                 );
