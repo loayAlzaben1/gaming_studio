@@ -16,7 +16,7 @@
             <div class="text-center mb-6 sm:mb-8">
                 <div class="relative inline-block mb-3 sm:mb-4">
                     {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-20 sm:w-24 h-20 sm:h-24 rounded-full border-4 border-blue-500 object-cover">
+                        <img src="{{ profile.avatar.url }}" alt="<!-- User info removed -->" class="w-20 sm:w-24 h-20 sm:h-24 rounded-full border-4 border-blue-500 object-cover">
                     {% else %}
                         <div class="w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-4 border-blue-500">
                             <i class="fas fa-user text-white text-2xl sm:text-3xl"></i>
@@ -26,7 +26,7 @@
                         Lv.{{ profile.account_level }}
                     </div>
                 </div>
-                <h2 class="text-white font-bold text-lg sm:text-xl">{{ user.get_full_name|default:user.username }}</h2>
+                <h2 class="text-white font-bold text-lg sm:text-xl"><!-- User info removed --></h2>
                 {% if profile.current_tier %}
                     <div class="inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold mt-2" style="background-color: {{ profile.current_tier.color }}; color: white;">
                         <i class="{{ profile.current_tier.icon }} mr-1"></i>

@@ -173,16 +173,7 @@
                             <!-- Post Actions -->
                             <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-600/20">
                                 <div class="flex items-center space-x-4">
-                                    {% if user.is_authenticated %}
-                                        <button onclick="likePost({{ post.id }})" class="flex items-center space-x-1 text-sm text-gray-400 hover:text-red-400 transition duration-200">
-                                            <i class="fas fa-heart"></i>
-                                            <span id="likes-{{ post.id }}">{{ post.like_count }}</span>
-                                        </button>
-                                        <button onclick="quotePost({{ post.id }}, '{{ post.author.username|escapejs }}')" class="flex items-center space-x-1 text-sm text-gray-400 hover:text-blue-400 transition duration-200">
-                                            <i class="fas fa-quote-right"></i>
-                                            <span>Quote</span>
-                                        </button>
-                                    {% endif %}
+                                    <!-- User authentication removed -->
                                 </div>
                                 <div class="text-xs text-gray-500">
                                     {% if post.like_count > 0 %}

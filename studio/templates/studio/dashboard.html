@@ -14,7 +14,7 @@
                 <div class="flex items-center space-x-2">
                     <span class="text-sm text-gray-300">Level {{ profile.level|default:1 }}</span>
                     {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full border-2 border-blue-400">
+                        <img src="{{ profile.avatar.url }}" alt="<!-- User info removed -->" class="w-8 h-8 rounded-full border-2 border-blue-400">
                     {% else %}
                         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
                             <i class="fas fa-user text-white text-xs"></i>
@@ -29,8 +29,8 @@
         <!-- Welcome Section - Mobile Optimized -->
         <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg p-4 mb-4 border border-blue-400/30">
             <div class="text-center">
-                <h2 class="text-xl font-bold text-white mb-1">Welcome back, {{ user.first_name|default:user.username }}!</h2>
-                <p class="text-blue-200 text-sm">Gaming Studio Member since {{ user.date_joined|date:"M Y" }}</p>
+                <h2 class="text-xl font-bold text-white mb-1">Welcome back, <!-- User info removed -->!</h2>
+                <p class="text-blue-200 text-sm">Gaming Studio Member since <!-- User info removed --></p>
             </div>
         </div>
 
@@ -60,14 +60,14 @@
             <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg p-4 border border-blue-400/20">
                 <div class="flex items-center space-x-3">
                     {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-12 h-12 rounded-full border-2 border-blue-400">
+                        <img src="{{ profile.avatar.url }}" alt="<!-- User info removed -->" class="w-12 h-12 rounded-full border-2 border-blue-400">
                     {% else %}
                         <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-2 border-blue-400">
                             <i class="fas fa-user text-white"></i>
                         </div>
                     {% endif %}
                     <div class="flex-1">
-                        <h3 class="text-white font-bold text-sm">{{ user.get_full_name|default:user.username }}</h3>
+                        <h3 class="text-white font-bold text-sm"><!-- User info removed --></h3>
                         <p class="text-gray-300 text-xs">{{ profile.experience_points|default:0 }} XP</p>
                         <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
                             <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: {{ next_level_progress|default:0 }}%;"></div>

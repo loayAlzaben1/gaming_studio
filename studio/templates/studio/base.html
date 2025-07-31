@@ -424,15 +424,7 @@
                         <a href="{% url 'games' %}">All Games</a>
                         <a href="{% url 'games' %}?status=featured">Featured</a>
                         <a href="{% url 'games' %}?status=coming_soon">Upcoming</a>
-                        {% if user.is_authenticated %}
-                            <hr class="border-gray-600 my-1">
-                            <a href="{% url 'user_wishlist' %}">
-                                <i class="fas fa-heart mr-2 text-red-400"></i>My Wishlist
-                            </a>
-                            <a href="{% url 'game_collection_list' %}">
-                                <i class="fas fa-folder mr-2 text-blue-400"></i>Collections
-                            </a>
-                        {% endif %}
+                        <!-- User authentication removed -->
                     </div>
                 </div>
                 
@@ -440,41 +432,13 @@
                 <div class="dropdown relative">
                     <a href="#" class="hover:text-neon transition-colors duration-200 flex items-center">
                         Community
-                        {% if user.is_authenticated %}
-                            <span class="ml-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
-                                NEW
-                            </span>
-                        {% endif %}
+                        <!-- User authentication removed -->
                     </a>
                     <div class="dropdown-content min-w-56">
                         <a href="{% url 'community_showcase' %}">
                             <i class="fas fa-users mr-2 text-blue-400"></i>Community Hub
                         </a>
-                        {% if user.is_authenticated %}
-                            <hr class="border-gray-600 my-1">
-                            <div class="px-3 py-2 text-xs text-gray-400 font-semibold">REVIEW FEATURES</div>
-                            <a href="{% url 'review_hub' %}" class="text-yellow-300 hover:text-yellow-200">
-                                <i class="fas fa-star mr-2 text-yellow-400"></i>Write Reviews
-                            </a>
-                            <a href="{% url 'rating_hub' %}" class="text-purple-300 hover:text-purple-200">
-                                <i class="fas fa-chart-bar mr-2 text-purple-400"></i>Rate Games
-                            </a>
-                            <a href="{% url 'forum_hub' %}" class="text-green-300 hover:text-green-200">
-                                <i class="fas fa-comments mr-2 text-green-400"></i>Game Forums
-                            </a>
-                            <a href="{% url 'games' %}" class="text-red-300 hover:text-red-200" onclick="showDesktopToast('upload')">
-                                <i class="fas fa-upload mr-2 text-red-400"></i>Upload Content
-                            </a>
-                            <hr class="border-gray-600 my-1">
-                            <a href="{% url 'review_guide' %}" class="text-blue-300 hover:text-blue-200">
-                                <i class="fas fa-question-circle mr-2 text-blue-400"></i>Review Guide
-                            </a>
-                        {% else %}
-                            <hr class="border-gray-600 my-1">
-                            <a href="{% url 'account_login' %}" class="text-yellow-300">
-                                <i class="fas fa-sign-in-alt mr-2 text-yellow-400"></i>Login to Review
-                            </a>
-                        {% endif %}
+                        <!-- User authentication removed -->
                     </div>
                 </div>
                 
@@ -482,15 +446,7 @@
                 <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}text-neon{% else %}hover:text-neon{% endif %} transition-colors duration-200">Contact</a>
                 
                 <!-- Review Badge Button -->
-                {% if user.is_authenticated %}
-                    <a href="{% url 'review_guide' %}" class="relative bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center transform hover:scale-105">
-                        <i class="fas fa-star mr-2"></i>
-                        <span class="hidden xl:inline">Review</span>
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
-                            !
-                        </span>
-                    </a>
-                {% endif %}
+                <!-- User authentication removed -->
                 
                 <a href="{% url 'donate' %}" class="btn-neon flex items-center">
                     <i class="fas fa-heart mr-2 text-red-300"></i>
@@ -498,16 +454,7 @@
                 </a>
                 
                 <!-- Authentication Links -->
-                {% if user.is_authenticated %}
-                    <div class="dropdown relative">
-                        <a href="#" class="hover:text-neon transition-colors duration-200 flex items-center">
-                            <i class="fas fa-user-circle mr-1"></i>
-                            {{ user.get_full_name|default:user.username }}
-                            {% if user.profile.current_tier %}
-                                <span class="ml-1 text-xs px-2 py-1 rounded-full" style="background-color: {{ user.profile.current_tier.color }}; color: white;">
-                                    {{ user.profile.current_tier.get_name_display }}
-                                </span>
-                            {% endif %}
+                <!-- User authentication removed -->
                         </a>
                         <div class="dropdown-content">
                             <a href="{% url 'dashboard' %}">Dashboard</a>
@@ -578,19 +525,7 @@
                     
                     <!-- Community Section (Simplified) -->
                     <div class="border-t border-gray-600 my-2 pt-2">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'review_hub' %}" class="mobile-menu-link">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span>Reviews</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'account_login' %}" class="mobile-menu-link">
-                                <i class="fas fa-sign-in-alt text-blue-400"></i>
-                                <span>Login</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        {% endif %}
+                        <!-- User authentication removed -->
                     </div>
                     
                     <a href="{% url 'team' %}" class="mobile-menu-link {% if request.path == '/team/' %}active{% endif %}">
@@ -611,15 +546,7 @@
                     </a>
                     
                     <!-- Authentication Links for Mobile -->
-                    {% if user.is_authenticated %}
-                        <div class="border-t border-gray-600 my-4 pt-4">
-                            <div class="px-4 py-2 text-sm text-gray-300">
-                                Welcome, {{ user.get_full_name|default:user.username }}!
-                                {% if user.profile.current_tier %}
-                                    <span class="block text-xs mt-1" style="color: {{ user.profile.current_tier.color }};">
-                                        {{ user.profile.current_tier.get_name_display }} Supporter
-                                    </span>
-                                {% endif %}
+                    <!-- User authentication removed -->
                             </div>
                         </div>
                         <a href="{% url 'dashboard' %}" class="mobile-menu-link">
@@ -700,15 +627,7 @@
                 <div>
                     <h4 class="text-lg font-semibold text-white mb-4">Community</h4>
                     <ul class="space-y-2">
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'review_hub' %}" class="footer-link">Reviews</a></li>
-                            <li><a href="{% url 'forum_hub' %}" class="footer-link">Forums</a></li>
-                            <li><a href="{% url 'donate' %}" class="footer-link">Support Us</a></li>
-                        {% else %}
-                            <li><a href="{% url 'account_login' %}" class="footer-link">Join Community</a></li>
-                            <li><a href="{% url 'account_login' %}" class="footer-link">Reviews</a></li>
-                            <li><a href="{% url 'donate' %}" class="footer-link">Support Us</a></li>
-                        {% endif %}
+                        <!-- User authentication removed -->
                     </ul>
                 </div>
             </div>

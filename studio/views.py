@@ -279,13 +279,13 @@ def donate_success(request):
             donation.save()  # This will automatically set sponsor tier and send thank you email
             
             # Track user activity and award achievements if user is logged in
-            if request.user.is_authenticated:
+            if False:  # Authentication disabled
                 # Get or create user profile
-                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
                 
                 # Create activity record
                 UserActivity.objects.create(
-                    user=request.user,
+                    user=None  # No authentication,
                     activity_type='donation',
                     description=f'Made a ${amount:.2f} donation',
                     experience_gained=int(amount * 5)  # 5 XP per dollar donated
@@ -381,7 +381,7 @@ def dashboard(request):
     """Enhanced user dashboard with gaming stats, achievements, and donation history."""
     try:
         # Get or create user profile
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
         
         # Update login streak
         today = date.today()
@@ -407,15 +407,15 @@ def dashboard(request):
         print(f"Profile creation error: {e}")
         # Create a basic context for error cases
         return render(request, 'studio/dashboard_simple.html', {
-            'user': request.user,
+            'user': None  # No authentication,
             'error': 'Profile system temporarily unavailable'
         })
     
     # Calculate total donated and update profile
-    total_donated = Donation.objects.filter(donor_email=request.user.email).aggregate(
+    total_donated = Donation.objects.filter(donor_email="anonymous@example.com"  # No authentication).aggregate(
         total=Sum('amount'))['total'] or Decimal('0.00')
     
-    donation_count = Donation.objects.filter(donor_email=request.user.email).count()
+    donation_count = Donation.objects.filter(donor_email="anonymous@example.com"  # No authentication).count()
     
     if total_donated != profile.total_donated:
         profile.total_donated = total_donated
@@ -438,15 +438,15 @@ def dashboard(request):
         profile.save()
     
     # Get user's achievements
-    user_achievements = UserAchievement.objects.filter(user=request.user).select_related('achievement').order_by('-earned_date')
+    user_achievements = UserAchievement.objects.filter(user=None  # No authentication).select_related('achievement').order_by('-earned_date')
     showcased_achievements = user_achievements.filter(is_showcased=True)[:3]
     recent_achievements = user_achievements[:6]
     
     # Get recent donations
-    recent_donations = Donation.objects.filter(donor_email=request.user.email).order_by('-donated_at')[:5]
+    recent_donations = Donation.objects.filter(donor_email="anonymous@example.com"  # No authentication).order_by('-donated_at')[:5]
     
     # Get recent activities
-    recent_activities = UserActivity.objects.filter(user=request.user)[:10]
+    recent_activities = UserActivity.objects.filter(user=None  # No authentication)[:10]
     
     # Calculate stats
     total_experience = profile.experience_points
@@ -483,7 +483,7 @@ def dashboard(request):
 def profile_edit(request):
     """Enhanced profile editing with gaming features."""
     try:
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
         
         if request.method == 'POST':
             form = UserProfileForm(request.POST, request.FILES, instance=profile)
@@ -497,7 +497,7 @@ def profile_edit(request):
                     
                     # Create activity record
                     UserActivity.objects.create(
-                        user=request.user,
+                        user=None  # No authentication,
                         activity_type='profile_update',
                         description='Updated gaming profile with new information',
                         experience_gained=25
@@ -519,7 +519,7 @@ def profile_edit(request):
             form = UserProfileForm(instance=profile)
         
         # Get user achievements for showcase selection
-        user_achievements = UserAchievement.objects.filter(user=request.user).select_related('achievement').order_by('-earned_date')
+        user_achievements = UserAchievement.objects.filter(user=None  # No authentication).select_related('achievement').order_by('-earned_date')
         
         context = {
             'form': form,
@@ -543,16 +543,16 @@ def profile_view(request, username=None):
             profile = get_object_or_404(UserProfile, user=profile_user)
             
             # Check if profile is public or if it's the user's own profile
-            if not profile.is_profile_public and request.user != profile_user:
+            if not profile.is_profile_public and None  # No authentication != profile_user:
                 messages.error(request, "This profile is private.")
                 return redirect('dashboard')
             
             # Increment profile views (only if it's not the owner viewing)
-            if request.user != profile_user:
+            if None  # No authentication != profile_user:
                 profile.profile_views += 1
                 profile.save()
         else:
-            profile_user = request.user
+            profile_user = None  # No authentication
             profile, created = UserProfile.objects.get_or_create(user=profile_user)
         
         # Get user achievements
@@ -608,11 +608,11 @@ def follow_user(request, username):
         try:
             user_to_follow = get_object_or_404(User, username=username)
             
-            if user_to_follow == request.user:
+            if user_to_follow == None  # No authentication:
                 return JsonResponse({'error': 'Cannot follow yourself'})
             
             follow_relationship, created = UserFollow.objects.get_or_create(
-                follower=request.user,
+                follower=None  # No authentication,
                 following=user_to_follow
             )
             
@@ -628,14 +628,14 @@ def follow_user(request, username):
                 
                 # Create activity
                 UserActivity.objects.create(
-                    user=request.user,
+                    user=None  # No authentication,
                     activity_type='social',
                     description=f'Started following {user_to_follow.username}',
                     experience_gained=5
                 )
                 
                 # Add experience for social interaction
-                profile = UserProfile.objects.get(user=request.user)
+                profile = UserProfile.objects.get(user=None  # No authentication)
                 profile.add_experience(5)
             
             return JsonResponse({
@@ -654,10 +654,10 @@ def follow_user(request, username):
 def my_donations(request):
     """Display user's donation history."""
     try:
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
         
         # Get all donations for this user
-        user_donations = Donation.objects.filter(donor_email=request.user.email).order_by('-donated_at')
+        user_donations = Donation.objects.filter(donor_email="anonymous@example.com"  # No authentication).order_by('-donated_at')
         
         # Calculate total donated
         total_donated = user_donations.aggregate(total=Sum('amount'))['total'] or 0
@@ -675,7 +675,7 @@ def my_donations(request):
         print(f"My donations error: {e}")
         # Return simple donation history without profile dependencies
         try:
-            user_donations = Donation.objects.filter(donor_email=request.user.email).order_by('-donated_at')
+            user_donations = Donation.objects.filter(donor_email="anonymous@example.com"  # No authentication).order_by('-donated_at')
             total_donated = user_donations.aggregate(total=Sum('amount'))['total'] or 0
             
             context = {
@@ -695,13 +695,13 @@ def settings(request):
     """Enhanced user settings page with gaming profile integration."""
     try:
         # Get or create user profile
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
         
         # Get user's achievements count for display
-        achievements_count = UserAchievement.objects.filter(user=request.user).count()
+        achievements_count = UserAchievement.objects.filter(user=None  # No authentication).count()
         
         # Calculate total donated
-        total_donated = Donation.objects.filter(donor_email=request.user.email).aggregate(
+        total_donated = Donation.objects.filter(donor_email="anonymous@example.com"  # No authentication).aggregate(
             total=Sum('amount'))['total'] or Decimal('0.00')
         
         context = {
@@ -736,9 +736,9 @@ def game_detail(request, pk):
     
     # Get user's wishlist status if authenticated
     in_wishlist = False
-    if request.user.is_authenticated:
+    if False:  # Authentication disabled
         in_wishlist = GameWishlist.objects.filter(
-            user=request.user, game=game
+            user=None  # No authentication, game=game
         ).exists()
     
     # Get reviews for this game
@@ -775,10 +775,10 @@ def game_detail(request, pk):
     ugc_content = UserGeneratedContent.objects.filter(game=game, is_approved=True).select_related('user', 'user__profile').order_by('-created_at')[:10]
     
     # Add like information for authenticated users
-    if request.user.is_authenticated:
+    if False:  # Authentication disabled
         # Get user's likes for these content items
         user_likes = set(UGCLike.objects.filter(
-            user=request.user,
+            user=None  # No authentication,
             content__in=ugc_content
         ).values_list('content_id', flat=True))
         
@@ -792,11 +792,11 @@ def game_detail(request, pk):
     
     # Get user's own UGC content (even if not approved)
     user_ugc_content = []
-    if request.user.is_authenticated:
-        user_ugc_content = UserGeneratedContent.objects.filter(game=game, user=request.user).select_related('user', 'user__profile').order_by('-created_at')[:5]
+    if False:  # Authentication disabled
+        user_ugc_content = UserGeneratedContent.objects.filter(game=game, user=None  # No authentication).select_related('user', 'user__profile').order_by('-created_at')[:5]
     
     # Check if user can review (separate query to avoid slice issue)
-    user_can_review = request.user.is_authenticated and not CommunityGameReview.objects.filter(game=game, user=request.user).exists()
+    user_can_review = False  # Authentication disabled and not CommunityGameReview.objects.filter(game=game, user=None  # No authentication).exists()
     
     context = {
         'game': game,
@@ -818,7 +818,7 @@ def toggle_wishlist(request, pk):
     if request.method == 'POST':
         game = get_object_or_404(Game, pk=pk)
         wishlist_item, created = GameWishlist.objects.get_or_create(
-            user=request.user,
+            user=None  # No authentication,
             game=game,
             defaults={'priority': 2}
         )
@@ -845,7 +845,7 @@ def toggle_wishlist(request, pk):
 @login_required
 def user_wishlist(request):
     """Display user's wishlist."""
-    wishlist_items = GameWishlist.objects.filter(user=request.user).select_related('game').order_by('-priority', '-added_at')
+    wishlist_items = GameWishlist.objects.filter(user=None  # No authentication).select_related('game').order_by('-priority', '-added_at')
     
     # Group by priority
     high_priority = wishlist_items.filter(priority=4)
@@ -864,7 +864,7 @@ def user_wishlist(request):
 @login_required
 def game_collection_list(request):
     """Display user's game collections."""
-    collections = GameCollection.objects.filter(user=request.user).prefetch_related('games').order_by('-updated_at')
+    collections = GameCollection.objects.filter(user=None  # No authentication).prefetch_related('games').order_by('-updated_at')
     
     # Get collection stats
     total_games = sum(collection.games.count() for collection in collections)
@@ -887,7 +887,7 @@ def create_game_collection(request):
         
         if name:
             collection = GameCollection.objects.create(
-                user=request.user,
+                user=None  # No authentication,
                 name=name,
                 description=description,
                 collection_type=collection_type,
@@ -903,7 +903,7 @@ def create_game_collection(request):
 # Game Analytics Views (for future admin dashboard)
 def game_analytics_summary(request):
     """Basic analytics summary for games."""
-    if not request.user.is_staff:
+    if not None  # No authentication.is_staff:
         return redirect('home')
     
     from django.db.models import Avg, Count
@@ -935,13 +935,13 @@ def game_analytics_summary(request):
 def write_review(request, game_id):
     """Write or edit a game review with detailed ratings"""
     game = get_object_or_404(Game, id=game_id)
-    existing_review = CommunityGameReview.objects.filter(user=request.user, game=game).first()
+    existing_review = CommunityGameReview.objects.filter(user=None  # No authentication, game=game).first()
     
     if request.method == 'POST':
         form = CommunityGameReviewForm(request.POST, instance=existing_review)
         if form.is_valid():
             review = form.save(commit=False)
-            review.user = request.user
+            review.user = None  # No authentication
             review.game = game
             review.save()
             
@@ -949,10 +949,10 @@ def write_review(request, game_id):
             game.update_average_rating()
             
             # Award achievement and experience
-            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
             if not existing_review:  # Only for new reviews
                 UserActivity.objects.create(
-                    user=request.user,
+                    user=None  # No authentication,
                     activity_type='review',
                     description=f'Reviewed {game.title}',
                     experience_gained=50
@@ -1009,8 +1009,8 @@ def game_forum(request, game_id):
     
     # Get user's topics if authenticated
     user_topics = []
-    if request.user.is_authenticated:
-        user_topics = forum.topics.filter(author=request.user).order_by('-created_at')[:5]
+    if False:  # Authentication disabled
+        user_topics = forum.topics.filter(author=None  # No authentication).order_by('-created_at')[:5]
     
     # Get topic categories for filtering
     topic_categories = [
@@ -1049,13 +1049,13 @@ def create_topic(request, forum_id):
             try:
                 topic = form.save(commit=False)
                 topic.forum = forum
-                topic.author = request.user
+                topic.author = None  # No authentication
                 topic.save()
                 
                 # Award experience for community participation
-                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
                 UserActivity.objects.create(
-                    user=request.user,
+                    user=None  # No authentication,
                     activity_type='forum',
                     description=f'Started discussion: {topic.title}',
                     experience_gained=25
@@ -1091,18 +1091,18 @@ def forum_topic(request, topic_id):
     topic.view_count += 1
     topic.save(update_fields=['view_count'])
     
-    if request.method == 'POST' and request.user.is_authenticated:
+    if request.method == 'POST' and False  # Authentication disabled:
         form = ForumPostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.topic = topic
-            post.author = request.user
+            post.author = None  # No authentication
             post.save()
             topic.updated_at = timezone.now()
             topic.save(update_fields=['updated_at'])
             
             # Award experience for participation
-            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
             profile.add_experience(10)
             
             return redirect('forum_topic', topic_id=topic.id)
@@ -1124,11 +1124,11 @@ def add_comment(request, content_type, object_id):
             comment = form.save(commit=False)
             comment.content_type = content_type
             comment.object_id = object_id
-            comment.author = request.user
+            comment.author = None  # No authentication
             comment.save()
             
             # Award experience for engagement
-            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
             profile.add_experience(5)
             
             # Redirect back to the content
@@ -1148,14 +1148,14 @@ def upload_ugc(request, game_id):
         form = UGCForm(request.POST, request.FILES)
         if form.is_valid():
             ugc = form.save(commit=False)
-            ugc.user = request.user
+            ugc.user = None  # No authentication
             ugc.game = game
             ugc.save()
             
             # Award experience for content creation
-            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
             UserActivity.objects.create(
-                user=request.user,
+                user=None  # No authentication,
                 activity_type='ugc',
                 description=f'Uploaded {ugc.get_content_type_display()}: {ugc.title}',
                 experience_gained=75
@@ -1201,9 +1201,9 @@ def review_hub(request):
     # Get recent reviews if user is authenticated
     recent_reviews = None
     user_reviews_count = 0
-    if request.user.is_authenticated:
-        recent_reviews = CommunityGameReview.objects.filter(user=request.user).order_by('-created_at')[:5]
-        user_reviews_count = CommunityGameReview.objects.filter(user=request.user).count()
+    if False:  # Authentication disabled
+        recent_reviews = CommunityGameReview.objects.filter(user=None  # No authentication).order_by('-created_at')[:5]
+        user_reviews_count = CommunityGameReview.objects.filter(user=None  # No authentication).count()
     
     return render(request, 'studio/review_hub.html', {
         'games': games,
@@ -1219,9 +1219,9 @@ def rating_hub(request):
     # Get user's recent ratings
     user_ratings = None
     user_ratings_count = 0
-    if request.user.is_authenticated:
-        user_ratings = AdvancedGameRating.objects.filter(user=request.user).order_by('-created_at')[:5]
-        user_ratings_count = AdvancedGameRating.objects.filter(user=request.user).count()
+    if False:  # Authentication disabled
+        user_ratings = AdvancedGameRating.objects.filter(user=None  # No authentication).order_by('-created_at')[:5]
+        user_ratings_count = AdvancedGameRating.objects.filter(user=None  # No authentication).count()
     
     return render(request, 'studio/rating_hub.html', {
         'games': games,
@@ -1239,8 +1239,8 @@ def forum_hub(request):
         'recent_posts': recent_posts,
     }
     
-    if request.user.is_authenticated:
-        context['user_posts_count'] = ForumTopic.objects.filter(author=request.user).count()
+    if False:  # Authentication disabled
+        context['user_posts_count'] = ForumTopic.objects.filter(author=None  # No authentication).count()
     
     return render(request, 'studio/forum_hub.html', context)
 
@@ -1248,13 +1248,13 @@ def forum_hub(request):
 def rate_game(request, game_id):
     """Advanced game rating with multiple categories"""
     game = get_object_or_404(Game, id=game_id)
-    existing_rating = AdvancedGameRating.objects.filter(user=request.user, game=game).first()
+    existing_rating = AdvancedGameRating.objects.filter(user=None  # No authentication, game=game).first()
     
     if request.method == 'POST':
         form = AdvancedGameRatingForm(request.POST, instance=existing_rating)
         if form.is_valid():
             rating = form.save(commit=False)
-            rating.user = request.user
+            rating.user = None  # No authentication
             rating.game = game
             rating.save()
             
@@ -1262,7 +1262,7 @@ def rate_game(request, game_id):
             game.update_average_rating()
             
             # Award experience
-            profile, created = UserProfile.objects.get_or_create(user=request.user)
+            profile, created = UserProfile.objects.get_or_create(user=None  # No authentication)
             if not existing_rating:
                 profile.add_experience(25)
                 profile.award_achievement('game_rater')
@@ -1287,7 +1287,7 @@ def like_review(request, review_id):
     if request.method == 'POST':
         review = get_object_or_404(CommunityGameReview, id=review_id)
         helpful, created = ReviewHelpful.objects.get_or_create(
-            user=request.user,
+            user=None  # No authentication,
             review=review,
             defaults={'is_helpful': True}
         )
@@ -1313,7 +1313,7 @@ def like_ugc(request, content_id):
     if request.method == 'POST':
         content = get_object_or_404(UserGeneratedContent, id=content_id)
         like, created = UGCLike.objects.get_or_create(
-            user=request.user,
+            user=None  # No authentication,
             content=content
         )
         
@@ -1340,7 +1340,7 @@ def like_comment(request, comment_id):
         is_like = request.POST.get('is_like', 'true') == 'true'
         
         like, created = CommentLike.objects.get_or_create(
-            user=request.user,
+            user=None  # No authentication,
             comment=comment,
             defaults={'is_like': is_like}
         )

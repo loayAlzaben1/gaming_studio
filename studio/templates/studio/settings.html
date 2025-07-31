@@ -18,7 +18,7 @@
             <div class="text-center mb-4 sm:mb-6">
                 <div class="relative inline-block mb-3 sm:mb-4">
                     {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="w-16 sm:w-20 h-16 sm:h-20 rounded-full border-4 border-blue-500 object-cover">
+                        <img src="{{ profile.avatar.url }}" alt="<!-- User info removed -->" class="w-16 sm:w-20 h-16 sm:h-20 rounded-full border-4 border-blue-500 object-cover">
                     {% else %}
                         <div class="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border-4 border-blue-500">
                             <i class="fas fa-user text-white text-lg sm:text-2xl"></i>
@@ -28,8 +28,8 @@
                         Lv.{{ profile.account_level|default:"1" }}
                     </div>
                 </div>
-                <h2 class="text-white font-bold text-lg sm:text-xl">{{ user.get_full_name|default:user.username }}</h2>
-                <p class="text-gray-400 text-sm">Member since {{ user.date_joined|date:"F Y" }}</p>
+                <h2 class="text-white font-bold text-lg sm:text-xl"><!-- User info removed --></h2>
+                <p class="text-gray-400 text-sm">Member since <!-- User info removed --></p>
             </div>
 
             <!-- Settings Categories -->
@@ -43,19 +43,19 @@
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Username:</span>
-                            <span class="text-white font-medium">{{ user.username }}</span>
+                            <span class="text-white font-medium"><!-- User info removed --></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Email:</span>
-                            <span class="text-white font-medium truncate ml-2">{{ user.email }}</span>
+                            <span class="text-white font-medium truncate ml-2"><!-- User info removed --></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">First Name:</span>
-                            <span class="text-white font-medium">{{ user.first_name|default:"Not Set" }}</span>
+                            <span class="text-white font-medium"><!-- User info removed --></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Last Name:</span>
-                            <span class="text-white font-medium">{{ user.last_name|default:"Not Set" }}</span>
+                            <span class="text-white font-medium"><!-- User info removed --></span>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -73,7 +73,7 @@
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Primary Email:</span>
-                            <span class="text-white font-medium truncate ml-2">{{ user.email }}</span>
+                            <span class="text-white font-medium truncate ml-2"><!-- User info removed --></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Email Verified:</span>
@@ -103,7 +103,7 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Last Changed:</span>
-                            <span class="text-gray-400 text-xs">{{ user.last_login|date:"M d, Y"|default:"Never" }}</span>
+                            <span class="text-gray-400 text-xs"><!-- User info removed --></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">Two-Factor Auth:</span>

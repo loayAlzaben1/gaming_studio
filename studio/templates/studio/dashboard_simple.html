@@ -14,7 +14,7 @@
         {% endif %}
         
         <div class="text-center mb-6">
-            <h2 class="text-xl font-semibold">Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+            <h2 class="text-xl font-semibold">Welcome, <!-- User info removed -->!</h2>
             <p class="text-gray-300 mt-2">Your gaming profile is being set up. Please check back shortly.</p>
         </div>
         
@@ -31,9 +31,9 @@
             <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4">
                 <h3 class="text-lg font-semibold mb-2">Account</h3>
                 <div class="space-y-2">
-                    <p class="text-gray-300">Username: {{ user.username }}</p>
-                    <p class="text-gray-300">Email: {{ user.email }}</p>
-                    <p class="text-gray-300">Member since: {{ user.date_joined|date:"F Y" }}</p>
+                    <p class="text-gray-300">Username: <!-- User info removed --></p>
+                    <p class="text-gray-300">Email: <!-- User info removed --></p>
+                    <p class="text-gray-300">Member since: <!-- User info removed --></p>
                 </div>
             </div>
         </div>

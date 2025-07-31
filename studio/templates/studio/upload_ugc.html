@@ -184,20 +184,7 @@
         </div>
 
         <!-- Recent Uploads Preview -->
-        {% if user.is_authenticated %}
-        <div class="mt-12">
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center">
-                <i class="fas fa-history text-blue-400 mr-2"></i>Your Recent Uploads
-            </h2>
-            {% if user_recent_uploads %}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {% for upload in user_recent_uploads %}
-                    <div class="bg-gray-800/60 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-600/20">
-                        {% if upload.image %}
-                            <div class="h-32 overflow-hidden">
-                                <img src="{{ upload.image.url }}" alt="{{ upload.title }}" class="w-full h-full object-cover">
-                            </div>
-                        {% endif %}
+        <!-- User authentication removed -->
                         <div class="p-3">
                             <h4 class="text-white font-semibold mb-1 line-clamp-1">{{ upload.title }}</h4>
                             <p class="text-gray-400 text-sm mb-2">{{ upload.game.title }}</p>
